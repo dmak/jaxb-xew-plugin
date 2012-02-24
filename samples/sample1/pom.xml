@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.jaxb-xew-plugin</groupId>
+	<artifactId>sample1</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.8.1</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<verbose>true</verbose>
+							<generateDirectory>${project.build.sourceDirectory}</generateDirectory>
+							<schemaDirectory>xsd</schemaDirectory>
+							<removeOldOutput>false</removeOldOutput>
+							<episode>false</episode>
+
+							<extension>true</extension>
+							<args>
+								<arg>-no-header</arg>
+								<arg>-Xxew</arg>
+								<arg>-Xxew:instantiate lazy</arg>
+								<arg>-Xxew:delete</arg>
+							</args>
+							<plugins>
+								<plugin>
+									<groupId>com.github.jaxb-xew-plugin</groupId>
+									<artifactId>jaxb-xew-plugin</artifactId>
+									<version>1.0</version>
+								</plugin>
+							</plugins>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+        </plugins>
+    </build>
+</project>
