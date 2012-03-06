@@ -134,6 +134,8 @@ The following options are applicable for plugin:
 
 ### Ant task
 
+First you need to download the plugin jar (for example, from [Maven repository](http://mirrors.ibiblio.org/pub/mirrors/maven2/com/github/jaxb-xew-plugin/jaxb-xew-plugin)) and put it to your project `lib` folder.
+
 To use the plugin from Ant you will need something like the following in your build file:
 
     <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
@@ -190,3 +192,61 @@ To use the plugin from Ant you will need something like the following in your bu
     </plugin>
 
 You can find more examples of this plugin in `samples` directory.
+
+## Contribution
+
+If you have time and desire to contribute to this project you can do it in many ways:
+
+* Improve this very documentation.
+* Implement Unit tests.
+* Provide more samples.
+
+### Development
+
+Everybody is very welcomed to send patches by email. But the best way would be:
+
+- Fork the repository
+- Apply the formatting rules (the ones for Eclipse can be found in [`dist`](https://github.com/dmak/jaxb-xew-plugin/tree/master/dist) folder)
+- Do the changes
+- Commit to your own fork
+- [Request for pull](http://help.github.com/send-pull-requests/)
+
+#### Code style
+
+* There are no specific coding and naming conventions for this project except ones given in [Code Conventions for the Java Programming Language](http://www.oracle.com/technetwork/java/codeconv-138413.html) by Sun. Use best practices and common sense.
+* For [code formatting](https://github.com/dmak/jaxb-xew-plugin/tree/master/dist/eclipse-code-fomatting-rules.xml) basically Eclipse build-in formatting rules were used with following changes:
+
+- Indentation -> Align fields on columns: on
+- Indentation -> Tab policy: Mixed
+- Indentation -> Use spaces to indent wrapped lines: on
+- Line Warpping -> Maximum line width: 120
+- Line Warpping -> Default identation for wrapped lines: 3
+- Comments -> Maximum line width for comments: 120
+- Comments -> Enable line comment formatting: off
+- New Lines -> Insert new line in empty anonymous class body: off
+- New Lines -> Insert new line in empty block: off
+
+### Algorithm description
+
+The plugin flow consists of the following parts: 
+
+* Parse arguments.
+* Find classes which are candidates for removal:
+  1. The candidate class must have exactly one property
+  2. The candidate class should not extend any other class (as the total number of properties will be more than 1)
+* Visit all classes again to check if the candidate is not eligible for removal:
+  1. If there are classes that extend the candidate
+  2. If there are class fields, that refer the candidate by e.g. @XmlElementRef annotation
+* Visit all classes again to replace the property having the candidate class type with collection plus @XmlElementWrapper annotation. On this step getters/setters are update and ObjectFactory methods are corrected. Also lazy initialization policy is applied.
+* Candidates which are still marked for removal are finally removed (and ObjectFactory is updated accordingly).
+
+
+## Authors
+
+Original code by [Bjarne Hansen](http://www.conspicio.dk/blog/bjarne/jaxb-xmlelementwrapper-plugin). Committers:
+
+* [Dmitry Katsubo](http://www.linkedin.com/in/dkatsubo)
+
+## License
+
+The whole project is licensed under LGPLv3 (or any later version).
