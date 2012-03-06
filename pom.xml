@@ -17,6 +17,7 @@
 	<name>JAXB @XmlElementWrapper Plugin</name>
 	<inceptionYear>2012</inceptionYear>
 	<description>This JAXB plugin utilizes the power of @XmlElementWrapper annotation. Originally xjc trends to create wrapper classes which are the containers for collections. This plugin goes through all properties to find ones which can be represented in the model in more optimal way.</description>
+	<url>https://github.com/dmak/jaxb-xew-plugin</url>
 
 	<scm>
 		<url>https://github.com/dmak/jaxb-xew-plugin</url>
@@ -33,8 +34,40 @@
 		<license>
 			<name>LGPLv3 License</name>
 			<url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
+			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+	<profiles>
+		<profile>
+			<id>stage-release</id>
+
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>versions-maven-plugin</artifactId>
+							<version>1.2</version>
+							<configuration>
+								<generateBackupPoms>false</generateBackupPoms>
+							</configuration>
+						</plugin>
+						<plugin>
+							<artifactId>maven-release-plugin</artifactId>
+							<version>2.2.2</version>
+							
+							<configuration>
+								<autoVersionSubmodules>true</autoVersionSubmodules>
+								<tagNameFormat>@{project.version}</tagNameFormat>
+								<preparationGoals>versions:update-parent clean verify</preparationGoals>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
 
 	<developers>
 		<developer>
