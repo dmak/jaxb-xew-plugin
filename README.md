@@ -215,16 +215,15 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 
 * There are no specific coding and naming conventions for this project except ones given in [Code Conventions for the Java Programming Language](http://www.oracle.com/technetwork/java/codeconv-138413.html) by Sun. Use best practices and common sense.
 * For [code formatting](https://github.com/dmak/jaxb-xew-plugin/tree/master/dist/eclipse-code-fomatting-rules.xml) basically Eclipse build-in formatting rules were used with following changes:
-
-- Indentation -> Align fields on columns: on
-- Indentation -> Tab policy: Mixed
-- Indentation -> Use spaces to indent wrapped lines: on
-- Line Warpping -> Maximum line width: 120
-- Line Warpping -> Default identation for wrapped lines: 3
-- Comments -> Maximum line width for comments: 120
-- Comments -> Enable line comment formatting: off
-- New Lines -> Insert new line in empty anonymous class body: off
-- New Lines -> Insert new line in empty block: off
+  - Indentation → Align fields on columns: on
+  - Indentation → Tab policy: Mixed
+  - Indentation → Use spaces to indent wrapped lines: on
+  - Line Wrapping → Maximum line width: 120
+  - Line Wrapping → Default indentation for wrapped lines: 3
+  - Comments → Maximum line width for comments: 120
+  - Comments → Enable line comment formatting: off
+  - New Lines → Insert new line in empty anonymous class body: off
+  - New Lines → Insert new line in empty block: off
 
 ### Algorithm description
 
@@ -236,10 +235,9 @@ The plugin flow consists of the following parts:
   2. The candidate class should not extend any other class (as the total number of properties will be more than 1)
 * Visit all classes again to check if the candidate is not eligible for removal:
   1. If there are classes that extend the candidate
-  2. If there are class fields, that refer the candidate by e.g. @XmlElementRef annotation
-* Visit all classes again to replace the property having the candidate class type with collection plus @XmlElementWrapper annotation. On this step getters/setters are update and ObjectFactory methods are corrected. Also lazy initialization policy is applied.
+  2. If there are class fields, that refer the candidate by e.g. `@XmlElementRef` annotation
+* Visit all classes again to replace the property having the candidate class type with collection plus `@XmlElementWrapper` annotation. On this step getters/setters are update and ObjectFactory methods are corrected. Also lazy initialization policy is applied.
 * Candidates which are still marked for removal are finally removed (and ObjectFactory is updated accordingly).
-
 
 ## Authors
 
@@ -249,4 +247,4 @@ Original code by [Bjarne Hansen](http://www.conspicio.dk/blog/bjarne/jaxb-xmlele
 
 ## License
 
-The whole project is licensed under LGPLv3 (or any later version).
+The whole project is licensed under [LGPLv3](http://www.gnu.org/licenses/lgpl-3.0.html) (or any later version).
