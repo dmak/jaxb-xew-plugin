@@ -225,6 +225,57 @@ Everybody is very welcomed to send patches by email. But the best way would be:
   - New Lines → Insert new line in empty anonymous class body: off
   - New Lines → Insert new line in empty block: off
 
+#### Release procedure
+
+* Read [Sonatype OSS Maven Repository Usage Guide](https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide) from cover to cover.
+* Use the following `settings.xml` for your Maven:
+
+    <settings>
+    	<!-- Optional proxy configuration (if applicable to your environment) -->
+    	<proxies>
+    		<proxy>
+    			<active>true</active>
+    			<protocol>http</protocol>
+    			<host>proxy</host>
+    			<port>8080</port>
+    			<nonProxyHosts>*.internal.domain</nonProxyHosts>
+    		</proxy>
+    		<proxy>
+    			<active>true</active>
+    			<protocol>https</protocol>
+    			<host>proxy</host>
+    			<port>8080</port>
+    			<nonProxyHosts>*.internal.domain</nonProxyHosts>
+    		</proxy>
+    	</proxies>
+    
+    	<servers>
+    		<server>
+    			<id>sonatype-nexus-snapshots</id>
+    			<username>...sonatype_user...</username>
+    			<password>...sonatype_password...</password>
+    		</server>
+    		<server>
+    			<id>sonatype-nexus-staging</id>
+    			<username>...sonatype_user...</username>
+    			<password>...sonatype_password...</password>
+    		</server>
+    	</servers>
+    
+    	<profiles>
+    		<profile>
+    			<id>gpg</id>
+    			<properties>
+    				<gpg.passphrase>...passphrase...</gpg.passphrase>
+    			</properties>
+    		</profile>
+    	</profiles>
+    </settings>
+
+* For Hudson freestyle job specify:
+  * Pre-release step `git checkout master; git reset --hard origin/master` (see [http://stackoverflow.com/questions/1877027](Can't get automated release working with Hudson + Git + Maven Release Plugin) for more details about the problem).
+  * Next step (release): `release:prepare release:perform -Pstage-release -Pgpg -Dresume=false -Dusername=...github_user... -Dpassword=...github_password...`
+
 ### Algorithm description
 
 The plugin flow consists of the following parts: 
