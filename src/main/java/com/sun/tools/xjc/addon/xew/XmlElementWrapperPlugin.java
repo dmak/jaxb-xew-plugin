@@ -478,7 +478,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		// We cannot remove candidates that have parent classes, but we can still substitute them:
 		if (parentClass != null) {
-			Candidate candidate = candidates.get(parentClass.name());
+			Candidate candidate = candidates.get(parentClass.fullName());
 
 			if (candidate != null) {
 				writeDebug("Candidate " + candidate.getClassName() + " is a parent of " + implementationClass.name()
