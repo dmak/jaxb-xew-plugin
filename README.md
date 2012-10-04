@@ -191,7 +191,7 @@ To use the plugin from Ant you will need something like the following in your bu
     	</executions>
     </plugin>
 
-You can find more examples of this plugin in `samples` directory.
+You can find more examples of this plugin in `samples` directory, including how to call this plugin from jaxws:wsimport.
 
 ## Contribution
 
