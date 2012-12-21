@@ -380,19 +380,23 @@ public class XmlElementWrapperPlugin extends Plugin {
 					xmlElementWrapperAnnotation.param("required", true);
 				}
 
-				String namespace = getXmlNamespace(originalImplField);
-				if (namespace != null) {
-					xmlElementWrapperAnnotation.param("namespace", namespace);
+				// Namespace of the wrapper element
+				String wrapperNamespace = getXmlNamespace(originalImplField);
+				if (wrapperNamespace != null) {
+					xmlElementWrapperAnnotation.param("namespace", wrapperNamespace);
 				}
 
 				// Annotate the new field with the @XmlElement annotation using the field name from the wrapped type as name.
 				JAnnotationUse xmlElementAnnotation = implField.annotate(XmlElement.class);
 				xmlElementAnnotation.param("name", candidate.getXmlElementName());
-				// TODO: The below assumption that the element belongs to the same namespace as the wrapper element,
-				// is not generally true for all cases (but I not know any real example proving that).
-				// If you know the better way to detect it, put it here:
+
+				// Namespace of the element itself
+				String namespace = getXmlNamespace(candidate.getDefinedClass().fields().get(candidate.getFieldName()));
 				if (namespace != null) {
 					xmlElementAnnotation.param("namespace", namespace);
+				}
+				else if (wrapperNamespace != null) {
+					xmlElementAnnotation.param("namespace", wrapperNamespace);
 				}
 
 				// -- debug info
