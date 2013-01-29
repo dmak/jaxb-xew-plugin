@@ -49,7 +49,7 @@ public class XmlElementWrapperPluginTest {
 	 */
 	@Test
 	public void testSimpleStartTestWithOutXEW() throws Throwable {
-		assertEquals(3, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_without_xew", false, null, "Order.java", "ObjectFactory.java", "Items.java"));
+		assertEquals(3, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_without_xew", false, "src/test/resources/com/sun/tools/xjc/addon/xew/sample_without_xew_java", "Order.java", "ObjectFactory.java", "Items.java"));
 	}
 
 	/**
