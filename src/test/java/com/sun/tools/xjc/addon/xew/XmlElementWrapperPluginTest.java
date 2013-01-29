@@ -41,7 +41,7 @@ public class XmlElementWrapperPluginTest {
 	 */
 	@Test
 	public void testSimpleStartTestWithXEW() throws Throwable {
-		assertEquals(2, assertXsd(this.getClass().getResource("sample.xsd").toString(),"sample_with_xew",true,"src/test/resources/com/sun/tools/xjc/addon/xew/","Order.java","ObjectFactory.java"));
+		assertEquals(2, assertXsd(this.getClass().getResource("sample.xsd").toString(),"sample_with_xew",true,"src/test/resources/com/sun/tools/xjc/addon/xew/sample_java","Order.java","ObjectFactory.java"));
 	}
 
 	/**
@@ -77,7 +77,6 @@ public class XmlElementWrapperPluginTest {
 		}
 
 		String[] list = new File(target, "generated").list();
-		assertEquals(2, list.length);
 
 		List<String> l = Arrays.asList(list);
 
@@ -86,9 +85,7 @@ public class XmlElementWrapperPluginTest {
 		}
 
 		if (compareDir != null) {
-			File compDir = new File(compareDir);
 			for (String ftoc : filesToCheck) {
-				assertTrue(l.contains(ftoc));
 				//To avoid Linefeed conflicts.
 				assertEquals(FileUtils.readLines(new File(compareDir, ftoc)),
 						FileUtils.readLines(new File(target, "generated/" + ftoc)));
