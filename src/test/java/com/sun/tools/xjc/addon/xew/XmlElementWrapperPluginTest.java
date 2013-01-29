@@ -41,7 +41,7 @@ public class XmlElementWrapperPluginTest {
 	 */
 	@Test
 	public void testSimpleStartTestWithXEW() throws Throwable {
-		assertEquals(2, assertXsd(this.getClass().getResource("sample.xsd").toString(),"sample_with_xew",true,"src/test/resources/com/sun/tools/xjc/addon/xew/sample_java","Order.java","ObjectFactory.java"));
+		assertEquals(2, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_with_xew", true, "src/test/resources/com/sun/tools/xjc/addon/xew/sample_java", "Order.java", "ObjectFactory.java"));
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class XmlElementWrapperPluginTest {
 	 */
 	@Test
 	public void testSimpleStartTestWithOutXEW() throws Throwable {
-		assertEquals(3, assertXsd(this.getClass().getResource("sample.xsd").toString(),"sample_without_xew",false,null,"Order.java","ObjectFactory.java","Items.java"));
+		assertEquals(3, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_without_xew", false, null, "Order.java", "ObjectFactory.java", "Items.java"));
 	}
 
 	/**
@@ -71,9 +71,9 @@ public class XmlElementWrapperPluginTest {
 		target.mkdirs();
 
 		if (useXEWPlugin) {
-			Driver.run(new String[]{"-no-header", "-Xxew", "-Xxew:instantiate lazy", "-Xxew:delete", "-d", target.getPath(), xsdUrl}, System.out, System.out);
+			Driver.run(new String[]{"-verbose", "-no-header", "-Xxew", "-Xxew:instantiate lazy", "-Xxew:delete", "-d", target.getPath(), xsdUrl}, System.out, System.out);
 		} else {
-			Driver.run(new String[]{"-no-header", "-d", target.getPath(), xsdUrl}, System.out, System.out);
+			Driver.run(new String[]{"-verbose", "-no-header", "-d", target.getPath(), xsdUrl}, System.out, System.out);
 		}
 
 		String[] list = new File(target, "generated").list();
