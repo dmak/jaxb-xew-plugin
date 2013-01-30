@@ -15,7 +15,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
+ * Testcases for the XEW Plugin
  * @author Tobias Warneke
  */
 public class XmlElementWrapperPluginTest {
@@ -51,6 +51,11 @@ public class XmlElementWrapperPluginTest {
 	public void testSimpleStartTestWithOutXEW() throws Throwable {
 		assertEquals(3, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_without_xew", false, "src/test/jaxb_resources/com/sun/tools/xjc/addon/xew/sample_without_xew_java", "Order.java", "ObjectFactory.java", "Items.java"));
 	}
+	
+	@Test
+	public void testSimpleSpecialCase() throws Throwable {
+		assertEquals(2, assertXsd(this.getClass().getResource("sample_specialcase.xsd").toString(), "sample_specialcase", true, "src/test/jaxb_resources/com/sun/tools/xjc/addon/xew/sample_specialcase_java", "AXTest.java", "ObjectFactory.java"));
+	}
 
 	/**
 	 * Stanardtest for XSD examples.
@@ -59,7 +64,7 @@ public class XmlElementWrapperPluginTest {
 	 * @param generateDir subfolder of target/test/generated-xsd-classes where
 	 * java - files are created
 	 * @param useXEWPlugin creating with or without XEW plugin
-	 * @param compareDir Exected sourcecodefiles. To content check will be done,
+	 * @param compareDir Exected sourcecodefiles. No content check will be done,
 	 * if this is null.
 	 * @param filesToCheck Expected files in generation dir. These files content
 	 * is checked, when compareDir is set.
