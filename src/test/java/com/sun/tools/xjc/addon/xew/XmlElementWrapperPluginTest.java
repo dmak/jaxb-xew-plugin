@@ -41,7 +41,7 @@ public class XmlElementWrapperPluginTest {
 	 */
 	@Test
 	public void testSimpleStartTestWithXEW() throws Throwable {
-		assertEquals(2, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_with_xew", true, "src/test/resources/com/sun/tools/xjc/addon/xew/sample_java", "Order.java", "ObjectFactory.java"));
+		assertEquals(2, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_with_xew", true, "src/test/jaxb_resources/com/sun/tools/xjc/addon/xew/sample_java", "Order.java", "ObjectFactory.java"));
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class XmlElementWrapperPluginTest {
 	 */
 	@Test
 	public void testSimpleStartTestWithOutXEW() throws Throwable {
-		assertEquals(3, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_without_xew", false, "src/test/resources/com/sun/tools/xjc/addon/xew/sample_without_xew_java", "Order.java", "ObjectFactory.java", "Items.java"));
+		assertEquals(3, assertXsd(this.getClass().getResource("sample.xsd").toString(), "sample_without_xew", false, "src/test/jaxb_resources/com/sun/tools/xjc/addon/xew/sample_without_xew_java", "Order.java", "ObjectFactory.java", "Items.java"));
 	}
 
 	/**
