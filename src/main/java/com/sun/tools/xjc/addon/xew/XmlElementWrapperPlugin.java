@@ -391,7 +391,24 @@ public class XmlElementWrapperPlugin extends Plugin {
 				// TODO: The below assumption that the element belongs to the same namespace as the wrapper element,
 				// is not generally true for all cases (but I not know any real example proving that).
 				// If you know the better way to detect it, put it here:
-				if (namespace != null) {
+
+				// The preferred namespace name comes from the wrapped
+				String wrapperNamespace = null;
+				if (field.getRawType() instanceof JDefinedClass)
+				{
+					JDefinedClass jdc = (JDefinedClass) field.getRawType();
+					Map<String, JFieldVar> jdcFields = jdc.fields();
+					if (jdcFields.size() == 1) // we only expect one field in wrapper classes (or we could pull out by expected name?)
+					{
+						JFieldVar jfieldVar = jdcFields.values().iterator().next();
+						wrapperNamespace = getXmlNamespace(jfieldVar);
+					}
+				}
+
+				if (wrapperNamespace != null) {
+					xmlElementAnnotation.param("namespace", wrapperNamespace);
+				}
+				else if (namespace != null) {
 					xmlElementAnnotation.param("namespace", namespace);
 				}
 
