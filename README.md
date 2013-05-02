@@ -255,6 +255,8 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 - Commit to your own fork
 - [Request for pull](http://help.github.com/send-pull-requests/)
 
+In any of above cases you automatically agree with a [project license](https://github.com/dmak/jaxb-xew-plugin#license).
+
 #### Code style
 
 * There are no specific coding and naming conventions for this project except ones given in [Code Conventions for the Java Programming Language](http://www.oracle.com/technetwork/java/codeconv-138413.html) by Sun. Use best practices and common sense.
@@ -322,7 +324,7 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 
 ### Algorithm description
 
-The plugin flow consists of the following parts: 
+The plugin flow consists of the following parts:
 
 * Parse arguments.
 * Find classes which are candidates for removal:
@@ -336,10 +338,14 @@ The plugin flow consists of the following parts:
 
 ## Authors
 
-Original code by [Bjarne Hansen](http://www.conspicio.dk/blog/bjarne/jaxb-xmlelementwrapper-plugin). Committers:
+Original code by [Bjarne Hansen](http://www.conspicio.dk/blog/bjarne/jaxb-xmlelementwrapper-plugin). Many thanks to committers:
 
 * [Dmitry Katsubo](http://www.linkedin.com/in/dkatsubo)
-* [David Matheson](https://github.com/davidfmatheson)
+* [David Matheson](https://github.com/davidfmatheson/)
+* [Sebastian Steiner](https://github.com/sebisteiner/)
+* [Colin Fairless](https://github.com/colin-yell/)
+* [Patrick Crocker](https://github.com/patrickcrocker/)
+* and others...
 
 ## License
 
