@@ -155,6 +155,8 @@ To use the plugin from Ant you will need something like the following in your bu
 
 ### Maven
 
+#### maven-jaxb2-plugin
+
     <plugin>
     	<groupId>org.jvnet.jaxb2.maven2</groupId>
     	<artifactId>maven-jaxb2-plugin</artifactId>
@@ -189,6 +191,48 @@ To use the plugin from Ant you will need something like the following in your bu
     			</configuration>
     		</execution>
     	</executions>
+    </plugin>
+
+#### jaxb2-maven-plugin
+
+    <plugin>
+    	<groupId>org.codehaus.mojo</groupId>
+    	<artifactId>jaxb2-maven-plugin</artifactId>
+    	<version>1.5</version>
+    	<executions>
+    		<execution>
+    			<phase>generate-sources</phase>
+    			<goals>
+    				<goal>xjc</goal>
+    			</goals>
+    			<configuration>
+    				<verbose>true</verbose>
+    				<outputDirectory>${project.build.sourceDirectory}</outputDirectory>
+    				<schemaDirectory>xsd</schemaDirectory>
+    				<clearOutputDir>false</clearOutputDir>
+    
+    				<extension>true</extension>
+    				<arguments>-no-header -Xxew -Xxew:instantiate lazy -Xxew:delete</arguments>
+    			</configuration>
+    		</execution>
+    	</executions>
+    	<dependencies>
+    		<dependency>
+    			<groupId>com.github.jaxb-xew-plugin</groupId>
+    			<artifactId>jaxb-xew-plugin</artifactId>
+    			<version>1.0</version>
+    		</dependency>
+    		<!-- 
+    		 | We need to update the jaxb-xjc plugin version from 2.1.13 to the 2.2.4-1 version 
+    		 | used by the jaxb-xew-plugin (version 2.1.13 which does not have the required 
+    		 | method com.suun.codemodel.JAnnotatable.annotations()Ljava/util/Collection).
+    		 -->
+    		<dependency>
+    			<groupId>com.sun.xml.bind</groupId>
+    			<artifactId>jaxb-xjc</artifactId>
+    			<version>2.2.4-1</version>
+    		</dependency>
+    	</dependencies>
     </plugin>
 
 You can find more examples of this plugin in `samples` directory.
