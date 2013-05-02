@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xml="http://www.w3.org/XML/1998/namespace"
+	elementFormDefault="qualified">
+
+	<xs:element name="AX_Test">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AX_SubItems" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="AX_SubItems">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="AX_Item" type="xs:string" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
