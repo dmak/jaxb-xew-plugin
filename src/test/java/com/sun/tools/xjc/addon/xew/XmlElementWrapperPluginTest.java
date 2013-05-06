@@ -54,6 +54,12 @@ public class XmlElementWrapperPluginTest {
 		            "ObjectFactory.java");
 	}
 
+	@Test
+	public void testInnerElementClass() throws Throwable {
+		assertXsd("inner-element-class.xsd", "inner_element_class", 3, "Filesystem.java", "Volume.java",
+		            "ObjectFactory.java");
+	}
+
 	/**
 	 * Standard test for XSD examples.
 	 * 
@@ -96,8 +102,8 @@ public class XmlElementWrapperPluginTest {
 
 		for (String fileName : filesToCheck) {
 			// To avoid CR/LF conflicts:
-			assertEquals(FileUtils.readFileToString(new File(compareToDir, fileName)).replaceAll("\r", ""), FileUtils
-			            .readFileToString(new File(target, fileName)).replaceAll("\r", ""));
+			assertEquals(FileUtils.readFileToString(new File(compareToDir, fileName)).replace("\r", ""), FileUtils
+			            .readFileToString(new File(target, fileName)).replace("\r", ""));
 		}
 	}
 

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="inner_element_class" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:element name="filesystem">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="files">
+					<xs:complexType>
+						<xs:sequence>
+							<!--
+								Important is that the class corresponding to this element is correctly shifted to container class.
+							-->
+							<xs:element name="file" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:all>
+										<xs:element name="name" type="xs:string" />
+										<xs:element name="size" type="xs:integer" />
+									</xs:all>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="directories">
+					<xs:complexType>
+						<xs:sequence>
+							<!--
+								Example with basic type (string).
+							-->
+							<xs:element name="directory" maxOccurs="unbounded">
+								<xs:simpleType>
+									<xs:restriction base="xs:string" />
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="volumes" type="volumes" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="volumes">
+		<xs:sequence>
+			<!--
+				Example when element is moved to package.
+			-->
+			<xs:element name="volume" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="name" type="xs:string" />
+						<xs:element name="capacity" type="xs:integer" />
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
