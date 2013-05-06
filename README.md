@@ -157,6 +157,8 @@ To use the plugin from Ant you will need something like the following in your bu
 
 #### maven-jaxb2-plugin
 
+Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API which is not compatible with this plugin. Version 0.8.1 is guaranteed to work, versions 0.8.2 and 0.8.3 should also work fine.
+
     <plugin>
     	<groupId>org.jvnet.jaxb2.maven2</groupId>
     	<artifactId>maven-jaxb2-plugin</artifactId>
@@ -194,6 +196,8 @@ To use the plugin from Ant you will need something like the following in your bu
     </plugin>
 
 #### jaxb2-maven-plugin
+
+Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which is not compatible with this plugin, thus additional dependency is needed to be added to **plugin classpath**.
 
     <plugin>
     	<groupId>org.codehaus.mojo</groupId>
@@ -235,7 +239,7 @@ To use the plugin from Ant you will need something like the following in your bu
     	</dependencies>
     </plugin>
 
-You can find more examples of this plugin in `samples` directory.
+You can find more examples of this plugin in [`samples`](tree/master/samples) directory.
 
 ## Contribution
 
@@ -249,18 +253,20 @@ If you have time and desire to contribute to this project you can do it in many 
 
 Everybody is very welcomed to send patches by email. But the best way would be:
 
-- Fork the repository
-- Apply the formatting rules (the ones for Eclipse can be found in [`dist`](https://github.com/dmak/jaxb-xew-plugin/tree/master/dist) folder)
-- Do the changes
-- Commit to your own fork
-- [Request for pull](http://help.github.com/send-pull-requests/)
+- Fork the repository.
+- Apply the [formatting rules](#code-style) (the ones for Eclipse can be found in [`dist`](tree/master/dist) folder).
+- Create a ticket in [bugtracker](issues/). If applicable attach XSD that demonstrates the problem to the issue.
+- Create a branch referring the ticket number (`git branch issue-22`).
+- Do the changes.
+- Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (issue#22)`).
+- [Request for pull](http://help.github.com/send-pull-requests/).
 
-In any of above cases you automatically agree with a [project license](https://github.com/dmak/jaxb-xew-plugin#license).
+If you provide the code in any way you automatically agree with a [project license](#license).
 
 #### Code style
 
 * There are no specific coding and naming conventions for this project except ones given in [Code Conventions for the Java Programming Language](http://www.oracle.com/technetwork/java/codeconv-138413.html) by Sun. Use best practices and common sense.
-* For [code formatting](https://github.com/dmak/jaxb-xew-plugin/tree/master/dist/eclipse-code-fomatting-rules.xml) basically Eclipse build-in formatting rules were used with following changes:
+* For [code formatting](tree/master/dist/eclipse-code-fomatting-rules.xml) basically Eclipse build-in formatting rules were used with following changes:
   - Indentation → Align fields on columns: on
   - Indentation → Tab policy: Mixed
   - Indentation → Use spaces to indent wrapped lines: on
@@ -270,6 +276,7 @@ In any of above cases you automatically agree with a [project license](https://g
   - Comments → Enable line comment formatting: off
   - New Lines → Insert new line in empty anonymous class body: off
   - New Lines → Insert new line in empty block: off
+* TAB is used for alignment for XML/XSD/... files. 
 
 #### Release procedure
 
@@ -320,7 +327,7 @@ In any of above cases you automatically agree with a [project license](https://g
 
 * For Hudson freestyle job specify:
   * Pre-release step `git checkout master; git reset --hard origin/master` (see [Can't get automated release working with Hudson + Git + Maven Release Plugin](http://stackoverflow.com/questions/1877027) for more details about the problem).
-  * Next step (release): `release:prepare release:perform -Pstage-release -Pgpg -Dresume=false -Dusername=...github_user... -Dpassword=...github_password...`
+  * Next step (release): `release:prepare release:perform -Pstage-release -Pgpg -Dresume=false -Dusername=<github_user> -Dpassword=<github_password>`
 
 ### Algorithm description
 
@@ -341,6 +348,7 @@ The plugin flow consists of the following parts:
 Original code by [Bjarne Hansen](http://www.conspicio.dk/blog/bjarne/jaxb-xmlelementwrapper-plugin). Many thanks to committers:
 
 * [Dmitry Katsubo](http://www.linkedin.com/in/dkatsubo)
+* [Tobias Warneke](https://github.com/wumpz/)
 * [David Matheson](https://github.com/davidfmatheson/)
 * [Sebastian Steiner](https://github.com/sebisteiner/)
 * [Colin Fairless](https://github.com/colin-yell/)
