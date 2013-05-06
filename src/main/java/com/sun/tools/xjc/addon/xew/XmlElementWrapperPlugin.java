@@ -21,11 +21,11 @@
  */
 package com.sun.tools.xjc.addon.xew;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -348,15 +348,14 @@ public class XmlElementWrapperPlugin extends Plugin {
 					modificationCount++;
 				}
 
-				List<JClass> itemNarrowing = candidate.getFieldType().getTypeParameters();
+				List<JClass> itemNarrowing = candidate.getFieldClass().getTypeParameters();
 
 				// Create the new interface and collection classes using the specified interface and
 				// collection classes (configuration) with an element type corresponding to
 				// the element type from the collection present in the candidate class (narrowing).
-				JClass collectionInterfaceClass = implementationClass.owner().ref(this.collectionInterfaceClass)
+				JClass collectionInterfaceClass = outline.getCodeModel().ref(this.collectionInterfaceClass)
 				            .narrow(itemNarrowing);
-				JClass collectionImplClass = implementationClass.owner().ref(this.collectionImplClass)
-				            .narrow(itemNarrowing);
+				JClass collectionImplClass = outline.getCodeModel().ref(this.collectionImplClass).narrow(itemNarrowing);
 
 				// Remove original field which refers to the inner class.
 				JFieldVar originalImplField = implementationClass.fields().get(fieldName);
@@ -500,22 +499,18 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * Also this move should be reflected on factory method names.
 	 */
 	private boolean moveInnerClassToParentIfNecessary(Candidate candidate) {
-		assert candidate.getFieldType().getTypeParameters().size() == 1 : "Type parametrization should contain exactly one class. This was resticted in findCandidateClasses().";
-
-		JClass fieldParametrizationClass = candidate.getFieldType().getTypeParameters().get(0);
-
 		// Skip basic parametrizations like "List<String>":
-		if (!(fieldParametrizationClass instanceof JDefinedClass)) {
+		if (!(candidate.getFieldParametrizationClass() instanceof JDefinedClass)) {
 			return false;
 		}
 
-		JDefinedClass fieldClass = (JDefinedClass) fieldParametrizationClass;
+		JDefinedClass fieldParametrizationClass = (JDefinedClass) candidate.getFieldParametrizationClass();
 
-		if (!candidate.getModelClass().equals(fieldClass.outer())) {
+		if (!candidate.getModelClass().equals(fieldParametrizationClass.outer())) {
 			return false;
 		}
 
-		String oldFactoryMethodName = fieldClass.outer().name() + fieldClass.name();
+		String oldFactoryMethodName = fieldParametrizationClass.outer().name() + fieldParametrizationClass.name();
 		JDefinedClass factoryClass = candidate.getFactoryClass();
 
 		// Rename methods in factory class: createABC() -> createAC()
@@ -526,31 +521,36 @@ public class XmlElementWrapperPlugin extends Plugin {
 				continue;
 			}
 
-			method.name(methodName.replace(oldFactoryMethodName, fieldClass.name()));
+			method.name(methodName.replace(oldFactoryMethodName, fieldParametrizationClass.name()));
 		}
 
 		// Container can be a class or package:
 		JClassContainer container = candidate.getModelClass().parentContainer();
-		setPrivateField(fieldClass, "outer", container);
+		setPrivateField(fieldParametrizationClass, "outer", container);
 
 		// FIXME: Pending https://java.net/jira/browse/JAXB-957
 		// Element class should be added as its container child:
 		if (container instanceof JDefinedClass) {
 			JDefinedClass parentClass = (JDefinedClass) container;
 
-			((Map<String, JDefinedClass>) getPrivateField(parentClass, "classes")).put(fieldClass.name(), fieldClass);
+			((Map<String, JDefinedClass>) getPrivateField(parentClass, "classes")).put(
+			            fieldParametrizationClass.name(), fieldParametrizationClass);
 
-			writeSummary("\tMoving inner class " + fieldClass.fullName() + " to class " + parentClass.fullName());
+			writeSummary("\tMoving inner class " + fieldParametrizationClass.fullName() + " to class "
+			            + parentClass.fullName());
 		}
 		else {
 			JPackage parentPackage = (JPackage) container;
 
-			((Map<String, JDefinedClass>) getPrivateField(parentPackage, "classes")).put(fieldClass.name(), fieldClass);
+			((Map<String, JDefinedClass>) getPrivateField(parentPackage, "classes")).put(
+			            fieldParametrizationClass.name(), fieldParametrizationClass);
 
 			// In this scenario class should have "static" modifier reset:
-			setPrivateField(fieldClass.mods(), "mods", fieldClass.mods().getValue() & ~JMod.STATIC);
+			setPrivateField(fieldParametrizationClass.mods(), "mods", fieldParametrizationClass.mods().getValue()
+			            & ~JMod.STATIC);
 
-			writeSummary("\tMoving inner class " + fieldClass.fullName() + " to package " + parentPackage.name());
+			writeSummary("\tMoving inner class " + fieldParametrizationClass.fullName() + " to package "
+			            + parentPackage.name());
 		}
 
 		return true;
@@ -730,10 +730,9 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * Read all candidates from a given file into the given set.
 	 */
 	private static void readCandidates(File file, Set<String> candidates) throws IOException {
-		LineNumberReader input;
+		BufferedReader input = new BufferedReader(new FileReader(file));
 		String line;
 
-		input = new LineNumberReader(new FileReader(file));
 		while ((line = input.readLine()) != null) {
 			line = line.trim();
 
@@ -760,19 +759,40 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 			// * The candidate class must have exactly one property
 			// * The candidate class should not extend any other class (as the total number of properties in this case will be more than 1)
-			if (classInfo.getProperties().size() == 1 && classInfo.getBaseClass() == null) {
-				CPropertyInfo property = classInfo.getProperties().get(0);
-
-				// * The property must be a collection
-				// * The collection should refer exactly one type
-				if (property.isCollection() && property.ref().size() == 1) {
-					// We have a candidate class
-					Candidate candidate = new Candidate(outline.getClazz(classInfo).implClass, property);
-					candidates.put(className, candidate);
-					logger.debug("Candidate found: " + candidate.getClassName() + " [private "
-					            + candidate.getFieldType().name() + " " + candidate.getFieldName() + "]");
-				}
+			if (classInfo.getProperties().size() != 1 || classInfo.getBaseClass() != null) {
+				continue;
 			}
+
+			CPropertyInfo property = classInfo.getProperties().get(0);
+
+			// * The property must be a collection
+			if (!property.isCollection()) {
+				continue;
+			}
+
+			JDefinedClass modelClass = outline.getClazz(classInfo).implClass;
+
+			String fieldName = property.getName(false);
+			// A given property is a collection, hence it is a class:
+			JClass fieldClass = (JClass) modelClass.fields().get(fieldName).type();
+
+			// * The collection should have exactly one class as parametrization type
+			if (fieldClass.getTypeParameters().size() != 1) {
+				continue;
+			}
+
+			// * The parametrization type should not be java.lang.Object (the case for <xs:any>)
+			JClass fieldParametrizationClass = fieldClass.getTypeParameters().get(0);
+			if (fieldParametrizationClass.fullName().equals(Object.class.getName())) {
+				continue;
+			}
+
+			// We have a candidate class
+			Candidate candidate = new Candidate(modelClass, fieldName, fieldClass, fieldParametrizationClass, property);
+			candidates.put(className, candidate);
+
+			logger.debug("Candidate found: " + candidate.getClassName() + " [private "
+			            + candidate.getFieldClass().name() + " " + candidate.getFieldName() + "]");
 		}
 
 		return candidates;
@@ -929,19 +949,21 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * Describes the collection container class -- a candidate for removal.
 	 */
 	private static class Candidate {
-		private JDefinedClass       clazz;
+		private JDefinedClass       modelClass;
 		private String              fieldName;
-		private JClass              fieldType;
+		private JClass              fieldClass;
+		private JClass              fieldParametrizationClass;
 		private String              xmlElementName     = null;
 		private boolean             markedForRemoval   = true;
 
 		private static final String FACTORY_CLASS_NAME = "ObjectFactory";
 
-		public Candidate(JDefinedClass clazz, CPropertyInfo property) {
-			this.clazz = clazz;
-			this.fieldName = property.getName(false);
-			// A given property is a collection, hence it is a class:
-			this.fieldType = (JClass) clazz.fields().get(this.fieldName).type();
+		public Candidate(JDefinedClass modelClass, String fieldName, JClass fieldClass,
+		            JClass fieldParametrizationClass, CPropertyInfo property) {
+			this.modelClass = modelClass;
+			this.fieldName = fieldName;
+			this.fieldClass = fieldClass;
+			this.fieldParametrizationClass = fieldParametrizationClass;
 			this.xmlElementName = extractXmlElementName(property);
 
 			if (this.xmlElementName == null) {
@@ -953,21 +975,21 @@ public class XmlElementWrapperPlugin extends Plugin {
 		 * Container class metadata
 		 */
 		public JDefinedClass getModelClass() {
-			return clazz;
+			return modelClass;
 		}
 
 		/**
 		 * Return the class which corresponds to "ObjectFactory" class in the model.
 		 */
 		public JDefinedClass getFactoryClass() {
-			return clazz._package()._getClass(FACTORY_CLASS_NAME);
+			return modelClass._package()._getClass(FACTORY_CLASS_NAME);
 		}
 
 		/**
 		 * Container class name
 		 */
 		public String getClassName() {
-			return clazz.fullName();
+			return modelClass.fullName();
 		}
 
 		/**
@@ -978,10 +1000,17 @@ public class XmlElementWrapperPlugin extends Plugin {
 		}
 
 		/**
-		 * The type of the only field in container class.
+		 * The class of the only field in container class.
 		 */
-		public JClass getFieldType() {
-			return fieldType;
+		public JClass getFieldClass() {
+			return fieldClass;
+		}
+
+		/**
+		 * Return the only parametrization class of the field.
+		 */
+		public JClass getFieldParametrizationClass() {
+			return fieldParametrizationClass;
 		}
 
 		/**

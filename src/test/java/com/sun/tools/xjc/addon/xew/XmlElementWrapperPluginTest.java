@@ -81,6 +81,11 @@ public class XmlElementWrapperPluginTest {
 		            "ObjectFactory.java");
 	}
 
+	@Test
+	public void testElementAny() throws Throwable {
+		assertXsd("element-any.xsd", "element_any", "-verbose", 2, "Data.java", "ObjectFactory.java");
+	}
+
 	/**
 	 * Standard test for XSD examples.
 	 * 

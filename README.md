@@ -335,8 +335,11 @@ The plugin flow consists of the following parts:
 
 * Parse arguments.
 * Find classes which are candidates for removal:
-  1. The candidate class must have exactly one property
-  2. The candidate class should not extend any other class (as the total number of properties will be more than 1)
+  1. The candidate class should not extend any other class (as the total number of properties will be more than 1)
+  2. The candidate class must have exactly one property.
+  3. This property should be a collection.
+  4. This collection should have exactly one parametrization type.
+  5. This parametrization type should not be `java.lang.Object` (the case for `<xs:any>`).
 * Visit all classes again to check if the candidate is not eligible for removal:
   1. If there are classes that extend the candidate
   2. If there are class fields, that refer the candidate by e.g. `@XmlElementRef` annotation
