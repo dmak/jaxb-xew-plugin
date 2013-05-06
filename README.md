@@ -239,7 +239,7 @@ Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which 
     	</dependencies>
     </plugin>
 
-You can find more examples of this plugin in [`samples`](tree/master/samples) directory.
+You can find more examples of this plugin in [`samples`](samples/) directory.
 
 ## Contribution
 
@@ -254,11 +254,11 @@ If you have time and desire to contribute to this project you can do it in many 
 Everybody is very welcomed to send patches by email. But the best way would be:
 
 - Fork the repository.
-- Apply the [formatting rules](#code-style) (the ones for Eclipse can be found in [`dist`](tree/master/dist) folder).
-- Create a ticket in [bugtracker](issues/). If applicable attach XSD that demonstrates the problem to the issue.
+- Apply the [formatting rules](#code-style) (the ones for Eclipse can be found in [`dist`](dist) folder).
+- Create a ticket in [bugtracker](https://github.com/dmak/jaxb-xew-plugin/issues). If applicable attach XSD that demonstrates the problem to the issue.
 - Create a branch referring the ticket number (`git branch issue-22`).
 - Do the changes.
-- Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (issue#22)`).
+- Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (fixes #22)`). Check [here](https://github.com/blog/831-issues-2-0-the-next-generation) the commit message syntax sugar.
 - [Request for pull](http://help.github.com/send-pull-requests/).
 
 If you provide the code in any way you automatically agree with a [project license](#license).
@@ -266,7 +266,7 @@ If you provide the code in any way you automatically agree with a [project licen
 #### Code style
 
 * There are no specific coding and naming conventions for this project except ones given in [Code Conventions for the Java Programming Language](http://www.oracle.com/technetwork/java/codeconv-138413.html) by Sun. Use best practices and common sense.
-* For [code formatting](tree/master/dist/eclipse-code-fomatting-rules.xml) basically Eclipse build-in formatting rules were used with following changes:
+* For [code formatting](dist/eclipse-code-fomatting-rules.xml) basically Eclipse build-in formatting rules were used with following changes:
   - Indentation → Align fields on columns: on
   - Indentation → Tab policy: Mixed
   - Indentation → Use spaces to indent wrapped lines: on
@@ -342,6 +342,14 @@ The plugin flow consists of the following parts:
   2. If there are class fields, that refer the candidate by e.g. `@XmlElementRef` annotation
 * Visit all classes again to replace the property having the candidate class type with collection plus `@XmlElementWrapper` annotation. On this step getters/setters are update and ObjectFactory methods are corrected. Also lazy initialization policy is applied.
 * Candidates which are still marked for removal are finally removed (and ObjectFactory is updated accordingly).
+
+There are many pitfalls in JAXB Code Model API, which are forcing the developer to use dirty tricks (like acessing private fields) in order to implement the manipulation of code model. Among others:
+
+* [JAXB-784](http://java.net/jira/browse/JAXB-784) is about NPE in `JAnnotationUse#getAnnotationMembers()` method.
+* [JAXB-884](https://java.net/jira/browse/JAXB-884) is about ClassCastException in `JAnnotationArrayMember#annotations()` method. 
+* [JAXB-878](https://java.net/jira/browse/JAXB-878) and [JAXB-879](https://java.net/jira/browse/JAXB-879) describe the lack of public getters for class fields.
+* [JAXB-957](https://java.net/jira/browse/JAXB-957) mentions what need to be added to make it possible for the inner class to be moved to another class or package. 
+* [JAXB-883](http://java.net/jira/browse/JAXB-883) does not allow to learn if "simpleMode" setting is enabled, which in its turn controls plural form for collection property names. There are however some more difficulties to overcome.
 
 ## Authors
 
