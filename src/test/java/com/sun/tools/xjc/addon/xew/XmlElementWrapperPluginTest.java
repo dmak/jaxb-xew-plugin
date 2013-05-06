@@ -50,7 +50,7 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Throwable {
-		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces", 4, "Folder.java",
+		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces", 4, "Composed.java",
 		            "ObjectFactory.java");
 	}
 

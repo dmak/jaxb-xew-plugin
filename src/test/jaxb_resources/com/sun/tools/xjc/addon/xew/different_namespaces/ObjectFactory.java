@@ -30,19 +30,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Folder }
+     * Create an instance of {@link Composed }
      * 
      */
-    public Folder createFolder() {
-        return new Folder();
+    public Composed createComposed() {
+        return new Composed();
     }
 
     /**
-     * Create an instance of {@link Document }
+     * Create an instance of {@link Entry }
      * 
      */
-    public Document createDocument() {
-        return new Document();
+    public Entry createEntry() {
+        return new Entry();
     }
 
 }

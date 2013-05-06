@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema
+<xs:schema
 	jaxb:version="2.0"
-	targetNamespace="http://www.bar.org/"
+	targetNamespace="http://example.com/entry"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified">
-
-	<xsd:annotation>
-		<xsd:appinfo>
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	<xs:annotation>
+		<xs:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="different_namespaces" />
 			</jaxb:schemaBindings>
-		</xsd:appinfo>
-	</xsd:annotation>
+		</xs:appinfo>
+	</xs:annotation>
 
-	<xsd:element name="document">
-        <xsd:complexType>
-			<xsd:sequence>
-				<xsd:element name="title" type="xsd:string" />
-				<xsd:element name="author" type="xsd:string" />
-			</xsd:sequence>
-		</xsd:complexType>
-    </xsd:element>
-</xsd:schema>
+	<xs:element name="entry">
+		<xs:complexType>
+			<xs:attribute name="name" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

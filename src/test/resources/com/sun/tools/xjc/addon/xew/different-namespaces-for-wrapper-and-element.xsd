@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema
+<xs:schema
 	jaxb:version="2.0"
-	targetNamespace="http://www.foo.org/"
-	xmlns:bar="http://www.bar.org/"
+	targetNamespace="http://example.com/composed"
+	xmlns:ns1="http://example.com/composed"
+	xmlns:ns2="http://example.com/entry"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified">
-
-	<xsd:annotation>
-		<xsd:appinfo>
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	<xs:annotation>
+		<xs:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="different_namespaces" />
 			</jaxb:schemaBindings>
-		</xsd:appinfo>
-	</xsd:annotation>
+		</xs:appinfo>
+	</xs:annotation>
 
-	<xsd:import namespace="http://www.bar.org/" schemaLocation="different-namespaces-helper.xsd" />
+	<xs:import schemaLocation="different-namespaces-helper.xsd" namespace="http://example.com/entry" />
 
-	<xsd:element name="folder">
-        <xsd:complexType>
-			<xsd:sequence>
-				<xsd:element name="documents">
-					<xsd:complexType>
-						<xsd:sequence>
-							<!--
-								Important is that the namespace for this collection element is correctly reflected in @XmlElement.
-							-->
-							<xsd:element ref="bar:document" maxOccurs="unbounded" />
-						</xsd:sequence>
-					</xsd:complexType>
-				</xsd:element>
-			</xsd:sequence>
-		</xsd:complexType>
-    </xsd:element>
-</xsd:schema>
+	<xs:element name="composed">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ns1:entries" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="entries">
+		<xs:complexType>
+			<xs:sequence>
+				<!--
+					Important is that the namespace for this collection element is correctly reflected in @XmlElement.
+				-->
+				<xs:element ref="ns2:entry" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
