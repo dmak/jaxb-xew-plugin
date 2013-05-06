@@ -1,3 +1,23 @@
+/*
+ * XmlElementWrapperPluginTest.java
+ * 
+ * Copyright (C) 2009, Tobias Warneke
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
 package com.sun.tools.xjc.addon.xew;
 
 import static org.junit.Assert.assertEquals;
@@ -23,30 +43,15 @@ import org.junit.Test;
  */
 public class XmlElementWrapperPluginTest {
 
-	private static final String	PRECOMPILED_SOURCES_PREFIX	= "src/test/jaxb_resources/";
-	private static final String	GENERATED_SOURCES_PREFIX	= "target/test/generated-xsd-classes/";
+	private static final String PRECOMPILED_SOURCES_PREFIX = "src/test/jaxb_resources/";
+	private static final String GENERATED_SOURCES_PREFIX   = "target/test/generated-xsd-classes/";
 
-	private static final Log	logger						= LogFactory.getLog(XmlElementWrapperPluginTest.class);
-
-	/**
-	 * Simple start of the available sample file with XEW.
-	 */
-	@Test
-	public void testSimpleStartTestWithXEW() throws Throwable {
-		assertXsd("sample.xsd", "sample_with_xew", true, 3, "Order.java", "ObjectFactory.java");
-	}
-
-	/**
-	 * Simple start of the available sample file without XEW.
-	 */
-	@Test
-	public void testSimpleStartTestWithOutXEW() throws Throwable {
-		assertXsd("sample.xsd", "sample_without_xew", false, 5, "Order.java", "ObjectFactory.java", "Items.java");
-	}
+	private static final Log    logger                     = LogFactory.getLog(XmlElementWrapperPluginTest.class);
 
 	@Test
-	public void testSimpleSpecialCase() throws Throwable {
-		assertXsd("sample_specialcase.xsd", "sample_specialcase", true, 2, "AXTest.java", "ObjectFactory.java");
+	public void testDifferentNamespacesForWrapperAndElement() throws Throwable {
+		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces", 4, "Folder.java",
+		            "ObjectFactory.java");
 	}
 
 	/**
@@ -55,61 +60,53 @@ public class XmlElementWrapperPluginTest {
 	 * @param xsdUrl
 	 *            URL to xsd file
 	 * @param testName
-	 *            subfolder of target/test/generated-xsd-classes where java - files are created
-	 * @param useXewPlugin
-	 *            creating with or without XEW plugin
-	 * @param totalFiles
+	 *            the name of this test, also target package name
+	 * @param totalNumberOfFiles
 	 *            total number of generated files
 	 * @param filesToCheck
 	 *            Expected files in generation dir. These files content is checked, when compareDir is set.
-	 * @return
-	 * @throws Exception
 	 */
-	private void assertXsd(String resourceXsd, String testName, boolean useXewPlugin, int totalFiles,
-				String... filesToCheck) throws Exception {
+	private void assertXsd(String resourceXsd, String testName, int totalNumberOfFiles, String... filesToCheck)
+	            throws Exception {
 		String xsdUrl = getClass().getResource(resourceXsd).getFile();
 
-		File target = new File(GENERATED_SOURCES_PREFIX + testName);
+		File target = new File(GENERATED_SOURCES_PREFIX);
 
 		target.mkdirs();
 
 		LoggingPrintStream loggingPrintStream = new LoggingPrintStream();
 
-		if (useXewPlugin) {
-			Driver.run(new String[]{"-verbose", "-no-header", "-Xxew", "-Xxew:instantiate lazy", "-Xxew:delete", "-d",
-					target.getPath(), xsdUrl}, loggingPrintStream, loggingPrintStream);
-		}
-		else {
-			Driver.run(new String[]{"-verbose", "-no-header", "-d", target.getPath(), xsdUrl}, loggingPrintStream,
-						loggingPrintStream);
-		}
+		Driver.run(new String[] { "-verbose", "-no-header", "-Xxew", "-Xxew:instantiate lazy", "-Xxew:delete", "-d",
+		        target.getPath(), xsdUrl }, loggingPrintStream, loggingPrintStream);
 
-		String[] list = new File(target, "generated").list();
+		target = new File(target, testName);
 
-		List<String> l = Arrays.asList(list);
+		String[] list = target.list();
 
-		assertEquals(totalFiles, list.length);
+		List<String> generatedFileList = Arrays.asList(list);
 
-		for (String ftoc : filesToCheck) {
-			assertTrue(l.contains(ftoc));
+		assertEquals(totalNumberOfFiles, list.length);
+
+		for (String fileName : filesToCheck) {
+			assertTrue(generatedFileList.contains(fileName));
 		}
 
-		String compareDir = PRECOMPILED_SOURCES_PREFIX + getClass().getPackage().getName().replace('.', '/') + "/"
-					+ testName;
+		String compareToDir = PRECOMPILED_SOURCES_PREFIX + getClass().getPackage().getName().replace('.', '/') + "/"
+		            + testName;
 
-		for (String ftoc : filesToCheck) {
-			// To avoid CR/LF conflicts.
-			assertEquals(FileUtils.readLines(new File(compareDir, ftoc)),
-						FileUtils.readLines(new File(target, "generated/" + ftoc)));
+		for (String fileName : filesToCheck) {
+			// To avoid CR/LF conflicts:
+			assertEquals(FileUtils.readFileToString(new File(compareToDir, fileName)).replaceAll("\r", ""), FileUtils
+			            .readFileToString(new File(target, fileName)).replaceAll("\r", ""));
 		}
 	}
 
 	/**
-	 * Class will redirect everything printed to {@link PrintStream} to logger.
+	 * Class will redirect everything printed to this {@link PrintStream} to logger.
 	 */
 	private static class LoggingPrintStream extends PrintStream {
 
-		private final StringBuilder	sb	= new StringBuilder();
+		private final StringBuilder sb = new StringBuilder();
 
 		public LoggingPrintStream() {
 			super(new NullOutputStream());
@@ -125,17 +122,30 @@ public class XmlElementWrapperPluginTest {
 		@Override
 		public void write(int b) {
 			switch (b) {
-				case '\n' :
-					logger.debug(sb.toString());
+			case '\n':
+				logMessage();
 
-					sb.setLength(0);
+			case '\r':
+				break;
 
-				case '\r' :
-					break;
-
-				default :
-					sb.append((char) b);
+			default:
+				sb.append((char) b);
 			}
+		}
+
+		@Override
+		public void close() {
+			super.close();
+
+			if (sb.length() > 0) {
+				logMessage();
+			}
+		}
+
+		private void logMessage() {
+			logger.debug("[XJC] " + sb.toString());
+
+			sb.setLength(0);
 		}
 	}
 }
