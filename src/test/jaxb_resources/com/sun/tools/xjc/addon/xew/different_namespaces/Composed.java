@@ -1,7 +1,7 @@
 
 package different_namespaces;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -39,12 +39,9 @@ public class Composed {
 
     @XmlElementWrapper(name = "entries", required = true)
     @XmlElement(name = "entry", namespace = "http://example.com/entry")
-    protected List<Entry> entries;
+    protected List<Entry> entries = new LinkedList<Entry>();
 
     public List<Entry> getEntries() {
-        if (entries == null) {
-            entries = new ArrayList<Entry>();
-        }
         return entries;
     }
 

@@ -20,7 +20,7 @@
 					<xs:complexType>
 						<xs:sequence>
 							<!--
-								Important is that the class corresponding to this element is correctly shifted to container class.
+								Important is that inner class corresponding to this element is correctly moved to outer class.
 							-->
 							<xs:element name="file" maxOccurs="unbounded">
 								<xs:complexType>
@@ -37,7 +37,7 @@
 					<xs:complexType>
 						<xs:sequence>
 							<!--
-								Example with basic type (string).
+								Example of collection with basic type (string).
 							-->
 							<xs:element name="directory" maxOccurs="unbounded">
 								<xs:simpleType>
@@ -55,7 +55,7 @@
 	<xs:complexType name="volumes">
 		<xs:sequence>
 			<!--
-				Example when element is moved to package.
+				Example when inner class is moved to package.
 			-->
 			<xs:element name="volume" maxOccurs="unbounded">
 				<xs:complexType>

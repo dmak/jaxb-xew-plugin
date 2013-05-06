@@ -80,33 +80,33 @@ import org.xml.sax.ErrorHandler;
  */
 public class XmlElementWrapperPlugin extends Plugin {
 
-	private static final String PLUGIN_NAME              = "Xxew";
-	private static final String OPTION_NAME_DELETE       = "-" + PLUGIN_NAME + ":delete";
-	private static final String OPTION_NAME_INCLUDE      = "-" + PLUGIN_NAME + ":includeFile";
-	private static final String OPTION_NAME_EXCLUDE      = "-" + PLUGIN_NAME + ":excludeFile";
-	private static final String OPTION_NAME_SUMMARY      = "-" + PLUGIN_NAME + ":summaryFile";
-	private static final String OPTION_NAME_COLLECTION   = "-" + PLUGIN_NAME + ":collection";
-	private static final String OPTION_NAME_INSTANTIATE  = "-" + PLUGIN_NAME + ":instantiate";
+	private static final String PLUGIN_NAME                            = "Xxew";
+	private static final String OPTION_NAME_DELETE                     = "-" + PLUGIN_NAME + ":delete";
+	private static final String OPTION_NAME_INCLUDE                    = "-" + PLUGIN_NAME + ":includeFile";
+	private static final String OPTION_NAME_EXCLUDE                    = "-" + PLUGIN_NAME + ":excludeFile";
+	private static final String OPTION_NAME_SUMMARY                    = "-" + PLUGIN_NAME + ":summaryFile";
+	private static final String OPTION_NAME_COLLECTION                 = "-" + PLUGIN_NAME + ":collection";
+	private static final String OPTION_NAME_INSTANTIATE                = "-" + PLUGIN_NAME + ":instantiate";
 
-	private File                includeFile              = null;
-	private Set<String>         include                  = null;                                            // list of classes for inclusion
-	private File                excludeFile              = null;
-	private Set<String>         exclude                  = null;                                            // list of classes for exclusion
-	private File                summaryFile              = null;
-	private PrintWriter         summary                  = null;
-	private boolean             debugMode                = false;
-	private boolean             verbose                  = false;
-	private Class<?>            collectionInterfaceClass = java.util.List.class;
-	private Class<?>            collectionImplClass      = java.util.ArrayList.class;
-	private Instantiation       instantiation            = Instantiation.EARLY;
-	private boolean             deleteCandidates         = false;
+	private File                includeFile                            = null;
+	private Set<String>         include                                = null;                                             // list of classes for inclusion
+	private File                excludeFile                            = null;
+	private Set<String>         exclude                                = null;                                             // list of classes for exclusion
+	private File                summaryFile                            = null;
+	private PrintWriter         summary                                = null;
+	private Class<?>            collectionInterfaceClass               = java.util.List.class;
+	private Class<?>            collectionImplClass                    = java.util.ArrayList.class;
+	private Instantiation       instantiation                          = Instantiation.EARLY;
+	private boolean             deleteCandidates                       = false;
 
 	// This is currently an experimental and not properly working feature, so keep this field set to false.
 	// Waiting for this bug to be resolved: http://java.net/jira/browse/JAXB-883
 	//private boolean				applyPluralForm				= Ring.get(BIGlobalBinding.class).isSimpleMode();
-	private static boolean      applyPluralForm          = false;
+	private static boolean      applyPluralForm                        = false;
 
-	private static final Log    logger                   = LogFactory.getLog(XmlElementWrapperPlugin.class);
+	private Log                 logger;
+
+	private static final String COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY = "org.apache.commons.logging.simplelog.defaultlog";
 
 	@Override
 	public String getOptionName() {
@@ -120,34 +120,56 @@ public class XmlElementWrapperPlugin extends Plugin {
 		            + ": Replace collection types with fields having the @XmlElementWrapper and @XmlElement annotations.";
 	}
 
+	void initLoggerIfNecessary(Options opts) {
+		if (logger != null) {
+			return;
+		}
+
+		// Allow the caller to control the log level by explicitly setting this system variable:
+		if (System.getProperty(COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY) == null) {
+			String logLevel = "WARN";
+
+			if (opts.verbose) {
+				logLevel = "INFO";
+			}
+			if (opts.debugMode) {
+				logLevel = "DEBUG";
+			}
+
+			System.setProperty(COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY, logLevel);
+		}
+
+		logger = LogFactory.getLog(getClass());
+	}
+
 	@Override
 	public void onActivated(Options opts) {
-		debugMode = opts.debugMode;
-		verbose = opts.verbose;
+		initLoggerIfNecessary(opts);
 
-		// If we are in debug mode, report...
-		writeDebug("JAXB Compilation started (XmlElementWrapperPlugin.onActivated):");
-		writeDebug("\tbuildId        :\t" + Options.getBuildID());
-		writeDebug("\tdefaultPackage :\t" + opts.defaultPackage);
-		writeDebug("\tdefaultPackage2:\t" + opts.defaultPackage2);
-		writeDebug("\tquiet          :\t" + opts.quiet);
-		writeDebug("\tdebug          :\t" + opts.debugMode);
-		writeDebug("\ttargetDir      :\t" + opts.targetDir);
-		writeDebug("\tverbose        :\t" + opts.verbose);
-		writeDebug("\tGrammars       :\t" + opts.getGrammars().length);
+		logger.debug("JAXB Compilation started (XmlElementWrapperPlugin.onActivated):");
+		logger.debug("\tbuildId        :\t" + Options.getBuildID());
+		logger.debug("\tdefaultPackage :\t" + opts.defaultPackage);
+		logger.debug("\tdefaultPackage2:\t" + opts.defaultPackage2);
+		logger.debug("\tquiet          :\t" + opts.quiet);
+		logger.debug("\tdebug          :\t" + opts.debugMode);
+		logger.debug("\ttargetDir      :\t" + opts.targetDir);
+		logger.debug("\tverbose        :\t" + opts.verbose);
+		logger.debug("\tGrammars       :\t" + opts.getGrammars().length);
 
 		for (int i = 0; i < opts.getGrammars().length; i++) {
-			writeDebug("\t  [" + i + "]: " + opts.getGrammars()[i].getSystemId());
+			logger.debug("\t  [" + i + "]: " + opts.getGrammars()[i].getSystemId());
 		}
 	}
 
 	@Override
-	public int parseArgument(Options opt, String[] args, int i) throws BadCommandLineException, IOException {
+	public int parseArgument(Options opts, String[] args, int i) throws BadCommandLineException, IOException {
+		initLoggerIfNecessary(opts);
+
 		int recognized = 0;
 		String filename;
 
 		String arg = args[i];
-		writeDebug("Argument[" + i + "] = " + arg);
+		logger.debug("Argument[" + i + "] = " + arg);
 
 		if (arg.startsWith(OPTION_NAME_DELETE)) {
 			recognized++;
@@ -236,7 +258,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 	@Override
 	public boolean run(Outline outline, Options opt, ErrorHandler errorHandler) {
-		writeDebug("JAXB Process Model (run)...");
+		logger.debug("JAXB Process Model (run)...");
 
 		// Write summary information on the option for this compilation.
 		writeSummary("Compilation:");
@@ -305,8 +327,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 					// If the candidate T is referred from list of parametrisations (e.g. List<T>), it cannot be removed.
 					// We also stop the cycle leaving candidate variable NULL:
 					else if (isListedAsParametrisation(c.getModelClass(), field.getRawType())) {
-						writeDebug("Candidate " + c.getClassName()
-						            + " is listed as parametrisation and hence won't be removed.");
+						logger.debug("Candidate " + c.getClassName() + " is listed as parametrisation of "
+						            + implementationClass.fullName() + "#" + fieldName + " and hence won't be removed.");
 						c.setMarkedForRemoval(false);
 						break;
 					}
@@ -374,7 +396,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				// If instantiation is specified to be "early", add code for creating new instance of the collection class.
 				if (instantiation == Instantiation.EARLY) {
-					writeDebug("Applying EARLY instantiation...");
+					logger.debug("Applying EARLY instantiation...");
 					// GENERATED CODE: ... fieldName = new C<T>();
 					implField.init(JExpr._new(collectionImplClass));
 				}
@@ -430,7 +452,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				            + fieldPublicName);
 
 				if (instantiation == Instantiation.LAZY) {
-					writeDebug("Applying LAZY instantiation...");
+					logger.debug("Applying LAZY instantiation...");
 					// GENERATED CODE: if (fieldName == null) fieldName = new C<T>();
 					getterMethod.body()._if(JExpr.ref(fieldName).eq(JExpr._null()))._then()
 					            .assign(JExpr.ref(fieldName), JExpr._new(collectionImplClass));
@@ -461,10 +483,10 @@ public class XmlElementWrapperPlugin extends Plugin {
 		writeSummary("\t" + deletionCount + " deletion(s) from original code.");
 		writeSummary("");
 
-		writeDebug("Closing summary...");
+		logger.debug("Closing summary...");
 		closeSummary();
 
-		writeDebug("Done");
+		logger.debug("Done");
 
 		return true;
 	}
@@ -542,17 +564,13 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * </ol>
 	 */
 	private void cancelRemovalIfNecessary(Map<String, Candidate> candidates, JDefinedClass implementationClass) {
-		JClass parentClass = implementationClass._extends();
-
 		// We cannot remove candidates that have parent classes, but we can still substitute them:
-		if (parentClass != null) {
-			Candidate candidate = candidates.get(parentClass.fullName());
+		Candidate candidate = candidates.get(implementationClass._extends().fullName());
 
-			if (candidate != null) {
-				writeDebug("Candidate " + candidate.getClassName() + " is a parent of " + implementationClass.name()
-				            + " and hence won't be removed.");
-				candidate.setMarkedForRemoval(false);
-			}
+		if (candidate != null) {
+			logger.debug("Candidate " + candidate.getClassName() + " is a parent of " + implementationClass.name()
+			            + " and hence won't be removed.");
+			candidate.setMarkedForRemoval(false);
 		}
 
 		for (JFieldVar field : implementationClass.fields().values()) {
@@ -593,7 +611,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 			Candidate candidate = candidates.get(typeClassName);
 
 			if (candidate != null) {
-				writeDebug("Candidate " + candidate.getClassName()
+				logger.debug("Candidate " + candidate.getClassName()
 				            + " is used in XmlElements/XmlElementRef and hence won't be removed.");
 				candidate.setMarkedForRemoval(false);
 			}
@@ -751,7 +769,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 					// We have a candidate class
 					Candidate candidate = new Candidate(outline.getClazz(classInfo).implClass, property);
 					candidates.put(className, candidate);
-					writeDebug("Candidate found: " + candidate.getClassName() + " [private "
+					logger.debug("Candidate found: " + candidate.getClassName() + " [private "
 					            + candidate.getFieldType().name() + " " + candidate.getFieldName() + "]");
 				}
 			}
@@ -891,20 +909,12 @@ public class XmlElementWrapperPlugin extends Plugin {
 			summary.println(s);
 		}
 
-		if (verbose) {
-			logger.info(s);
-		}
+		logger.info(s);
 	}
 
 	private void closeSummary() {
 		if (summary != null) {
 			summary.close();
-		}
-	}
-
-	private void writeDebug(String s) {
-		if (debugMode) {
-			logger.debug(s);
 		}
 	}
 

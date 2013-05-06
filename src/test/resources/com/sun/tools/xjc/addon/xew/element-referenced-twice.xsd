@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="element_referenced_twice" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:complexType name="family">
+		<xs:choice>
+			<xs:element name="family-member" type="family-member" maxOccurs="unbounded"/>
+			<xs:element name="parent-member" />
+		</xs:choice>
+	</xs:complexType>
+	<!--
+		Important is that class "FamilyMember" is referred from class "Family"
+		and thus should not be deleted.
+	-->
+	<xs:complexType name="family-member">
+		<xs:sequence>
+			<xs:element name="id" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="number" />
+						<xs:element name="type" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

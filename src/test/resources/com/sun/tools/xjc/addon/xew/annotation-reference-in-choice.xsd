@@ -25,7 +25,7 @@
 	<xs:element name="p" />
 	<xs:element name="u" type="markup" />
 	<!--
-		Important is that class "Sub" will be referred from class "Markup" via @XmlElementRef(name = "sub", type = Sub.class)
+		Important is that class "Sub" is referred from class "Markup" via @XmlElementRef(name = "sub", type = Sub.class)
 		and thus should not be deleted.
 	-->
 	<xs:element name="sub">

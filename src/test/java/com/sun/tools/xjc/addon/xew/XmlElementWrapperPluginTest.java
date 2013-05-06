@@ -43,28 +43,42 @@ import org.junit.Test;
  */
 public class XmlElementWrapperPluginTest {
 
-	private static final String PRECOMPILED_SOURCES_PREFIX = "src/test/jaxb_resources/";
-	private static final String GENERATED_SOURCES_PREFIX   = "target/test/generated-xsd-classes/";
+	private static final String PREGENERATED_SOURCES_PREFIX = "src/test/jaxb_resources/";
+	private static final String GENERATED_SOURCES_PREFIX    = "target/test/generated-xsd-classes/";
 
-	private static final Log    logger                     = LogFactory.getLog(XmlElementWrapperPluginTest.class);
+	private static final Log    logger                      = LogFactory.getLog(XmlElementWrapperPluginTest.class);
 
 	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Throwable {
-		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces", 4, "Composed.java",
-		            "ObjectFactory.java");
+		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces",
+		            "-Xxew:collection java.util.LinkedList", 4, "Composed.java", "ObjectFactory.java");
 	}
 
 	@Test
 	public void testInnerElementClass() throws Throwable {
-		assertXsd("inner-element-class.xsd", "inner_element_class", 3, "Filesystem.java", "Volume.java",
-		            "ObjectFactory.java");
+		assertXsd("inner-element-class.xsd", "inner_element_class", "-Xxew:instantiate lazy", 3, "Filesystem.java",
+		            "Volume.java", "ObjectFactory.java");
 	}
 
 	@Test
 	public void testAnnotationReferenceInChoice() throws Throwable {
 		// "Markup.java" cannot be tested for content because it contents is changing from one compilation to other
 		// as order of @XmlElementRef annotations is not pre-defined (set is used as container).
-		assertXsd("annotation-reference-in-choice.xsd", "annotation_reference", 3, "Sub.java", "ObjectFactory.java");
+		assertXsd("annotation-reference-in-choice.xsd", "annotation_reference", "-debug", 3, "Sub.java",
+		            "ObjectFactory.java");
+	}
+
+	@Test
+	public void testElementWithParent() throws Throwable {
+		assertXsd("element-with-parent.xsd", "element_with_parent", "-verbose", 3, "Group.java", "Organization.java",
+		            "ObjectFactory.java");
+	}
+
+	@Test
+	public void testElementReferencedTwice() throws Throwable {
+		assertXsd("element-referenced-twice.xsd", "element_referenced_twice", "-Xxew:summaryFile "
+		            + GENERATED_SOURCES_PREFIX + "summary.txt", 3, "Family.java", "FamilyMember.java",
+		            "ObjectFactory.java");
 	}
 
 	/**
@@ -76,11 +90,13 @@ public class XmlElementWrapperPluginTest {
 	 *            the name of this test, also target package name
 	 * @param totalNumberOfFiles
 	 *            total number of generated files
+	 * @param extraXxewOption
+	 *            to be passed to plugin
 	 * @param filesToCheck
 	 *            expected files in target directory; these files content is checked
 	 */
-	private void assertXsd(String resourceXsd, String testName, int totalNumberOfFiles, String... filesToCheck)
-	            throws Exception {
+	private void assertXsd(String resourceXsd, String testName, String extraXxewOption, int totalNumberOfFiles,
+	            String... filesToCheck) throws Exception {
 		String xsdUrl = getClass().getResource(resourceXsd).getFile();
 
 		File target = new File(GENERATED_SOURCES_PREFIX);
@@ -89,8 +105,8 @@ public class XmlElementWrapperPluginTest {
 
 		LoggingPrintStream loggingPrintStream = new LoggingPrintStream();
 
-		Driver.run(new String[] { "-verbose", "-no-header", "-Xxew", "-Xxew:instantiate lazy", "-Xxew:delete", "-d",
-		        target.getPath(), xsdUrl }, loggingPrintStream, loggingPrintStream);
+		Driver.run(new String[] { "-no-header", extraXxewOption, "-Xxew", "-Xxew:delete", "-d", target.getPath(),
+		        xsdUrl }, loggingPrintStream, loggingPrintStream);
 
 		target = new File(target, testName);
 
@@ -104,13 +120,13 @@ public class XmlElementWrapperPluginTest {
 			assertTrue(generatedFileList.contains(fileName));
 		}
 
-		String compareToDir = PRECOMPILED_SOURCES_PREFIX + getClass().getPackage().getName().replace('.', '/') + "/"
+		String compareToDir = PREGENERATED_SOURCES_PREFIX + getClass().getPackage().getName().replace('.', '/') + "/"
 		            + testName;
 
 		for (String fileName : filesToCheck) {
 			// To avoid CR/LF conflicts:
-			assertEquals(FileUtils.readFileToString(new File(compareToDir, fileName)).replace("\r", ""), FileUtils
-			            .readFileToString(new File(target, fileName)).replace("\r", ""));
+			assertEquals("For file \"" + fileName + "\"", FileUtils.readFileToString(new File(compareToDir, fileName))
+			            .replace("\r", ""), FileUtils.readFileToString(new File(target, fileName)).replace("\r", ""));
 		}
 	}
 
