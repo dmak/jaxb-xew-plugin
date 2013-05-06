@@ -80,18 +80,15 @@ public class Filesystem {
 
     @XmlElementWrapper(name = "files", required = true)
     @XmlElement(name = "file")
-    protected List<Filesystem.File> files;
+    protected List<Filesystem.File> files = new ArrayList<Filesystem.File>();
     @XmlElementWrapper(name = "directories", required = true)
     @XmlElement(name = "directory")
-    protected List<String> directories;
+    protected List<String> directories = new ArrayList<String>();
     @XmlElementWrapper(name = "volumes", required = true)
     @XmlElement(name = "volume")
-    protected List<Volume> volumes;
+    protected List<Volume> volumes = new ArrayList<Volume>();
 
     public List<Filesystem.File> getFiles() {
-        if (files == null) {
-            files = new ArrayList<Filesystem.File>();
-        }
         return files;
     }
 
@@ -100,9 +97,6 @@ public class Filesystem {
     }
 
     public List<String> getDirectories() {
-        if (directories == null) {
-            directories = new ArrayList<String>();
-        }
         return directories;
     }
 
@@ -111,9 +105,6 @@ public class Filesystem {
     }
 
     public List<Volume> getVolumes() {
-        if (volumes == null) {
-            volumes = new ArrayList<Volume>();
-        }
         return volumes;
     }
 

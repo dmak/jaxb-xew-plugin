@@ -20,21 +20,33 @@
  */
 package com.sun.tools.xjc.addon.xew;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import com.sun.tools.xjc.Driver;
+import com.sun.tools.xjc.reader.Const;
+import com.sun.tools.xjc.reader.internalizer.DOMForest;
+import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.NullOutputStream;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Testcases for the XEW Plugin
@@ -50,40 +62,65 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Throwable {
-		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces",
-		            "-Xxew:collection java.util.LinkedList", 4, "Composed.java", "ObjectFactory.java");
+		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces", new String[] {
+		        "-Xxew:collection java.util.LinkedList", "-Xxew:instantiate lazy" }, 4, "Composed.java",
+		            "ObjectFactory.java");
 	}
 
 	@Test
 	public void testInnerElementClass() throws Throwable {
-		assertXsd("inner-element-class.xsd", "inner_element_class", "-Xxew:instantiate lazy", 3, "Filesystem.java",
-		            "Volume.java", "ObjectFactory.java");
+		String episodeFile = GENERATED_SOURCES_PREFIX + "/inner_element_class/" + "episode.xml";
+
+		assertXsd("inner-element-class.xsd", "inner_element_class", new String[] { "-debug",
+		        "-Xxew:includeFile " + getClass().getResource("inner-element-class-includes.txt").getFile(),
+		        "-episode", episodeFile }, 4, "Filesystem.java", "Volume.java", "ObjectFactory.java");
+
+		assertArrayEquals(new String[] { "inner_element_class.Filesystem", "inner_element_class.Volumes" },
+		            getClassReferencesFromEpisodeFile(episodeFile));
+	}
+
+	/**
+	 * Return values of all {@code <jaxb:class ref="..." />} attributes.
+	 */
+	private String[] getClassReferencesFromEpisodeFile(String episodeFile) throws SAXException {
+		DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic());
+
+		Document episodeDocument = forest.parse(new InputSource(episodeFile), true);
+
+		NodeList nodeList = episodeDocument.getElementsByTagNameNS(Const.JAXB_NSURI, "class");
+		Collection<String> classReferences = new ArrayList<String>();
+
+		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
+			classReferences.add(((Element) nodeList.item(i)).getAttribute("ref"));
+		}
+
+		return classReferences.toArray(new String[classReferences.size()]);
 	}
 
 	@Test
 	public void testAnnotationReferenceInChoice() throws Throwable {
 		// "Markup.java" cannot be tested for content because it contents is changing from one compilation to other
 		// as order of @XmlElementRef annotations is not pre-defined (set is used as container).
-		assertXsd("annotation-reference-in-choice.xsd", "annotation_reference", "-debug", 3, "Sub.java",
-		            "ObjectFactory.java");
+		assertXsd("annotation-reference-in-choice.xsd", "annotation_reference", new String[] { "-debug", "-verbose" },
+		            3, "Sub.java", "ObjectFactory.java");
 	}
 
 	@Test
 	public void testElementWithParent() throws Throwable {
-		assertXsd("element-with-parent.xsd", "element_with_parent", "-verbose", 3, "Group.java", "Organization.java",
+		assertXsd("element-with-parent.xsd", "element_with_parent", null, 3, "Group.java", "Organization.java",
 		            "ObjectFactory.java");
 	}
 
 	@Test
 	public void testElementReferencedTwice() throws Throwable {
-		assertXsd("element-referenced-twice.xsd", "element_referenced_twice", "-Xxew:summaryFile "
-		            + GENERATED_SOURCES_PREFIX + "summary.txt", 3, "Family.java", "FamilyMember.java",
+		assertXsd("element-referenced-twice.xsd", "element_referenced_twice", new String[] { "-Xxew:summaryFile "
+		            + GENERATED_SOURCES_PREFIX + "summary.txt" }, 3, "Family.java", "FamilyMember.java",
 		            "ObjectFactory.java");
 	}
 
 	@Test
 	public void testElementAny() throws Throwable {
-		assertXsd("element-any.xsd", "element_any", "-verbose", 2, "Data.java", "ObjectFactory.java");
+		assertXsd("element-any.xsd", "element_any", null, 2, "Data.java", "ObjectFactory.java");
 	}
 
 	/**
@@ -100,7 +137,7 @@ public class XmlElementWrapperPluginTest {
 	 * @param filesToCheck
 	 *            expected files in target directory; these files content is checked
 	 */
-	private void assertXsd(String resourceXsd, String testName, String extraXxewOption, int totalNumberOfFiles,
+	private void assertXsd(String resourceXsd, String testName, String[] extraXxewOption, int totalNumberOfFiles,
 	            String... filesToCheck) throws Exception {
 		String xsdUrl = getClass().getResource(resourceXsd).getFile();
 
@@ -110,8 +147,9 @@ public class XmlElementWrapperPluginTest {
 
 		LoggingPrintStream loggingPrintStream = new LoggingPrintStream();
 
-		Driver.run(new String[] { "-no-header", extraXxewOption, "-Xxew", "-Xxew:delete", "-d", target.getPath(),
-		        xsdUrl }, loggingPrintStream, loggingPrintStream);
+		// "-episode", "product.episode"
+		Driver.run(ArrayUtils.addAll(extraXxewOption, "-no-header", "-Xxew", "-Xxew:delete", "-d", target.getPath(),
+		            xsdUrl), loggingPrintStream, loggingPrintStream);
 
 		target = new File(target, testName);
 
@@ -177,7 +215,7 @@ public class XmlElementWrapperPluginTest {
 		}
 
 		private void logMessage() {
-			logger.debug("[XJC] " + sb.toString());
+			logger.info("[XJC] " + sb.toString());
 
 			sb.setLength(0);
 		}

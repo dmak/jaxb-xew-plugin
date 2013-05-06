@@ -39,9 +39,12 @@ public class Composed {
 
     @XmlElementWrapper(name = "entries", required = true)
     @XmlElement(name = "entry", namespace = "http://example.com/entry")
-    protected List<Entry> entries = new LinkedList<Entry>();
+    protected List<Entry> entries;
 
     public List<Entry> getEntries() {
+        if (entries == null) {
+            entries = new LinkedList<Entry>();
+        }
         return entries;
     }
 
