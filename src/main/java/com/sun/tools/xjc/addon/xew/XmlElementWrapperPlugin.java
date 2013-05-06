@@ -27,6 +27,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,13 +48,12 @@ import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassContainer;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JJavaName;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
-import com.sun.codemodel.JStringLiteral;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.BadCommandLineException;
@@ -510,13 +511,14 @@ public class XmlElementWrapperPlugin extends Plugin {
 		JClassContainer container = candidate.getModelClass().parentContainer();
 		setPrivateField(fieldClass, "outer", container);
 
-		// If container is a class, then element class should be added as its child:
+		// FIXME: Pending https://java.net/jira/browse/JAXB-957
+		// Element class should be added as its container child:
 		if (container instanceof JDefinedClass) {
 			JDefinedClass parentClass = (JDefinedClass) container;
 
 			((Map<String, JDefinedClass>) getPrivateField(parentClass, "classes")).put(fieldClass.name(), fieldClass);
 
-			writeSummary("\tMoving class " + fieldClass.fullName() + " to class " + parentClass.fullName());
+			writeSummary("\tMoving inner class " + fieldClass.fullName() + " to class " + parentClass.fullName());
 		}
 		else {
 			JPackage parentPackage = (JPackage) container;
@@ -526,7 +528,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 			// In this scenario class should have "static" modifier reset:
 			setPrivateField(fieldClass.mods(), "mods", fieldClass.mods().getValue() & ~JMod.STATIC);
 
-			writeSummary("\tMoving class " + fieldClass.fullName() + " to package " + parentPackage.name());
+			writeSummary("\tMoving inner class " + fieldClass.fullName() + " to package " + parentPackage.name());
 		}
 
 		return true;
@@ -792,27 +794,24 @@ public class XmlElementWrapperPlugin extends Plugin {
 	private static final String getAnnotationMemberStringValue(JAnnotationUse annotation, String annotationMember) {
 		JAnnotationValue annotationValue = annotation.getAnnotationMembers().get(annotationMember);
 
-		if (annotationValue != null) {
-			return getAnnotationStringValue(annotationValue);
+		if (annotationValue == null) {
+			return null;
 		}
 
-		return null;
+		return getAnnotationStringValue(annotationValue);
 	}
 
 	/**
 	 * Returns the string value of annotation.
 	 */
 	private static final String getAnnotationStringValue(JAnnotationValue annotationValue) {
-		// FIXME: Waiting for improvement in http://java.net/jira/browse/JAXB-878 and http://java.net/jira/browse/JAXB-879:
-		if (annotationValue.getClass().getSimpleName().equals("JAnnotationStringValue")) {
-			JExpression value = (JExpression) getPrivateField(annotationValue, "value");
+		// There is hardly any clean universal way to get the value from JExpression except of serializing it.
+		// Compare JStringLiteral and JExp#dotclass().
+		Writer w = new StringWriter();
 
-			if (value instanceof JStringLiteral) {
-				return ((JStringLiteral) value).str;
-			}
-		}
+		annotationValue.generate(new JFormatter(w));
 
-		return null;
+		return w.toString().replace("\"", "");
 	}
 
 	/**

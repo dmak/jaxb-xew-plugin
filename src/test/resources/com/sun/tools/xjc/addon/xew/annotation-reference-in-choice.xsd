@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="annotation_reference" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:complexType name="markup">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="br" />
+			<xs:element ref="u" />
+			<xs:element ref="p" />
+			<xs:element ref="sub" />
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="br" />
+	<xs:element name="p" />
+	<xs:element name="u" type="markup" />
+	<!--
+		Important is that class "Sub" will be referred from class "Markup" via @XmlElementRef(name = "sub", type = Sub.class)
+		and thus should not be deleted.
+	-->
+	<xs:element name="sub">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="para" type="markup" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

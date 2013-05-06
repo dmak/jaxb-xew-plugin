@@ -60,6 +60,13 @@ public class XmlElementWrapperPluginTest {
 		            "ObjectFactory.java");
 	}
 
+	@Test
+	public void testAnnotationReferenceInChoice() throws Throwable {
+		// "Markup.java" cannot be tested for content because it contents is changing from one compilation to other
+		// as order of @XmlElementRef annotations is not pre-defined (set is used as container).
+		assertXsd("annotation-reference-in-choice.xsd", "annotation_reference", 3, "Sub.java", "ObjectFactory.java");
+	}
+
 	/**
 	 * Standard test for XSD examples.
 	 * 
@@ -70,7 +77,7 @@ public class XmlElementWrapperPluginTest {
 	 * @param totalNumberOfFiles
 	 *            total number of generated files
 	 * @param filesToCheck
-	 *            Expected files in generation dir. These files content is checked, when compareDir is set.
+	 *            expected files in target directory; these files content is checked
 	 */
 	private void assertXsd(String resourceXsd, String testName, int totalNumberOfFiles, String... filesToCheck)
 	            throws Exception {
