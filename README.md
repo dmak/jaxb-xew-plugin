@@ -132,6 +132,12 @@ The following options are applicable for plugin:
 </tr>
 </table>
 
+### Episode file
+
+For correct generation of episode file, the corresponding options should follow `-Xxew`, for example:
+
+`-Xxew ... -episode <file>`
+
 ### Ant task
 
 First you need to download the plugin jar (for example, from [Maven repository](http://mirrors.ibiblio.org/pub/mirrors/maven2/com/github/jaxb-xew-plugin/jaxb-xew-plugin)) and put it to your project `lib` folder.

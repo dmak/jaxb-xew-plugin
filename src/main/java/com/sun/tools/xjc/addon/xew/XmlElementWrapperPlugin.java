@@ -65,6 +65,8 @@ import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+import com.sun.xml.xsom.XSComponent;
+import com.sun.xml.xsom.XSDeclaration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -344,7 +346,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				modificationCount++;
 
 				// The container class has to be deleted. Check that inner class has to be moved to it's parent.
-				if (moveInnerClassToParentIfNecessary(candidate)) {
+				if (moveInnerClassToParentIfNecessary(outline, candidate)) {
 					modificationCount++;
 				}
 
@@ -476,7 +478,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 		int deletionCount = 0;
 
 		if (deleteCandidates) {
-			deletionCount = deleteCandidates(candidates);
+			deletionCount = deleteCandidates(outline, candidates);
 		}
 
 		writeSummary("\t" + deletionCount + " deletion(s) from original code.");
@@ -497,8 +499,11 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * we need to get<br>
 	 * {@code TopClass (will have a collection) -> ElementClass}.<br>
 	 * Also this move should be reflected on factory method names.
+	 * 
+	 * @param outline
+	 *            TODO
 	 */
-	private boolean moveInnerClassToParentIfNecessary(Candidate candidate) {
+	private boolean moveInnerClassToParentIfNecessary(Outline outline, Candidate candidate) {
 		// Skip basic parametrizations like "List<String>":
 		if (!(candidate.getFieldParametrizationClass() instanceof JDefinedClass)) {
 			return false;
@@ -533,14 +538,17 @@ public class XmlElementWrapperPlugin extends Plugin {
 		if (container instanceof JDefinedClass) {
 			JDefinedClass parentClass = (JDefinedClass) container;
 
-			((Map<String, JDefinedClass>) getPrivateField(parentClass, "classes")).put(
-			            fieldParametrizationClass.name(), fieldParametrizationClass);
-
 			writeSummary("\tMoving inner class " + fieldParametrizationClass.fullName() + " to class "
 			            + parentClass.fullName());
+
+			((Map<String, JDefinedClass>) getPrivateField(parentClass, "classes")).put(
+			            fieldParametrizationClass.name(), fieldParametrizationClass);
 		}
 		else {
 			JPackage parentPackage = (JPackage) container;
+
+			writeSummary("\tMoving inner class " + fieldParametrizationClass.fullName() + " to package "
+			            + parentPackage.name());
 
 			((Map<String, JDefinedClass>) getPrivateField(parentPackage, "classes")).put(
 			            fieldParametrizationClass.name(), fieldParametrizationClass);
@@ -549,8 +557,14 @@ public class XmlElementWrapperPlugin extends Plugin {
 			setPrivateField(fieldParametrizationClass.mods(), "mods", fieldParametrizationClass.mods().getValue()
 			            & ~JMod.STATIC);
 
-			writeSummary("\tMoving inner class " + fieldParametrizationClass.fullName() + " to package "
-			            + parentPackage.name());
+			for (ClassOutline classOutline : outline.getClasses()) {
+				if (classOutline.implClass == fieldParametrizationClass) {
+					XSComponent sc = classOutline.target.getSchemaComponent();
+					if (sc instanceof XSDeclaration && ((XSDeclaration) sc).isLocal()) {
+						setPrivateField(sc, "anonymous", Boolean.FALSE);
+					}
+				}
+			}
 		}
 
 		return true;
@@ -624,7 +638,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * 
 	 * @return the number of deletions performed
 	 */
-	private int deleteCandidates(Map<String, Candidate> candidates) {
+	private int deleteCandidates(Outline outline, Map<String, Candidate> candidates) {
 		int deletionCount = 0;
 
 		writeSummary("Deletions:");
@@ -660,7 +674,9 @@ public class XmlElementWrapperPlugin extends Plugin {
 			if (candidateClass.parentContainer().isClass()) {
 				// The candidate class is an inner class. Remove the class from its parent class.
 				JDefinedClass parent = (JDefinedClass) candidateClass.parentContainer();
+
 				writeSummary("\tRemoving class " + candidateClass.fullName() + " from class " + parent.fullName());
+
 				Iterator<JDefinedClass> iter = parent.classes();
 				while (iter.hasNext())
 					if (iter.next().equals(candidateClass)) {
@@ -674,6 +690,16 @@ public class XmlElementWrapperPlugin extends Plugin {
 				writeSummary("\tRemoving class " + candidateClass.fullName() + " from package "
 				            + candidateClass._package().name());
 				candidateClass._package().remove(candidateClass);
+
+				Iterator<? extends ClassOutline> iter = outline.getClasses().iterator();
+				while (iter.hasNext()) {
+					ClassOutline classOutline = iter.next();
+					if (classOutline.implClass == candidateClass) {
+						outline.getModel().beans().remove(classOutline.target);
+						iter.remove();
+					}
+				}
+
 				deletionCount++;
 			}
 		}
@@ -886,17 +912,27 @@ public class XmlElementWrapperPlugin extends Plugin {
 		return propertyInfo.getTypes().get(0).getTagName().getLocalPart();
 	}
 
+	private static void setPrivateField(Object obj, String fieldName, Object newValue) {
+		setPrivateField(obj, obj.getClass(), fieldName, newValue);
+	}
+
 	/**
 	 * Set the {@code newValue} to private field {@code fieldName} of given object {@code obj}.
 	 */
-	private static void setPrivateField(Object obj, String fieldName, Object newValue) {
+	private static void setPrivateField(Object obj, Class<?> clazz, String fieldName, Object newValue) {
 		try {
-			Field field = obj.getClass().getDeclaredField(fieldName);
+			Field field = clazz.getDeclaredField(fieldName);
 			field.setAccessible(true);
 			field.set(obj, newValue);
 		}
 		catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
+			if (clazz.getSuperclass() == Object.class) {
+				// Field is really not found:
+				throw new RuntimeException(e);
+			}
+
+			// Try super class:
+			setPrivateField(obj, clazz.getSuperclass(), fieldName, newValue);
 		}
 		catch (IllegalAccessException e) {
 			throw new RuntimeException(e);

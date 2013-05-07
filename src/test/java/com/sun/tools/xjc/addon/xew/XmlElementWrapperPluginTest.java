@@ -20,16 +20,14 @@
  */
 package com.sun.tools.xjc.addon.xew;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.sun.tools.xjc.Driver;
 import com.sun.tools.xjc.reader.Const;
@@ -63,38 +61,14 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Throwable {
 		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces", new String[] {
-		        "-Xxew:collection java.util.LinkedList", "-Xxew:instantiate lazy" }, 4, "Composed.java",
-		            "ObjectFactory.java");
+		        "-Xxew:collection java.util.LinkedList", "-Xxew:instantiate lazy" }, false, 4, "Composed");
 	}
 
 	@Test
 	public void testInnerElementClass() throws Throwable {
-		String episodeFile = GENERATED_SOURCES_PREFIX + "/inner_element_class/" + "episode.xml";
-
 		assertXsd("inner-element-class.xsd", "inner_element_class", new String[] { "-debug",
-		        "-Xxew:includeFile " + getClass().getResource("inner-element-class-includes.txt").getFile(),
-		        "-episode", episodeFile }, 4, "Filesystem.java", "Volume.java", "ObjectFactory.java");
-
-		assertArrayEquals(new String[] { "inner_element_class.Filesystem", "inner_element_class.Volumes" },
-		            getClassReferencesFromEpisodeFile(episodeFile));
-	}
-
-	/**
-	 * Return values of all {@code <jaxb:class ref="..." />} attributes.
-	 */
-	private String[] getClassReferencesFromEpisodeFile(String episodeFile) throws SAXException {
-		DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic());
-
-		Document episodeDocument = forest.parse(new InputSource(episodeFile), true);
-
-		NodeList nodeList = episodeDocument.getElementsByTagNameNS(Const.JAXB_NSURI, "class");
-		Collection<String> classReferences = new ArrayList<String>();
-
-		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
-			classReferences.add(((Element) nodeList.item(i)).getAttribute("ref"));
-		}
-
-		return classReferences.toArray(new String[classReferences.size()]);
+		        "-Xxew:includeFile " + getClass().getResource("inner-element-class-includes.txt").getFile() }, true, 3,
+		            "Filesystem", "Volume");
 	}
 
 	@Test
@@ -102,75 +76,126 @@ public class XmlElementWrapperPluginTest {
 		// "Markup.java" cannot be tested for content because it contents is changing from one compilation to other
 		// as order of @XmlElementRef annotations is not pre-defined (set is used as container).
 		assertXsd("annotation-reference-in-choice.xsd", "annotation_reference", new String[] { "-debug", "-verbose" },
-		            3, "Sub.java", "ObjectFactory.java");
+		            false, 3, "Markup", "Sub");
 	}
 
 	@Test
 	public void testElementWithParent() throws Throwable {
-		assertXsd("element-with-parent.xsd", "element_with_parent", null, 3, "Group.java", "Organization.java",
-		            "ObjectFactory.java");
+		assertXsd("element-with-parent.xsd", "element_with_parent", null, false, 3, "Group", "Organization");
 	}
 
 	@Test
 	public void testElementReferencedTwice() throws Throwable {
 		assertXsd("element-referenced-twice.xsd", "element_referenced_twice", new String[] { "-Xxew:summaryFile "
-		            + GENERATED_SOURCES_PREFIX + "summary.txt" }, 3, "Family.java", "FamilyMember.java",
-		            "ObjectFactory.java");
+		            + GENERATED_SOURCES_PREFIX + "summary.txt" }, false, 3, "Family", "FamilyMember");
 	}
 
 	@Test
 	public void testElementAny() throws Throwable {
-		assertXsd("element-any.xsd", "element_any", null, 2, "Data.java", "ObjectFactory.java");
+		assertXsd("element-any.xsd", "element_any", null, false, 2, "Data");
 	}
 
 	/**
 	 * Standard test for XSD examples.
 	 * 
-	 * @param xsdUrl
-	 *            URL to xsd file
-	 * @param testName
-	 *            the name of this test, also target package name
-	 * @param totalNumberOfFiles
-	 *            total number of generated files
-	 * @param extraXxewOption
+	 * @param resourceXsd
+	 *            XSD file name
+	 * @param packageName
+	 *            target package name
+	 * @param extraXewOptions
 	 *            to be passed to plugin
-	 * @param filesToCheck
-	 *            expected files in target directory; these files content is checked
+	 * @param generateEpisode
+	 *            generate episode file and check the list of classes included into it
+	 * @param totalNumberOfFiles
+	 *            total number of generated files, including {@code ObjectFactory.java} and {@code package-info.java}.
+	 * @param classesToCheck
+	 *            expected classes/files in target directory; these files content is checked if it is present in
+	 *            resources directory; {@code ObjectFactory.java} is automatically included
 	 */
-	private void assertXsd(String resourceXsd, String testName, String[] extraXxewOption, int totalNumberOfFiles,
-	            String... filesToCheck) throws Exception {
+	private void assertXsd(String resourceXsd, String packageName, String[] extraXewOptions, boolean generateEpisode,
+	            int totalNumberOfFiles, String... classesToCheck) throws Exception {
 		String xsdUrl = getClass().getResource(resourceXsd).getFile();
 
-		File target = new File(GENERATED_SOURCES_PREFIX);
+		File targetDir = new File(GENERATED_SOURCES_PREFIX);
 
-		target.mkdirs();
+		targetDir.mkdirs();
 
 		LoggingPrintStream loggingPrintStream = new LoggingPrintStream();
 
-		// "-episode", "product.episode"
-		Driver.run(ArrayUtils.addAll(extraXxewOption, "-no-header", "-Xxew", "-Xxew:delete", "-d", target.getPath(),
-		            xsdUrl), loggingPrintStream, loggingPrintStream);
+		String[] opts = ArrayUtils.addAll(extraXewOptions, "-no-header", "-Xxew", "-Xxew:delete", "-d",
+		            targetDir.getPath(), xsdUrl);
 
-		target = new File(target, testName);
+		String episodeFile = new File(targetDir, "episode.xml").getPath();
 
-		String[] list = target.list();
-
-		List<String> generatedFileList = Arrays.asList(list);
-
-		assertEquals(totalNumberOfFiles, list.length);
-
-		for (String fileName : filesToCheck) {
-			assertTrue(generatedFileList.contains(fileName));
+		// Episode plugin should be triggered after Xew, see https://github.com/dmak/jaxb-xew-plugin/issues/6
+		if (generateEpisode) {
+			opts = ArrayUtils.addAll(opts, "-episode", episodeFile);
 		}
 
-		String compareToDir = PREGENERATED_SOURCES_PREFIX + getClass().getPackage().getName().replace('.', '/') + "/"
-		            + testName;
+		assertTrue("XJC compilation failed. Checked console for more info.",
+		            Driver.run(opts, loggingPrintStream, loggingPrintStream) == 0);
 
-		for (String fileName : filesToCheck) {
-			// To avoid CR/LF conflicts:
-			assertEquals("For file \"" + fileName + "\"", FileUtils.readFileToString(new File(compareToDir, fileName))
-			            .replace("\r", ""), FileUtils.readFileToString(new File(target, fileName)).replace("\r", ""));
+		if (generateEpisode) {
+			Set<String> classReferences = getClassReferencesFromEpisodeFile(episodeFile);
+
+			assertEquals(classesToCheck.length, classReferences.size());
+
+			for (String className : classesToCheck) {
+				assertTrue(className + " class is missing in episode file",
+				            classReferences.contains(packageName + "." + className));
+			}
 		}
+
+		targetDir = new File(targetDir, packageName);
+
+		Set<String> generatedFileList = new HashSet<String>();
+
+		Collections.addAll(generatedFileList, targetDir.list());
+
+		assertEquals(totalNumberOfFiles, generatedFileList.size());
+
+		// This class is added and checked by default:
+		classesToCheck = ArrayUtils.add(classesToCheck, "ObjectFactory");
+
+		for (String className : classesToCheck) {
+			className += ".java";
+
+			assertTrue(className + " class is missing in target directory", generatedFileList.contains(className));
+		}
+
+		String preGeneratedDir = PREGENERATED_SOURCES_PREFIX + getClass().getPackage().getName().replace('.', '/')
+		            + "/" + packageName;
+
+		// Check the contents for those files which exist in resources:
+		for (String className : classesToCheck) {
+			className += ".java";
+
+			File sourceFile = new File(preGeneratedDir, className);
+
+			if (sourceFile.exists()) {
+				// To avoid CR/LF conflicts:
+				assertEquals("For " + className, FileUtils.readFileToString(sourceFile).replace("\r", ""), FileUtils
+				            .readFileToString(new File(targetDir, className)).replace("\r", ""));
+			}
+		}
+	}
+
+	/**
+	 * Return values of all {@code <jaxb:class ref="..." />} attributes.
+	 */
+	private Set<String> getClassReferencesFromEpisodeFile(String episodeFile) throws SAXException {
+		DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic());
+
+		Document episodeDocument = forest.parse(new InputSource(episodeFile), true);
+
+		NodeList nodeList = episodeDocument.getElementsByTagNameNS(Const.JAXB_NSURI, "class");
+		Set<String> classReferences = new HashSet<String>();
+
+		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
+			classReferences.add(((Element) nodeList.item(i)).getAttribute("ref"));
+		}
+
+		return classReferences;
 	}
 
 	/**
