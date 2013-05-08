@@ -1,4 +1,0 @@
-# The only class for inclusion:
-inner_element_class.Filesystem.Files
-inner_element_class.Filesystem.Directories
-inner_element_class.Volumes

@@ -1,5 +1,5 @@
 
-package inner_element_class;
+package element_as_parametrisation;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the inner_element_class package. 
+ * generated in the element_as_parametrisation package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -23,34 +23,42 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: inner_element_class
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: element_as_parametrisation
      * 
      */
     public ObjectFactory() {
     }
 
     /**
-     * Create an instance of {@link Filesystem }
+     * Create an instance of {@link Articles }
      * 
      */
-    public Filesystem createFilesystem() {
-        return new Filesystem();
+    public Articles createArticles() {
+        return new Articles();
     }
 
     /**
-     * Create an instance of {@link Volume }
+     * Create an instance of {@link Article }
      * 
      */
-    public Volume createVolume() {
-        return new Volume();
+    public Article createArticle() {
+        return new Article();
     }
 
     /**
-     * Create an instance of {@link Filesystem.File }
+     * Create an instance of {@link Publisher }
      * 
      */
-    public Filesystem.File createFilesystemFile() {
-        return new Filesystem.File();
+    public Publisher createPublisher() {
+        return new Publisher();
+    }
+
+    /**
+     * Create an instance of {@link ArticlesCollections }
+     * 
+     */
+    public ArticlesCollections createArticlesCollections() {
+        return new ArticlesCollections();
     }
 
 }

@@ -1,5 +1,5 @@
 
-package inner_element_class;
+package inner_element;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -22,12 +22,12 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="files">
+ *         &lt;element name="file-listing">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="file" maxOccurs="unbounded">
+ *                   &lt;element name="file-item" maxOccurs="unbounded">
  *                     &lt;complexType>
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -44,12 +44,12 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="directories">
+ *         &lt;element name="directory-listing">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="directory" maxOccurs="unbounded">
+ *                   &lt;element name="directory-item" maxOccurs="unbounded">
  *                     &lt;simpleType>
  *                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                       &lt;/restriction>
@@ -71,37 +71,37 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "files",
-    "directories",
+    "fileListing",
+    "directoryListing",
     "volumes"
 })
 @XmlRootElement(name = "filesystem")
 public class Filesystem {
 
-    @XmlElementWrapper(name = "files", required = true)
-    @XmlElement(name = "file")
-    protected List<Filesystem.File> files = new ArrayList<Filesystem.File>();
-    @XmlElementWrapper(name = "directories", required = true)
-    @XmlElement(name = "directory")
-    protected List<String> directories = new ArrayList<String>();
+    @XmlElementWrapper(name = "file-listing", required = true)
+    @XmlElement(name = "file-item")
+    protected List<Filesystem.FileItem> fileListing = new ArrayList<Filesystem.FileItem>();
+    @XmlElementWrapper(name = "directory-listing", required = true)
+    @XmlElement(name = "directory-item")
+    protected List<String> directoryListing = new ArrayList<String>();
     @XmlElementWrapper(name = "volumes", required = true)
     @XmlElement(name = "volume")
     protected List<Volume> volumes = new ArrayList<Volume>();
 
-    public List<Filesystem.File> getFiles() {
-        return files;
+    public List<Filesystem.FileItem> getFileListing() {
+        return fileListing;
     }
 
-    public void setFiles(List<Filesystem.File> files) {
-        this.files = files;
+    public void setFileListing(List<Filesystem.FileItem> fileListing) {
+        this.fileListing = fileListing;
     }
 
-    public List<String> getDirectories() {
-        return directories;
+    public List<String> getDirectoryListing() {
+        return directoryListing;
     }
 
-    public void setDirectories(List<String> directories) {
-        this.directories = directories;
+    public void setDirectoryListing(List<String> directoryListing) {
+        this.directoryListing = directoryListing;
     }
 
     public List<Volume> getVolumes() {
@@ -137,7 +137,7 @@ public class Filesystem {
     @XmlType(name = "", propOrder = {
 
     })
-    public static class File {
+    public static class FileItem {
 
         @XmlElement(required = true)
         protected String name;

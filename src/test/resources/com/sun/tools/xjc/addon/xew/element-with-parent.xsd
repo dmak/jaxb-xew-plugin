@@ -13,6 +13,9 @@
 		</xs:appinfo>
 	</xs:annotation>
 
+	<!--
+		This class is not considered as candidate because it has a parent class.
+	-->
 	<xs:complexType name="group">
 		<xs:sequence>
 			<xs:element name="person" maxOccurs="unbounded">
@@ -26,10 +29,15 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<!--
+		This class is not considered as candidate because it has a parent class.
+	-->
 	<xs:complexType name="organization">
 		<xs:complexContent>
 			<xs:extension base="group">
-				<xs:attribute name="title" type="xs:string" />
+				<xs:sequence>
+					<xs:element name="address" type="xs:string" maxOccurs="unbounded" />
+				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

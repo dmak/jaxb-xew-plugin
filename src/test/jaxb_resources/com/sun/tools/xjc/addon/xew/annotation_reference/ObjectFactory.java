@@ -24,8 +24,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _U_QNAME = new QName("", "u");
-    private final static QName _P_QNAME = new QName("", "p");
+    private final static QName _Page_QNAME = new QName("", "page");
     private final static QName _Br_QNAME = new QName("", "br");
 
     /**
@@ -36,11 +35,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Sub }
+     * Create an instance of {@link Para }
      * 
      */
-    public Sub createSub() {
-        return new Sub();
+    public Para createPara() {
+        return new Para();
     }
 
     /**
@@ -52,21 +51,60 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Markup }{@code >}}
+     * Create an instance of {@link ClassesEu }
      * 
      */
-    @XmlElementDecl(namespace = "", name = "u")
-    public JAXBElement<Markup> createU(Markup value) {
-        return new JAXBElement<Markup>(_U_QNAME, Markup.class, null, value);
+    public ClassesEu createClassesEu() {
+        return new ClassesEu();
+    }
+
+    /**
+     * Create an instance of {@link SearchMulti }
+     * 
+     */
+    public SearchMulti createSearchMulti() {
+        return new SearchMulti();
+    }
+
+    /**
+     * Create an instance of {@link ClassExt }
+     * 
+     */
+    public ClassExt createClassExt() {
+        return new ClassExt();
+    }
+
+    /**
+     * Create an instance of {@link SearchEu }
+     * 
+     */
+    public SearchEu createSearchEu() {
+        return new SearchEu();
+    }
+
+    /**
+     * Create an instance of {@link ClassCommon }
+     * 
+     */
+    public ClassCommon createClassCommon() {
+        return new ClassCommon();
+    }
+
+    /**
+     * Create an instance of {@link ClassesUs }
+     * 
+     */
+    public ClassesUs createClassesUs() {
+        return new ClassesUs();
     }
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "p")
-    public JAXBElement<Object> createP(Object value) {
-        return new JAXBElement<Object>(_P_QNAME, Object.class, null, value);
+    @XmlElementDecl(namespace = "", name = "page")
+    public JAXBElement<Object> createPage(Object value) {
+        return new JAXBElement<Object>(_Page_QNAME, Object.class, null, value);
     }
 
     /**

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	targetNamespace="http://foo.org/"
+	xmlns:foo="http://foo.org/"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="element_mixed" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:complexType name="b" mixed="true">
+		<xs:sequence>
+			<xs:element name="i" type="foo:i" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="i" mixed="true">
+		<xs:sequence>
+			<xs:element name="b" type="foo:b" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="text">
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+
+	<xs:simpleType name="number">
+		<xs:restriction base="xs:integer" />
+	</xs:simpleType>
+
+	<!--
+		Example of "List<Object>" field + @XmlElements annotation.
+	-->
+	<xs:complexType name="formatted-text">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="i" type="foo:i" />
+			<xs:element name="b" type="foo:b" />
+		</xs:choice>
+	</xs:complexType>
+
+	<!--
+		Example of "List<Serializable>" field + @XmlElements annotation.
+	-->
+	<xs:complexType name="fixed-text">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="text" type="foo:text" />
+			<xs:element name="ref" type="foo:number" />
+		</xs:choice>
+	</xs:complexType>
+
+	<!--
+		Example of "List<JAXBElement<String>>" field + @XmlElementRefs annotation.
+		Results scoped declarations @XmlElementDecl(..., scope = PrefixedText.class).
+	-->
+	<xs:complexType name="prefixed-text">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="prefix" type="foo:text" />
+			<xs:element name="text" type="foo:text" />
+			<xs:element name="suffix" type="foo:text" />
+		</xs:choice>
+	</xs:complexType>
+</xs:schema>

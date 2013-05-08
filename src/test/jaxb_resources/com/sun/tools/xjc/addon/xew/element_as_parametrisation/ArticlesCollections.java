@@ -1,5 +1,5 @@
 
-package element_with_parent;
+package element_as_parametrisation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,18 +10,18 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for organization complex type.
+ * <p>Java class for articles-collections complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="organization">
+ * &lt;complexType name="articles-collections">
  *   &lt;complexContent>
- *     &lt;extension base="{}group">
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="address" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
+ *         &lt;element name="articles" type="{}articles" maxOccurs="unbounded"/>
  *       &lt;/sequence>
- *     &lt;/extension>
+ *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -29,43 +29,41 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "organization", propOrder = {
-    "address"
+@XmlType(name = "articles-collections", propOrder = {
+    "articles"
 })
-public class Organization
-    extends Group
-{
+public class ArticlesCollections {
 
     @XmlElement(required = true)
-    protected List<String> address;
+    protected List<Articles> articles;
 
     /**
-     * Gets the value of the address property.
+     * Gets the value of the articles property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the address property.
+     * This is why there is not a <CODE>set</CODE> method for the articles property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getAddress().add(newItem);
+     *    getArticles().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String }
+     * {@link Articles }
      * 
      * 
      */
-    public List<String> getAddress() {
-        if (address == null) {
-            address = new ArrayList<String>();
+    public List<Articles> getArticles() {
+        if (articles == null) {
+            articles = new ArrayList<Articles>();
         }
-        return this.address;
+        return this.articles;
     }
 
 }

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="annotation_reference" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+	
+	<!--
+		**************************
+		Reference with @XmlElement
+		**************************
+	-->
+
+	<xs:complexType name="search-eu">
+		<xs:sequence>
+			<xs:element name="classes-eu" type="classes-eu" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!--
+		This class won't be deleted due to generic field "List<Object>".
+	-->
+	<xs:complexType name="search-multi">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="classes-eu" type="classes-eu" />
+			<xs:element name="classes-us" type="classes-us" />
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="class-common">
+		<xs:sequence>
+			<xs:element name="country" type="xs:string" />
+			<xs:element name="code" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="class-ext">
+		<xs:complexContent>
+			<xs:extension base="class-common">
+				<xs:sequence>
+					<xs:element name="id" type="xs:string" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!--
+		Important is that this class is referred from class "SearchMulti" via
+		@XmlElement(name = "classes-eu", type = ClassesEu.class)
+		and thus should not be deleted.
+	-->
+	<xs:complexType name="classes-eu">
+		<xs:sequence>
+			<xs:element name="class-eu" type="class-common" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!--
+		Important is that this class is referred from class "SearchMulti" via
+		@XmlElement(name = "classes-us", type = ClassesUs.class)
+		and thus should not be deleted.
+	-->
+	<xs:complexType name="classes-us">
+		<xs:sequence>
+			<xs:element name="class-us" type="class-ext" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!--
+		*****************************
+		Reference with @XmlElementRef
+		*****************************
+	-->
+
+	<xs:complexType name="markup">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="br" />
+			<xs:element ref="page" />
+			<xs:element ref="para" />
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:element name="br" />
+	<xs:element name="page" />
+
+	<!--
+		Important is that class "Para" is referred from class "Markup" via
+		@XmlElementRef(name = "para", type = Para.class, required = false)
+		and thus should not be deleted.
+	-->
+	<xs:element name="para">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="sub" type="markup" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

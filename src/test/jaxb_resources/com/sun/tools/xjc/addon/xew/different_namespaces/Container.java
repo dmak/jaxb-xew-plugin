@@ -21,7 +21,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://example.com/composed}entries"/>
+ *         &lt;element ref="{http://example.com/entries}entries" minOccurs="0"/>
+ *         &lt;element ref="{http://example.com/items}items"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -32,14 +33,18 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "entries"
+    "entries",
+    "items"
 })
-@XmlRootElement(name = "composed")
-public class Composed {
+@XmlRootElement(name = "container", namespace = "http://example.com/container")
+public class Container {
 
-    @XmlElementWrapper(name = "entries", required = true)
+    @XmlElementWrapper(name = "entries")
     @XmlElement(name = "entry", namespace = "http://example.com/entry")
     protected List<Entry> entries;
+    @XmlElementWrapper(name = "items", required = true, namespace = "http://example.com/items")
+    @XmlElement(name = "entry", namespace = "http://example.com/entry")
+    protected List<Entry> items;
 
     public List<Entry> getEntries() {
         if (entries == null) {
@@ -50,6 +55,17 @@ public class Composed {
 
     public void setEntries(List<Entry> entries) {
         this.entries = entries;
+    }
+
+    public List<Entry> getItems() {
+        if (items == null) {
+            items = new LinkedList<Entry>();
+        }
+        return items;
+    }
+
+    public void setItems(List<Entry> items) {
+        this.items = items;
     }
 
 }

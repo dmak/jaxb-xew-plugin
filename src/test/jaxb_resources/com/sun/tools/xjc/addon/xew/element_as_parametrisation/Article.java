@@ -1,7 +1,6 @@
 
-package inner_element_class;
+package element_as_parametrisation;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -9,18 +8,18 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for article complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="article">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;all>
- *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="capacity" type="{http://www.w3.org/2001/XMLSchema}integer"/>
- *       &lt;/all>
+ *       &lt;sequence>
+ *         &lt;element name="title" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="author" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -29,62 +28,63 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-
+@XmlType(name = "article", propOrder = {
+    "title",
+    "author"
 })
-public class Volume {
+public class Article {
 
     @XmlElement(required = true)
-    protected String name;
+    protected String title;
     @XmlElement(required = true)
-    protected BigInteger capacity;
+    protected String author;
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the title property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the title property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setTitle(String value) {
+        this.title = value;
     }
 
     /**
-     * Gets the value of the capacity property.
+     * Gets the value of the author property.
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link String }
      *     
      */
-    public BigInteger getCapacity() {
-        return capacity;
+    public String getAuthor() {
+        return author;
     }
 
     /**
-     * Sets the value of the capacity property.
+     * Sets the value of the author property.
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link String }
      *     
      */
-    public void setCapacity(BigInteger value) {
-        this.capacity = value;
+    public void setAuthor(String value) {
+        this.author = value;
     }
 
 }

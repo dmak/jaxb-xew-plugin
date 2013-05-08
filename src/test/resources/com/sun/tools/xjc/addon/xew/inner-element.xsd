@@ -8,7 +8,7 @@
 	<xs:annotation>
 		<xs:appinfo>
 			<jaxb:schemaBindings>
-				<jaxb:package name="inner_element_class" />
+				<jaxb:package name="inner_element" />
 			</jaxb:schemaBindings>
 		</xs:appinfo>
 	</xs:annotation>
@@ -16,13 +16,13 @@
 	<xs:element name="filesystem">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="files">
+				<xs:element name="file-listing">
 					<xs:complexType>
 						<xs:sequence>
 							<!--
 								Important is that inner class corresponding to this element is correctly moved to outer class.
 							-->
-							<xs:element name="file" maxOccurs="unbounded">
+							<xs:element name="file-item" maxOccurs="unbounded">
 								<xs:complexType>
 									<xs:all>
 										<xs:element name="name" type="xs:string" />
@@ -33,13 +33,13 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="directories">
+				<xs:element name="directory-listing">
 					<xs:complexType>
 						<xs:sequence>
 							<!--
 								Example of collection with basic type (string).
 							-->
-							<xs:element name="directory" maxOccurs="unbounded">
+							<xs:element name="directory-item" maxOccurs="unbounded">
 								<xs:simpleType>
 									<xs:restriction base="xs:string" />
 								</xs:simpleType>

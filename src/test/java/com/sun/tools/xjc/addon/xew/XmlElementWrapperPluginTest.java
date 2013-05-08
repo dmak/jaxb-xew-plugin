@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,7 +36,6 @@ import com.sun.tools.xjc.reader.internalizer.DOMForest;
 import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +47,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Testcases for the XEW Plugin
+ * Testcases for the XEW Plugin.
  * 
  * @author Tobias Warneke
  */
@@ -59,40 +59,56 @@ public class XmlElementWrapperPluginTest {
 	private static final Log    logger                      = LogFactory.getLog(XmlElementWrapperPluginTest.class);
 
 	@Test
-	public void testDifferentNamespacesForWrapperAndElement() throws Throwable {
+	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
 		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces", new String[] {
-		        "-Xxew:collection java.util.LinkedList", "-Xxew:instantiate lazy" }, false, 4, "Composed");
+		        "-Xxew:collection java.util.LinkedList", "-Xxew:instantiate lazy" }, false, 4, "Container",
+		            "package-info");
 	}
 
 	@Test
-	public void testInnerElementClass() throws Throwable {
-		assertXsd("inner-element-class.xsd", "inner_element_class", new String[] { "-debug",
-		        "-Xxew:includeFile " + getClass().getResource("inner-element-class-includes.txt").getFile() }, true, 3,
+	public void testInnerElement() throws Exception {
+		assertXsd("inner-element.xsd", "inner_element", new String[] { "-verbose",
+		        "-Xxew:includeFile " + getClass().getResource("inner-element-includes.txt").getFile() }, true, 3,
 		            "Filesystem", "Volume");
 	}
 
 	@Test
-	public void testAnnotationReferenceInChoice() throws Throwable {
-		// "Markup.java" cannot be tested for content because it contents is changing from one compilation to other
-		// as order of @XmlElementRef annotations is not pre-defined (set is used as container).
-		assertXsd("annotation-reference-in-choice.xsd", "annotation_reference", new String[] { "-debug", "-verbose" },
-		            false, 3, "Markup", "Sub");
+	public void testAnnotationReference() throws Exception {
+		// "Markup.java" cannot be tested for content because the content is changing from
+		// one compilation to other as order of @XmlElementRef/@XmlElement annotations is not pre-defined
+		// (set is used as their container).
+		assertXsd("annotation-reference.xsd", "annotation_reference", new String[] { "-verbose", "-debug" }, false, 9,
+		            "ClassCommon", "ClassExt", "ClassesEu", "ClassesUs", "Markup", "Para", "SearchEu", "SearchMulti");
 	}
 
 	@Test
-	public void testElementWithParent() throws Throwable {
+	public void testElementAsParametrisation() throws Exception {
+		assertXsd("element-as-parametrisation.xsd", "element_as_parametrisation", new String[] { "-Xxew:excludeFile "
+		            + getClass().getResource("element-as-parametrisation-excludes.txt").getFile() }, false, 5,
+		            "Article", "Articles", "ArticlesCollections", "Publisher");
+	}
+
+	@Test
+	public void testElementWithParent() throws Exception {
 		assertXsd("element-with-parent.xsd", "element_with_parent", null, false, 3, "Group", "Organization");
 	}
 
 	@Test
-	public void testElementReferencedTwice() throws Throwable {
+	public void testElementReferencedTwice() throws Exception {
 		assertXsd("element-referenced-twice.xsd", "element_referenced_twice", new String[] { "-Xxew:summaryFile "
 		            + GENERATED_SOURCES_PREFIX + "summary.txt" }, false, 3, "Family", "FamilyMember");
 	}
 
 	@Test
-	public void testElementAny() throws Throwable {
-		assertXsd("element-any.xsd", "element_any", null, false, 2, "Data");
+	public void testElementAny() throws Exception {
+		assertXsd("element-any.xsd", "element_any", new String[] { "-quiet" }, false, 2, "Data");
+	}
+
+	@Test
+	public void testElementMixed() throws Exception {
+		// Most classes cannot be tested for content
+		assertXsd("element-mixed.xsd", "element_mixed", new String[] { "-debug" }, false, 7, "B", "I", "FixedText",
+		            "FormattedText", "PrefixedText", "package-info");
 	}
 
 	/**
@@ -114,13 +130,17 @@ public class XmlElementWrapperPluginTest {
 	 */
 	private void assertXsd(String resourceXsd, String packageName, String[] extraXewOptions, boolean generateEpisode,
 	            int totalNumberOfFiles, String... classesToCheck) throws Exception {
+		// Force plugin to reinitialize the logger:
+		System.clearProperty(XmlElementWrapperPlugin.COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY);
+
 		String xsdUrl = getClass().getResource(resourceXsd).getFile();
 
 		File targetDir = new File(GENERATED_SOURCES_PREFIX);
 
 		targetDir.mkdirs();
 
-		LoggingPrintStream loggingPrintStream = new LoggingPrintStream();
+		PrintStream loggingPrintStream = new PrintStream(new LoggingOutputStream(logger,
+		            LoggingOutputStream.LogLevel.INFO, "[XJC] "));
 
 		String[] opts = ArrayUtils.addAll(extraXewOptions, "-no-header", "-Xxew", "-Xxew:delete", "-d",
 		            targetDir.getPath(), xsdUrl);
@@ -201,12 +221,26 @@ public class XmlElementWrapperPluginTest {
 	/**
 	 * Class will redirect everything printed to this {@link PrintStream} to logger.
 	 */
-	private static class LoggingPrintStream extends PrintStream {
+	static class LoggingOutputStream extends OutputStream {
+
+		public enum LogLevel {
+			TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+		}
 
 		private final StringBuilder sb = new StringBuilder();
 
-		public LoggingPrintStream() {
-			super(new NullOutputStream());
+		private final Log           logger;
+		private final LogLevel      logLevel;
+		private final String        messagePrefix;
+
+		public LoggingOutputStream(Log logger, LogLevel logLevel) {
+			this(logger, logLevel, null);
+		}
+
+		public LoggingOutputStream(Log logger, LogLevel logLevel, String messagePrefix) {
+			this.logger = logger;
+			this.logLevel = logLevel;
+			this.messagePrefix = messagePrefix;
 		}
 
 		@Override
@@ -218,6 +252,7 @@ public class XmlElementWrapperPluginTest {
 
 		@Override
 		public void write(int b) {
+			// Scan all input bytes and log a message on newline:
 			switch (b) {
 			case '\n':
 				logMessage();
@@ -232,15 +267,39 @@ public class XmlElementWrapperPluginTest {
 
 		@Override
 		public void close() {
-			super.close();
-
 			if (sb.length() > 0) {
 				logMessage();
 			}
 		}
 
 		private void logMessage() {
-			logger.info("[XJC] " + sb.toString());
+			String message = (messagePrefix == null ? "" : messagePrefix) + sb.toString();
+
+			switch (logLevel) {
+			case TRACE:
+				logger.trace(message);
+				break;
+
+			case DEBUG:
+				logger.debug(message);
+				break;
+
+			case INFO:
+				logger.info(message);
+				break;
+
+			case WARN:
+				logger.warn(message);
+				break;
+
+			case ERROR:
+				logger.error(message);
+				break;
+
+			case FATAL:
+				logger.fatal(message);
+				break;
+			}
 
 			sb.setLength(0);
 		}

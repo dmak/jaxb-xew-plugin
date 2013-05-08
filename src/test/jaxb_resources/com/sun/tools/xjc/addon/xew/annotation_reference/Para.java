@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="para" type="{}markup" maxOccurs="unbounded"/>
+ *         &lt;element name="sub" type="{}markup" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -31,27 +31,27 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "para"
+    "sub"
 })
-@XmlRootElement(name = "sub")
-public class Sub {
+@XmlRootElement(name = "para")
+public class Para {
 
     @XmlElement(required = true)
-    protected List<Markup> para;
+    protected List<Markup> sub;
 
     /**
-     * Gets the value of the para property.
+     * Gets the value of the sub property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the para property.
+     * This is why there is not a <CODE>set</CODE> method for the sub property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getPara().add(newItem);
+     *    getSub().add(newItem);
      * </pre>
      * 
      * 
@@ -61,11 +61,11 @@ public class Sub {
      * 
      * 
      */
-    public List<Markup> getPara() {
-        if (para == null) {
-            para = new ArrayList<Markup>();
+    public List<Markup> getSub() {
+        if (sub == null) {
+            sub = new ArrayList<Markup>();
         }
-        return this.para;
+        return this.sub;
     }
 
 }

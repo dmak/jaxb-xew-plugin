@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	targetNamespace="http://example.com/entries"
+	xmlns:entries="http://example.com/entries"
+	xmlns:entry="http://example.com/entry"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="different_namespaces" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:import schemaLocation="different-namespaces-entry.xsd" namespace="http://example.com/entry" />
+
+	<xs:element name="entries">
+		<xs:complexType>
+			<xs:sequence>
+				<!--
+					Important is that the namespace for this collection element is correctly reflected in @XmlElement.
+				-->
+				<xs:element ref="entry:entry" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
