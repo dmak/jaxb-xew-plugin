@@ -37,8 +37,7 @@
 
 	<xs:complexType name="class-common">
 		<xs:sequence>
-			<xs:element name="country" type="xs:string" />
-			<xs:element name="code" type="xs:string" />
+			<xs:element name="id" type="xs:byte" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -46,7 +45,8 @@
 		<xs:complexContent>
 			<xs:extension base="class-common">
 				<xs:sequence>
-					<xs:element name="id" type="xs:string" />
+					<xs:element name="country" type="xs:string" />
+					<xs:element name="code" type="xs:string" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
