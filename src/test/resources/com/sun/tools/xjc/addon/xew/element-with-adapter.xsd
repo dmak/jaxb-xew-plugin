@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="element_with_adapter" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:complexType name="calendar">
+		<xs:sequence>
+			<xs:element name="url" type="xs:anyURI" />
+			<xs:element name="appointments">
+				<xs:annotation>
+					<xs:appinfo>
+						<jaxb:property name="custom-appointments" />
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="appointment" type="xs:dateTime" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:appinfo>
+									<jaxb:property>
+										<jaxb:baseType>
+											<jaxb:javaType name="java.util.Date"
+												printMethod="com.sun.tools.xjc.addon.xew.XmlGregorianCalendarAdapter.toXml"
+												parseMethod="com.sun.tools.xjc.addon.xew.XmlGregorianCalendarAdapter.fromXml" />
+										</jaxb:baseType>
+									</jaxb:property>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

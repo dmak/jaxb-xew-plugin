@@ -1,6 +1,7 @@
 
 package element_with_parent;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -8,6 +9,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import com.sun.tools.xjc.addon.xew.CommonBean;
 
 
 /**
@@ -47,8 +49,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlSeeAlso({
     Organization.class
 })
-public class Group {
+public class Group
+    extends CommonBean
+    implements Serializable
+{
 
+    private final static long serialVersionUID = 1L;
     @XmlElement(required = true)
     protected List<Group.Person> person;
 
@@ -106,8 +112,12 @@ public class Group {
     @XmlType(name = "", propOrder = {
 
     })
-    public static class Person {
+    public static class Person
+        extends CommonBean
+        implements Serializable
+    {
 
+        private final static long serialVersionUID = 1L;
         @XmlElement(name = "first-name", required = true)
         protected String firstName;
         @XmlElement(name = "second-name", required = true)

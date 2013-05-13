@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import com.sun.tools.xjc.addon.xew.CommonBean;
 
 
 /**
@@ -32,7 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
 
 })
-public class Volume implements Cloneable
+public class Volume
+    extends CommonBean
+    implements Cloneable
 {
 
     @XmlElement(required = true)

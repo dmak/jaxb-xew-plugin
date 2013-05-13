@@ -43,6 +43,7 @@ import java.util.Set;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
@@ -51,6 +52,7 @@ import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassContainer;
+import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
@@ -85,6 +87,7 @@ import org.xml.sax.ErrorHandler;
  * @see <a href="http://www.conspicio.dk/projects/overview">source code and binary packages</a>
  * 
  * @author Bjarne Hansen
+ * @author Dmitry Katsubo
  */
 public class XmlElementWrapperPlugin extends Plugin {
 
@@ -97,9 +100,17 @@ public class XmlElementWrapperPlugin extends Plugin {
 	private static final String OPTION_NAME_INSTANTIATE                = "-" + PLUGIN_NAME + ":instantiate";
 
 	private File                includeFile                            = null;
-	private Set<String>         include                                = null;                                             // list of classes for inclusion
+	/**
+	 * List of classes for inclusion
+	 */
+	private Set<String>         include                                = null;
+
 	private File                excludeFile                            = null;
-	private Set<String>         exclude                                = null;                                             // list of classes for exclusion
+	/**
+	 * List of classes for exclusion
+	 */
+	private Set<String>         exclude                                = null;
+
 	private File                summaryFile                            = null;
 	private PrintWriter         summary                                = null;
 	private Class<?>            collectionInterfaceClass               = java.util.List.class;
@@ -368,7 +379,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				}
 
 				// We have a candidate field to be replaced with a wrapped version. Report finding to summary file.
-				writeSummary("\tReplacing field " + outlineClass.target.getName() + "#" + fieldName + " with type "
+				writeSummary("\tReplacing field " + implClass.fullName() + "#" + fieldName + " with type "
 				            + fieldType.name());
 				modificationCount++;
 
@@ -475,6 +486,13 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				if (context.isValueObjectDisabled() && candidate.getFieldParametrisationImpl() != null) {
 					xmlElementAnnotation.param("type", candidate.getFieldParametrisationImpl());
+				}
+
+				// Custom java adapter
+				JExpression xmlJavaTypeAdapter = getXmlJavaTypeAdapterMemberExpression(candidate.getField());
+
+				if (xmlJavaTypeAdapter != null) {
+					implField.annotate(XmlJavaTypeAdapter.class).param("value", xmlJavaTypeAdapter);
 				}
 
 				String fieldPublicName = field.getPropertyInfo().getName(true);
@@ -628,16 +646,31 @@ public class XmlElementWrapperPlugin extends Plugin {
 		for (ClassOutline classOutline : outline.getClasses()) {
 			JDefinedClass candidateClass = classOutline.implClass;
 
-			// * The candidate class should have exactly one property
-			// * The candidate class should not extend any other class (as the total number of properties in this case will be more than 1)
-			if (candidateClass.fields().size() != 1 || !isBasicClass(candidateClass._extends())) {
+			// * The candidate class should not extend any other model class (as the total number of properties in this case will be more than 1)
+			if (!isHiddenClass(candidateClass._extends())) {
 				continue;
 			}
 
-			JFieldVar field = candidateClass.fields().values().iterator().next();
+			JFieldVar field = null;
 
+			// * The candidate class should have exactly one property
+			for (JFieldVar f : candidateClass.fields().values()) {
+				if ((f.mods().getValue() & JMod.STATIC) == JMod.STATIC) {
+					continue;
+				}
+
+				// If there are at least two non-static fields, we discard this candidate:
+				if (field != null) {
+					field = null;
+					break;
+				}
+
+				field = f;
+			}
+
+			// "field" is null if there are no fields (or all fields are static) or there are more then two fields.
 			// The only property should be a collection, hence it should be class:
-			if (!(field.type() instanceof JClass)) {
+			if (field == null || !(field.type() instanceof JClass)) {
 				continue;
 			}
 
@@ -648,7 +681,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				continue;
 			}
 
-			List<JClass> fieldParametrisations = ((JClass) field.type()).getTypeParameters();
+			List<JClass> fieldParametrisations = fieldType.getTypeParameters();
 
 			// FIXME: All known collections have exactly one parametrisation type.
 			assert fieldParametrisations.size() == 1;
@@ -716,22 +749,21 @@ public class XmlElementWrapperPlugin extends Plugin {
 			deleteFactoryMethod(context.getValueObjectFactoryClass(), candidateClass);
 			deletionCount++;
 
+			deleteClass(outline, candidateClass);
+			deletionCount++;
+
+			// Redo the same for interface:
 			if (context.isValueObjectDisabled()) {
 				deleteFactoryMethod(context.getObjectFactoryClass(), candidateClass);
 				deletionCount++;
-			}
 
-			deleteClass(outline, candidateClass);
+				for (Iterator<JClass> iter = candidateClass._implements(); iter.hasNext();) {
+					JClass interfaceClass = iter.next();
 
-			deletionCount++;
-
-			for (Iterator<JClass> iter = candidateClass._implements(); iter.hasNext();) {
-				JClass interfaceClass = iter.next();
-
-				if (interfaceClass instanceof JDefinedClass) {
-					deleteClass(outline, (JDefinedClass) interfaceClass);
-
-					deletionCount++;
+					if (!isHiddenClass(interfaceClass)) {
+						deleteClass(outline, (JDefinedClass) interfaceClass);
+						deletionCount++;
+					}
 				}
 			}
 		}
@@ -933,6 +965,15 @@ public class XmlElementWrapperPlugin extends Plugin {
 	}
 
 	/**
+	 * Returns {@code true} if given class is hidden, that is not generated by the model. These are for example
+	 * instances of {@link JCodeModel.JReferencedClass} or instances of {@link JDefinedClass} with hidden flag.
+	 */
+	private boolean isHiddenClass(JClass clazz) {
+		// See also https://java.net/jira/browse/JAXB-958
+		return !(clazz instanceof JDefinedClass) || ((JDefinedClass) clazz).isHidden();
+	}
+
+	/**
 	 * Returns <code>true</code> of the given <code>type</code> is {@link JClass} and contains <code>classToCheck</code>
 	 * in the list of parametrisations.
 	 */
@@ -1011,8 +1052,23 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * Returns the value of the given annotation member of {@link XmlElement} annotation for the given field.
 	 */
 	private static JExpression getXmlElementMemberExpression(JVar field, String annotationMember) {
+		return getAnnotationMemberExpression(field, "XmlElement", annotationMember);
+	}
+
+	/**
+	 * Returns the value of the "value" member of {@link XmlJavaTypeAdapter} annotation for the given field.
+	 */
+	private static JExpression getXmlJavaTypeAdapterMemberExpression(JVar field) {
+		return getAnnotationMemberExpression(field, "XmlJavaTypeAdapter", "value");
+	}
+
+	/**
+	 * Returns the value of the given annotation member of given annotation for the given field.
+	 */
+	private static JExpression getAnnotationMemberExpression(JVar field, String annotationClassName,
+	            String annotationMember) {
 		for (JAnnotationUse annotation : field.annotations()) {
-			if (annotation.getAnnotationClass().name().equals("XmlElement")) {
+			if (annotation.getAnnotationClass().name().equals(annotationClassName)) {
 				return getAnnotationMemberExpression(annotation, annotationMember);
 			}
 		}

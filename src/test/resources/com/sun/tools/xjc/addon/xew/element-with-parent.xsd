@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema
 	jaxb:version="2.0"
+	jaxb:extensionBindingPrefixes="xjc"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
@@ -10,11 +12,15 @@
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_with_parent" />
 			</jaxb:schemaBindings>
+			<jaxb:globalBindings>
+				<xjc:superClass name="com.sun.tools.xjc.addon.xew.CommonBean" />
+				<xjc:serializable uid="1" />
+			</jaxb:globalBindings>
 		</xs:appinfo>
 	</xs:annotation>
 
 	<!--
-		This class is not considered as candidate because it has a parent class.
+		This class is not considered as candidate because it has a child class.
 	-->
 	<xs:complexType name="group">
 		<xs:sequence>
@@ -30,7 +36,7 @@
 	</xs:complexType>
 
 	<!--
-		This class is not considered as candidate because it has a parent class.
+		This class is not considered as candidate because it extends another class.
 	-->
 	<xs:complexType name="organization">
 		<xs:complexContent>

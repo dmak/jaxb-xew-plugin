@@ -25,6 +25,10 @@
 			<xs:element name="b" type="foo:b" />
 		</xs:sequence>
 	</xs:complexType>
+	<!--
+		Example of element with no fields.
+	-->
+	<xs:complexType name="br" />
 
 	<xs:simpleType name="text">
 		<xs:restriction base="xs:string" />
@@ -41,6 +45,7 @@
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="i" type="foo:i" />
 			<xs:element name="b" type="foo:b" />
+			<xs:element name="br" type="foo:br" />
 		</xs:choice>
 	</xs:complexType>
 

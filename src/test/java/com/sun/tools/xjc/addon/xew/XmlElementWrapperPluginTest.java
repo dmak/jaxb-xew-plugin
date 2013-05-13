@@ -97,7 +97,8 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementWithParent() throws Exception {
-		assertXsd("element-with-parent.xsd", "element_with_parent", null, false, "Group", "Organization");
+		assertXsd("element-with-parent.xsd", "element_with_parent", new String[] { "-debug" }, false, "Group",
+		            "Organization");
 	}
 
 	@Test
@@ -114,8 +115,13 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementMixed() throws Exception {
 		// Most classes cannot be tested for content
-		assertXsd("element-mixed.xsd", "element_mixed", new String[] { "-debug" }, false, "B", "I", "FixedText",
+		assertXsd("element-mixed.xsd", "element_mixed", new String[] { "-debug" }, false, "B", "Br", "I", "FixedText",
 		            "FormattedText", "PrefixedText", "package-info");
+	}
+
+	@Test
+	public void testElementWithAdapter() throws Exception {
+		assertXsd("element-with-adapter.xsd", "element_with_adapter", null, false, "Calendar", "Adapter1");
 	}
 
 	/**

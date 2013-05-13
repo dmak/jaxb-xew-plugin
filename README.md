@@ -261,9 +261,9 @@ You can find more examples of this plugin in [`samples`](samples/) directory.
 
 ### v1.1
 
-* Bugs fixed (issue #1, #6, #7). Some functionality is possible only by accessing private fields, so Xew plugin may not work in security-managed environment.
+* Plugin is re-worked. Bugs fixed (issue #1, #3, #6, #7). Some functionality is possible only by accessing private fields, so Xew plugin may not work in security-managed environment.
 * Testing framework introduced. XSD in [`com/sun/tools/xjc/addon/xew/`](src/test/resources/com/sun/tools/xjc/addon/xew/) directory can be used as reference.
-* Logging is done via `commons-logging`. Log level is configurable like this `-D org.apache.commons.logging.simplelog.defaultlog=DEBUG`.
+* Logging is done via `commons-logging`. Log level is configurable like this `mvn -Dorg.apache.commons.logging.simplelog.defaultlog=DEBUG`.
 
 ### v1.0
 
@@ -366,7 +366,7 @@ The plugin flow consists of the following parts:
 * Parse arguments.
 * Find classes which are candidates for removal:
   1. The candidate class should not extend any other class (as the total number of properties will be more than 1)
-  2. The candidate class must have exactly one property.
+  2. The candidate class should have exactly one non-static property.
   3. This property should be a collection.
   4. This collection should have exactly one parametrisation type.
   5. This parametrisation type should not be `java.lang.Object` / `java.io.Serializable`.

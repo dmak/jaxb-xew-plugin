@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import com.sun.tools.xjc.addon.xew.CommonBean;
 
 
 /**
@@ -76,7 +77,9 @@ import javax.xml.bind.annotation.XmlType;
     "volumes"
 })
 @XmlRootElement(name = "filesystem")
-public class Filesystem implements Cloneable
+public class Filesystem
+    extends CommonBean
+    implements Cloneable
 {
 
     @XmlElementWrapper(name = "file-listing", required = true)
@@ -138,7 +141,9 @@ public class Filesystem implements Cloneable
     @XmlType(name = "", propOrder = {
 
     })
-    public static class FileItem implements Cloneable
+    public static class FileItem
+        extends CommonBean
+        implements Cloneable
     {
 
         @XmlElement(required = true)

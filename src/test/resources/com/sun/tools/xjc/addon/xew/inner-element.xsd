@@ -13,7 +13,7 @@
 				<jaxb:package name="inner_element" />
 			</jaxb:schemaBindings>
 			<jaxb:globalBindings>
-				<xjc:superInterface name="java.io.Serializable" />
+				<xjc:superClass name="com.sun.tools.xjc.addon.xew.CommonBean" />
 				<xjc:superInterface name="java.lang.Cloneable" />
 			</jaxb:globalBindings>
 		</xs:appinfo>

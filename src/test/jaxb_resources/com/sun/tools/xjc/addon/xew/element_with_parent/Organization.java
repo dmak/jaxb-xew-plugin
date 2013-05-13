@@ -1,6 +1,7 @@
 
 package element_with_parent;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -34,8 +35,10 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Organization
     extends Group
+    implements Serializable
 {
 
+    private final static long serialVersionUID = 1L;
     @XmlElement(required = true)
     protected List<String> address;
 
