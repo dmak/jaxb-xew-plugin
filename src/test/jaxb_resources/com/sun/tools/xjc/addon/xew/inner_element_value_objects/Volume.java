@@ -1,11 +1,8 @@
 
-package inner_element;
+package inner_element_value_objects;
 
+import java.io.Serializable;
 import java.math.BigInteger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -28,17 +25,10 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-
-})
-public class Volume implements Cloneable
+public interface Volume
+    extends Serializable
 {
 
-    @XmlElement(required = true)
-    protected String name;
-    @XmlElement(required = true)
-    protected BigInteger capacity;
 
     /**
      * Gets the value of the name property.
@@ -48,9 +38,7 @@ public class Volume implements Cloneable
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
-    }
+    String getName();
 
     /**
      * Sets the value of the name property.
@@ -60,9 +48,7 @@ public class Volume implements Cloneable
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
-    }
+    void setName(String value);
 
     /**
      * Gets the value of the capacity property.
@@ -72,9 +58,7 @@ public class Volume implements Cloneable
      *     {@link BigInteger }
      *     
      */
-    public BigInteger getCapacity() {
-        return capacity;
-    }
+    BigInteger getCapacity();
 
     /**
      * Sets the value of the capacity property.
@@ -84,8 +68,6 @@ public class Volume implements Cloneable
      *     {@link BigInteger }
      *     
      */
-    public void setCapacity(BigInteger value) {
-        this.capacity = value;
-    }
+    void setCapacity(BigInteger value);
 
 }

@@ -19,6 +19,7 @@
 			<xs:element name="parent-member" />
 		</xs:choice>
 	</xs:complexType>
+
 	<!--
 		Important is that class "FamilyMember" is referred from class "Family"
 		and thus should not be deleted.

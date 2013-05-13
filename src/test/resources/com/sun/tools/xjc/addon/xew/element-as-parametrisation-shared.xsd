@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:complexType name="article">
+		<xs:sequence>
+			<xs:element name="title" type="xs:string" />
+			<xs:element name="author" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="articles">
+		<xs:sequence>
+			<xs:element name="article" type="article" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!--
+		This class has to be pinned in order not to be removed.
+	-->
+	<xs:complexType name="articles-collections">
+		<xs:sequence>
+			<xs:element name="articles" type="articles" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="publisher">
+		<xs:sequence>
+			<xs:element name="articles" type="articles" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

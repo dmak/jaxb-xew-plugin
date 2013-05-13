@@ -10,14 +10,17 @@
 	<xs:annotation>
 		<xs:appinfo>
 			<jaxb:schemaBindings>
-				<jaxb:package name="inner_element" />
+				<jaxb:package name="inner_element_value_objects" />
 			</jaxb:schemaBindings>
-			<jaxb:globalBindings>
+			<jaxb:globalBindings generateValueClass="false">
+				<!--
+					Value objects are implementing this interface.
+				-->
 				<xjc:superInterface name="java.io.Serializable" />
-				<xjc:superInterface name="java.lang.Cloneable" />
 			</jaxb:globalBindings>
 		</xs:appinfo>
 	</xs:annotation>
 
 	<xs:include schemaLocation="inner-element-shared.xsd" />
+	<xs:include schemaLocation="element-as-parametrisation-shared.xsd" />
 </xs:schema>

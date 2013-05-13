@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:element name="filesystem">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="file-listing">
+					<xs:complexType>
+						<xs:sequence>
+							<!--
+								Important is that inner class corresponding to this element is correctly moved to outer class.
+							-->
+							<xs:element name="file-item" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:all>
+										<xs:element name="name" type="xs:string" />
+										<xs:element name="size" type="xs:integer" />
+									</xs:all>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="directory-listing">
+					<xs:complexType>
+						<xs:sequence>
+							<!--
+								Example of collection with basic type (string).
+							-->
+							<xs:element name="directory-item" maxOccurs="unbounded">
+								<xs:simpleType>
+									<xs:restriction base="xs:string" />
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="volumes" type="volumes" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="volumes">
+		<xs:sequence>
+			<!--
+				Example when inner class is moved to package.
+			-->
+			<xs:element name="volume" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="name" type="xs:string" />
+						<xs:element name="capacity" type="xs:integer" />
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
