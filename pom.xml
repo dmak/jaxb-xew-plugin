@@ -60,7 +60,7 @@
 							<configuration>
 								<autoVersionSubmodules>true</autoVersionSubmodules>
 								<tagNameFormat>release-@{project.version}</tagNameFormat>
-								<preparationGoals>versions:update-parent clean verify</preparationGoals>
+								<preparationGoals>clean verify</preparationGoals>
 							</configuration>
 						</plugin>
 					</plugins>

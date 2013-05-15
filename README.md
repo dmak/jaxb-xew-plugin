@@ -357,7 +357,7 @@ If you provide the code in any way you automatically agree with a [project licen
 * You need to put JAXB API >= v2.2.3 to `endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
 * For Hudson freestyle job specify:
   * Pre-release step `git checkout master; git reset --hard origin/master` (see [Can't get automated release working with Hudson + Git + Maven Release Plugin](http://stackoverflow.com/questions/1877027) for more details about the problem).
-  * Next step (release): `release:prepare release:perform -Pstage-release -Pgpg -Dresume=false -Dusername=<github_user> -Dpassword=<github_password>`
+  * Next step (release): `release:prepare release:perform -Pstage-release,gpg -Dresume=false -Dusername=<github_user> -Dpassword=<github_password>`
 
 ### Algorithm description
 

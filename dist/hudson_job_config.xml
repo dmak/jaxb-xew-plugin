@@ -188,11 +188,7 @@
               <privateRepository>false</privateRepository>
               <privateTmpdir>false</privateTmpdir>
               <pomFile>pom.xml</pomFile>
-              <properties>
-                <entries>
-                  <entry name="log4j.configuration" value="/usr/share/tomcat6/lib/log4j.properties"/>
-                </entries>
-              </properties>
+              <properties/>
               <errors>false</errors>
               <verbosity>NORMAL</verbosity>
               <offline>false</offline>
@@ -342,15 +338,11 @@ git reset --hard origin/master</command>
             <maven-builder>
               <config>
                 <installationId>maven3</installationId>
-                <goals>release:prepare release:perform -Pstage-release -Pgpg -Dresume=false -Dusername=dmak -Dpassword=xxx</goals>
+                <goals>release:prepare release:perform -Pstage-release,gpg -Dresume=false -Dusername=dmak -Dpassword=xxx</goals>
                 <privateRepository>false</privateRepository>
                 <privateTmpdir>false</privateTmpdir>
                 <pomFile>pom.xml</pomFile>
-                <properties>
-                  <entries>
-                    <entry name="log4j.configuration" value="/usr/share/tomcat6/lib/log4j.properties"/>
-                  </entries>
-                </properties>
+                <properties/>
                 <errors>false</errors>
                 <verbosity>NORMAL</verbosity>
                 <offline>false</offline>
