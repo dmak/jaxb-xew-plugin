@@ -255,7 +255,7 @@ Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which 
     	</dependencies>
     </plugin>
 
-You can find more examples of this plugin in [`samples`](samples/) directory.
+You can find more examples of this plugin in [`samples`](samples/) directory (including how to call this plugin from `jaxws:wsimport`).
 
 ## What's new
 
