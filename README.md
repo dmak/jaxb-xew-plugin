@@ -116,7 +116,7 @@ The following options are applicable for plugin:
 </tr>
 <tr>
 	<td>-Xxew:summary filename</td>
-	<td>Specify a filename to contain summary information on the compilation.</td>
+	<td>Specify a filename to contain summary information for the compilation.</td>
 </tr>
 <tr>
 	<td>-Xxew:collection FQCN</td>
@@ -134,11 +134,11 @@ The following options are applicable for plugin:
 
 ### Episode file
 
-For correct generation of episode file, the corresponding options should follow `-Xxew`, for example:
+For correct generation of episode file the corresponding XJC options should follow `-Xxew`, for example:
 
 `-Xxew ... -episode <file>`
 
-This will trigger episode plugin after Xew plugin.
+This will trigger episode plugin after Xew plugin and episode file will be correctly generated.
 
 ### `fluent-api` and `value-constructor` plugins
 
@@ -146,7 +146,7 @@ These plugins should be activated after Xew plugin:
 
 `-Xxew ... -Xfluent-api -Xvalue-constructor` 
 
-Otherwise if they are activated before Xew plugin cannot revert the changes they made.
+Otherwise (if they are activated before) Xew plugin cannot revert/complement the changes they made and compile-time error is guaranteed.
 
 ### Ant task
 
@@ -261,8 +261,8 @@ You can find more examples of this plugin in [`samples`](samples/) directory (in
 
 ### v1.1
 
-* Plugin is re-worked. Bugs fixed (issue #1, #3, #6, #7). Some functionality is possible only by accessing private fields, so Xew plugin may not work in security-managed environment.
-* Testing framework introduced. XSD in [`com/sun/tools/xjc/addon/xew/`](src/test/resources/com/sun/tools/xjc/addon/xew/) directory can be used as reference.
+* Plugin is re-worked. Bugs fixed ([#1](https://github.com/dmak/jaxb-xew-plugin/issues/1), [#3](https://github.com/dmak/jaxb-xew-plugin/issues/3), [#6](https://github.com/dmak/jaxb-xew-plugin/issues/6), [#7](https://github.com/dmak/jaxb-xew-plugin/issues/7)). Some functionality is possible only by accessing private fields, so Xew plugin may not work in security-managed environment.
+* Testing framework introduced. XSDs in [`com/sun/tools/xjc/addon/xew/`](src/test/resources/com/sun/tools/xjc/addon/xew/) directory can be referred as collection of examples.
 * Logging is done via `commons-logging`. Log level is configurable like this `mvn -Dorg.apache.commons.logging.simplelog.defaultlog=DEBUG`.
 
 ### v1.0
@@ -353,8 +353,8 @@ If you provide the code in any way you automatically agree with a [project licen
         	</profiles>
         </settings>
 
-* Make sure you have git >= v1.7.10 installed, otherwise you may face [this bug#341221](https://bugs.eclipse.org/bugs/show_bug.cgi?id=341221).
-* You need to put JAXB API >= v2.2.3 to `endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
+* Make sure you have git ≥ v1.7.10 installed, otherwise you may face [this bug#341221](https://bugs.eclipse.org/bugs/show_bug.cgi?id=341221).
+* You need to put JAXB API ≥ v2.2.3 to `endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
 * For Hudson freestyle job specify:
   * Pre-release step `git checkout master; git reset --hard origin/master` (see [Can't get automated release working with Hudson + Git + Maven Release Plugin](http://stackoverflow.com/questions/1877027) for more details about the problem).
   * Next step (release): `release:prepare release:perform -Pstage-release,gpg -Dresume=false -Dusername=<github_user> -Dpassword=<github_password>`
@@ -372,11 +372,11 @@ The plugin flow consists of the following parts:
   5. This parametrisation type should not be `java.lang.Object` / `java.io.Serializable`.
 * Visit all classes again to check if the candidate is not eligible for removal:
   1. If there are classes that extend the candidate
-  2. If there are class fields, that refer the candidate by e.g. `@XmlElementRef` annotation
+  2. If there are class fields that refer the candidate by e.g. `@XmlElementRef` annotation
 * Visit all classes again to replace the property having the candidate class type with collection plus `@XmlElementWrapper` annotation. On this step getters/setters are update and ObjectFactory methods are corrected. Also lazy initialization policy is applied.
 * Candidates which are still marked for removal are finally removed (and ObjectFactory is updated accordingly).
 
-There are many pitfalls in JAXB Code Model API, which are forcing the developer to use dirty tricks (like accessing private fields) in order to implement the manipulation of code model. Among others:
+There are many pitfalls in JAXB Code Model API which are forcing the developer to use dirty tricks (like accessing private fields) in order to implement the manipulation of code model. Among others:
 
 * [JAXB-784](http://java.net/jira/browse/JAXB-784) is about NPE in `JAnnotationUse#getAnnotationMembers()` method.
 * [JAXB-884](https://java.net/jira/browse/JAXB-884) is about ClassCastException in `JAnnotationArrayMember#annotations()` method. 
