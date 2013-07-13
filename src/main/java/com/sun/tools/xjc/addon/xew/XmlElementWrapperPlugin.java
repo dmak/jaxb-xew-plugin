@@ -114,7 +114,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 	private PrintWriter         summary                                = null;
 	private Class<?>            collectionInterfaceClass               = java.util.List.class;
 	private Class<?>            collectionImplClass                    = java.util.ArrayList.class;
-	private Instantiation       instantiation                          = Instantiation.EARLY;
+	private Instantiation       instantiation;
 	private boolean             deleteCandidates                       = false;
 
 	// This is currently an experimental and not properly working feature, so keep this field set to false.
@@ -684,7 +684,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 			// * The only one parametrisation type should not be java.lang.Object (the case for <xs:any>)
 			//   or java.io.Serializable / javax.xml.bind.JAXBElement (the case for <xs:complexType ... mixed="true">)
-			if (/*!fieldParametrisations.get(0).erasure().fullName().equals(Object.class.getName()) && */isTopClass(fieldParametrisations.get(0))) {
+			if (!fieldParametrisations.get(0).erasure().fullName().equals(Object.class.getName()) && isTopClass(fieldParametrisations.get(0))) {
 				continue;
 			}
 
