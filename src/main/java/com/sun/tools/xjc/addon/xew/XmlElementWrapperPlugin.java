@@ -684,7 +684,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 			// * The only one parametrisation type should not be java.lang.Object (the case for <xs:any>)
 			//   or java.io.Serializable / javax.xml.bind.JAXBElement (the case for <xs:complexType ... mixed="true">)
-			if (isTopClass(fieldParametrisations.get(0))) {
+			if (/*!fieldParametrisations.get(0).erasure().fullName().equals(Object.class.getName()) && */isTopClass(fieldParametrisations.get(0))) {
 				continue;
 			}
 
