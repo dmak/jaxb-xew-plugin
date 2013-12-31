@@ -2,7 +2,6 @@
 package inner_element;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -84,13 +83,13 @@ public class Filesystem
 
     @XmlElementWrapper(name = "file-listing", required = true)
     @XmlElement(name = "file-item")
-    protected List<Filesystem.FileItem> fileListing = new ArrayList<Filesystem.FileItem>();
+    protected List<Filesystem.FileItem> fileListing;
     @XmlElementWrapper(name = "directory-listing", required = true)
     @XmlElement(name = "directory-item")
-    protected List<String> directoryListing = new ArrayList<String>();
+    protected List<String> directoryListing;
     @XmlElementWrapper(name = "volumes", required = true)
     @XmlElement(name = "volume")
-    protected List<Volume> volumes = new ArrayList<Volume>();
+    protected List<Volume> volumes;
 
     public List<Filesystem.FileItem> getFileListing() {
         return fileListing;

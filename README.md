@@ -123,8 +123,8 @@ The following options are applicable for plugin:
 	<td>Specify the class name of the collection type to use.</td>
 </tr>
 <tr>
-	<td>-Xxew:instantiate [lazy|early]</td>
-	<td>Specify when the collection class should be instantiated.</td>
+	<td>-Xxew:instantiate [early|lazy|none]</td>
+	<td>Specify when the collection class should be instantiated: when class is created / when property is accessed from getter / not instantiated at all.</td>
 </tr>
 <tr>
 	<td>-Xxew:delete</td>
@@ -138,15 +138,21 @@ For correct generation of episode file the corresponding XJC options should foll
 
 `-Xxew ... -episode <file>`
 
-This will trigger episode plugin after Xew plugin and episode file will be correctly generated.
+This will trigger episode plugin _after_ Xew plugin and episode file will be correctly generated.
 
 ### `fluent-api` and `value-constructor` plugins
 
-These plugins should be activated after Xew plugin:
+These plugins should be activated _after_ Xew plugin:
 
 `-Xxew ... -Xfluent-api -Xvalue-constructor` 
 
 Otherwise (if they are activated before) Xew plugin cannot revert/complement the changes they made and compile-time error is guaranteed.
+
+### `setters` plugin
+
+These plugin should be activated _before_ Xew plugin due to problem described in [issue#15](https://github.com/dmak/jaxb-xew-plugin/issues/15):
+
+`-Xsetters -Xxew ...` 
 
 ### Ant task
 
@@ -286,6 +292,9 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 - Create a ticket in [bugtracker](https://github.com/dmak/jaxb-xew-plugin/issues). If applicable attach XSD that demonstrates the problem to the issue.
 - Create a branch referring the ticket number (`git branch issue-22`).
 - Do the changes.
+- Verify your outgoing changeset. Make sure that:
+  - your changeset is _minimal and sufficient_ for the feature implementation
+  - your formatting rules have not caused changes in each and every line (e.g. due to end-of-line markers)
 - Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (fixes #22)`). Check [here](https://github.com/blog/831-issues-2-0-the-next-generation) the commit message syntax sugar.
 - [Request for pull](http://help.github.com/send-pull-requests/).
 
@@ -306,11 +315,10 @@ If you provide the code in any way you automatically agree with a [project licen
   - New Lines → Insert new line in empty block: off
 * TAB is used for alignment for XML/XSD/... files. 
 
-#### Release procedure
+#### Build and release procedure
 
 * Read [Sonatype OSS Maven Repository Usage Guide](https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide) from cover to cover.
 * Use the following `settings.xml` for your Maven:
-
         <settings>
         	<!-- Optional proxy configuration (if applicable to your environment) -->
         	<proxies>
@@ -352,13 +360,12 @@ If you provide the code in any way you automatically agree with a [project licen
         		</profile>
         	</profiles>
         </settings>
-
 * Make sure you have git ≥ v1.7.10 installed, otherwise you may face [this bug#341221](https://bugs.eclipse.org/bugs/show_bug.cgi?id=341221).
-* You need to put JAXB API ≥ v2.2.3 to `endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
+* You need to put JAXB API ≥ v2.2.3 to `jre/lib/endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
 * For Hudson freestyle job specify:
   * Pre-release step `git checkout master; git reset --hard origin/master` (see [Can't get automated release working with Hudson + Git + Maven Release Plugin](http://stackoverflow.com/questions/1877027) for more details about the problem).
   * Next step (release): `release:prepare release:perform -Pstage-release,gpg -Dresume=false -Dusername=<github_user> -Dpassword=<github_password>`
-
+	
 ### Algorithm description
 
 The plugin flow consists of the following parts:

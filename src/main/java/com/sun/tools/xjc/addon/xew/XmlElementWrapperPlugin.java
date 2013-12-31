@@ -1197,7 +1197,21 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * Types of collection instantiation modes.
 	 */
 	private enum Instantiation {
-		EARLY, LAZY
+		/**
+		 * Collection is initialized as property initializer (created when class is constructed).
+		 */
+		EARLY,
+
+		/**
+		 * Collection is initialized in getter (created when property is accessed the first time).
+		 */
+		LAZY,
+
+		/**
+		 * Collection is never initialized. It's consumers responsibility to set the property to some collection
+		 * instance.
+		 */
+		NONE
 	}
 
 	/**

@@ -66,7 +66,7 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testInnerElement() throws Exception {
-		assertXsd("inner-element.xsd", "inner_element", new String[] { "-verbose",
+		assertXsd("inner-element.xsd", "inner_element", new String[] { "-verbose", "-Xxew:instantiate none",
 		        "-Xxew:includeFile " + getClass().getResource("inner-element-includes.txt").getFile() }, true,
 		            "Filesystem", "Volume");
 	}
