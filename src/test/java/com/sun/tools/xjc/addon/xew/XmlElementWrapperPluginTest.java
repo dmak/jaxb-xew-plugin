@@ -105,6 +105,12 @@ public class XmlElementWrapperPluginTest {
 	public void testElementReferencedTwice() throws Exception {
 		assertXsd("element-referenced-twice.xsd", "element_referenced_twice", new String[] { "-Xxew:summaryFile "
 		            + GENERATED_SOURCES_PREFIX + "summary.txt" }, false, "Family", "FamilyMember");
+
+		String summaryFile = FileUtils.readFileToString(new File(GENERATED_SOURCES_PREFIX + "summary.txt"));
+
+		assertTrue(summaryFile.contains("1 candidate(s) being considered"));
+		assertTrue(summaryFile.contains("0 modification(s) to original code"));
+		assertTrue(summaryFile.contains("0 deletion(s) from original code"));
 	}
 
 	@Test
