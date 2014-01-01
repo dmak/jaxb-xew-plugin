@@ -81,7 +81,7 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testAnnotationReference() throws Exception {
-		// "Markup.java" cannot be tested for content because the content is changing from
+		// "Markup.java" cannot be verified for content because the content is changing from
 		// one compilation to other as order of @XmlElementRef/@XmlElement annotations is not pre-defined
 		// (set is used as their container).
 		assertXsd("annotation-reference.xsd", "annotation_reference", new String[] { "-verbose", "-debug" }, false,
@@ -128,6 +128,11 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementWithAdapter() throws Exception {
 		assertXsd("element-with-adapter.xsd", "element_with_adapter", null, false, "Calendar", "Adapter1");
+	}
+
+	@Test
+	public void testElementReservedWord() throws Exception {
+		assertXsd("element-reserved-word.xsd", "element_reserved_word", null, false, "Class", "Method");
 	}
 
 	/**
