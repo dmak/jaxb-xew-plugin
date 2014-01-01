@@ -625,11 +625,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 				JClass interfaceClass = iter.next();
 
 				if (interfaceClass instanceof JDefinedClass) {
-					// Don't care if interfaces collide: value classes have exactly one implementation.
+					// Don't care if some interfaces collide: value classes have exactly one implementation
 					interfaceImplementations.put(interfaceClass.fullName(), classOutline);
-
-					// FIXME: Generated model has one value class for each interface:
-					//assert oldClass == null;
 				}
 			}
 		}
@@ -839,6 +836,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 	/**
 	 * Move the given class to his grandparent (either class or package).
 	 */
+	@SuppressWarnings("unchecked")
 	private void moveClassLevelUp(Outline outline, JDefinedClass clazz) {
 		// Container can be a class or package:
 		JClassContainer container = clazz.parentContainer().parentContainer();
@@ -861,7 +859,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 			((Map<String, JDefinedClass>) getPrivateField(parentPackage, "classes")).put(clazz.name(), clazz);
 
 			// In this scenario class should have "static" modifier reset:
-			setPrivateField(clazz.mods(), "mods", clazz.mods().getValue() & ~JMod.STATIC);
+			setPrivateField(clazz.mods(), "mods", Integer.valueOf(clazz.mods().getValue() & ~JMod.STATIC));
 
 			for (ClassOutline classOutline : outline.getClasses()) {
 				if (classOutline.implClass == clazz) {
