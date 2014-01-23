@@ -1,0 +1,203 @@
+package com.sun.tools.xjc.addon.xew;
+
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.bind.JAXBElement;
+
+import com.sun.codemodel.JAnnotatable;
+import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JAnnotationValue;
+import com.sun.codemodel.JClass;
+import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpression;
+import com.sun.codemodel.JFormatter;
+import com.sun.codemodel.JGenerable;
+import com.sun.codemodel.JType;
+import com.sun.codemodel.JVar;
+
+public class CommonUtils {
+
+	/**
+	 * Returns {@code true} if given class is a top of the class hierarchy like {@link Object} or {@link Serializable}
+	 * or {@link JAXBElement}, or it is a customized super-class for all model beans. Basic JVM classes like
+	 * {@link String} or {@link Integer} are not treated as top-classes: for them this method returns {@code false}.
+	 */
+	public static boolean isTopClass(JClass clazz) {
+		// See also https://java.net/jira/browse/JAXB-958
+		return clazz instanceof JDefinedClass && ((JDefinedClass) clazz).isHidden();
+	}
+
+	/**
+	 * Returns {@code true} if given class is hidden, that is not generated & saved by XJC. These are for example
+	 * instances of {@link JCodeModel.JReferencedClass} (JVM-wide classes) or instances of {@link JDefinedClass} with
+	 * hidden flag (customized super-class or super-interface).
+	 */
+	public static boolean isHiddenClass(JClass clazz) {
+		// See also https://java.net/jira/browse/JAXB-958
+		return !(clazz instanceof JDefinedClass) || ((JDefinedClass) clazz).isHidden();
+	}
+
+	/**
+	 * Returns <code>true</code> of the given <code>type</code> is {@link JClass} and contains <code>classToCheck</code>
+	 * in the list of parametrisations.
+	 */
+	public static boolean isListedAsParametrisation(JClass classToCheck, JType type) {
+		return type instanceof JClass && ((JClass) type).getTypeParameters().contains(classToCheck);
+	}
+
+	//
+	// Annotation helpers.
+	//
+
+	/**
+	 * Returns the annotation for the given field.
+	 */
+	public static JAnnotationUse getAnnotation(JAnnotatable annotatable, JClass annotationClass) {
+		for (JAnnotationUse annotation : annotatable.annotations()) {
+			if (annotation.getAnnotationClass().equals(annotationClass)) {
+				return annotation;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Append the given annotation to list of annotations.
+	 */
+	@SuppressWarnings("unchecked")
+	public static void addAnnotation(JVar field, JAnnotationUse annotation) {
+		((List<JAnnotationUse>) getPrivateField(field, JVar.class, "annotations")).add(annotation);
+	}
+
+	/**
+	 * Removes the given annotation member of given annotation for the given field.
+	 */
+	public static boolean removeAnnotationMember(JAnnotatable annotatable, JClass annotationClass,
+	            String annotationMember) {
+		JAnnotationUse annotation = getAnnotation(annotatable, annotationClass);
+
+		if (annotation != null) {
+			return ((Map<String, JAnnotationValue>) getPrivateField(annotation, "memberValues"))
+			            .remove(annotationMember) != null;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the value of the given annotation member of given annotation for the given field.
+	 */
+	public static JExpression getAnnotationMemberExpression(JAnnotatable annotatable, JClass annotationClass,
+	            String annotationMember) {
+		JAnnotationUse annotation = getAnnotation(annotatable, annotationClass);
+
+		if (annotation != null) {
+			return getAnnotationMemberExpression(annotation, annotationMember);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the string value of annotation element. For example, for annotation
+	 * <code>@XmlElementRef(name = "last-name", namespace = "http://mycompany.org/exchange", type = JAXBElement.class)</code>
+	 * for member <code>name</code> the value <code>last-name</code> will be returned.
+	 */
+	public static final JExpression getAnnotationMemberExpression(JAnnotationUse annotation, String annotationMember) {
+		JAnnotationValue annotationValue = annotation.getAnnotationMembers().get(annotationMember);
+
+		if (annotationValue == null) {
+			return null;
+		}
+
+		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
+		return (JExpression) getPrivateField(annotationValue, "value");
+	}
+
+	/**
+	 * Returns the string value of passed argument.
+	 */
+	public static final String generableToString(JGenerable generable) {
+		if (generable == null) {
+			return null;
+		}
+
+		// There is hardly any clean universal way to get the value from e.g. JExpression except of serializing it.
+		// Compare JStringLiteral and JExp#dotclass().
+		Writer w = new StringWriter();
+
+		generable.generate(new JFormatter(w));
+
+		// FIXME: Hopefully nobody will put quotes into annotation member value.
+		return w.toString().replace("\"", "");
+	}
+
+	//
+	// Reflection helpers.
+	//
+
+	public static void setPrivateField(Object obj, String fieldName, Object newValue) {
+		setPrivateField(obj, obj.getClass(), fieldName, newValue);
+	}
+
+	/**
+	 * Set the {@code newValue} to private field {@code fieldName} of given object {@code obj}.
+	 */
+	private static void setPrivateField(Object obj, Class<?> clazz, String fieldName, Object newValue) {
+		try {
+			Field field = clazz.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			field.set(obj, newValue);
+		}
+		catch (NoSuchFieldException e) {
+			if (clazz.getSuperclass() == Object.class) {
+				// Field is really not found:
+				throw new RuntimeException(e);
+			}
+
+			// Try super class:
+			setPrivateField(obj, clazz.getSuperclass(), fieldName, newValue);
+		}
+		catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Get the value of private field {@code fieldName} of given object {@code obj}.
+	 */
+	public static Object getPrivateField(Object obj, String fieldName) {
+		return getPrivateField(obj, obj.getClass(), fieldName);
+	}
+
+	/**
+	 * Get the value of private field {@code fieldName} of given object {@code obj} which is treated as class
+	 * {@code clazz}.
+	 */
+	private static Object getPrivateField(Object obj, Class<?> clazz, String fieldName) {
+		try {
+			Field field = clazz.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			return field.get(obj);
+		}
+		catch (NoSuchFieldException e) {
+			if (clazz.getSuperclass() == Object.class) {
+				// Field is really not found:
+				throw new RuntimeException(e);
+			}
+
+			// Try super class:
+			return getPrivateField(obj, clazz.getSuperclass(), fieldName);
+		}
+		catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+}

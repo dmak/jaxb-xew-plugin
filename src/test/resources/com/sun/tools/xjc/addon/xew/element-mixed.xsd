@@ -16,15 +16,16 @@
 	</xs:annotation>
 
 	<xs:complexType name="b" mixed="true">
-		<xs:sequence>
+		<xs:sequence minOccurs="0">
 			<xs:element name="i" type="foo:i" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="i" mixed="true">
-		<xs:sequence>
+		<xs:sequence minOccurs="0">
 			<xs:element name="b" type="foo:b" />
 		</xs:sequence>
 	</xs:complexType>
+
 	<!--
 		Example of element with no fields.
 	-->
@@ -35,7 +36,7 @@
 	</xs:simpleType>
 
 	<xs:simpleType name="number">
-		<xs:restriction base="xs:integer" />
+		<xs:restriction base="xs:int" />
 	</xs:simpleType>
 
 	<!--
@@ -70,4 +71,14 @@
 			<xs:element name="suffix" type="foo:text" />
 		</xs:choice>
 	</xs:complexType>
+
+	<xs:element name="any-text">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="formatted-text" type="foo:formatted-text" />
+				<xs:element name="fixed-text" type="foo:fixed-text" />
+				<xs:element name="prefixed-text" type="foo:prefixed-text" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>

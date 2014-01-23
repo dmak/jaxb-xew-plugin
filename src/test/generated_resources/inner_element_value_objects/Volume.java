@@ -2,7 +2,6 @@
 package inner_element_value_objects;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 
 /**
@@ -16,7 +15,7 @@ import java.math.BigInteger;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;all>
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="capacity" type="{http://www.w3.org/2001/XMLSchema}integer"/>
+ *         &lt;element name="capacity" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *       &lt;/all>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -53,21 +52,13 @@ public interface Volume
     /**
      * Gets the value of the capacity property.
      * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
-    BigInteger getCapacity();
+    int getCapacity();
 
     /**
      * Sets the value of the capacity property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
      */
-    void setCapacity(BigInteger value);
+    void setCapacity(int value);
 
 }

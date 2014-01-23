@@ -1,7 +1,6 @@
 
 package inner_element;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -20,7 +19,7 @@ import com.sun.tools.xjc.addon.xew.CommonBean;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;all>
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="capacity" type="{http://www.w3.org/2001/XMLSchema}integer"/>
+ *         &lt;element name="capacity" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *       &lt;/all>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -40,8 +39,7 @@ public class Volume
 
     @XmlElement(required = true)
     protected String name;
-    @XmlElement(required = true)
-    protected BigInteger capacity;
+    protected int capacity;
 
     /**
      * Gets the value of the name property.
@@ -70,24 +68,16 @@ public class Volume
     /**
      * Gets the value of the capacity property.
      * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
-    public BigInteger getCapacity() {
+    public int getCapacity() {
         return capacity;
     }
 
     /**
      * Sets the value of the capacity property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
      */
-    public void setCapacity(BigInteger value) {
+    public void setCapacity(int value) {
         this.capacity = value;
     }
 

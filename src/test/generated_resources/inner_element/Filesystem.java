@@ -1,9 +1,14 @@
 
-package inner_element_value_objects;
+package inner_element;
 
-import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import com.sun.tools.xjc.addon.xew.CommonBean;
 
 
 /**
@@ -27,7 +32,7 @@ import java.util.List;
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;all>
  *                             &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                             &lt;element name="size" type="{http://www.w3.org/2001/XMLSchema}integer"/>
+ *                             &lt;element name="size" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                           &lt;/all>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -63,22 +68,51 @@ import java.util.List;
  * 
  * 
  */
-public interface Filesystem
-    extends Serializable
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = {
+    "fileListing",
+    "directoryListing",
+    "volumes"
+})
+@XmlRootElement(name = "filesystem")
+public class Filesystem
+    extends CommonBean
+    implements Cloneable
 {
 
+    @XmlElementWrapper(name = "file-listing", required = true)
+    @XmlElement(name = "file-item")
+    protected List<Filesystem.FileItem> fileListing;
+    @XmlElementWrapper(name = "directory-listing", required = true)
+    @XmlElement(name = "directory-item")
+    protected List<String> directoryListing;
+    @XmlElementWrapper(name = "volumes", required = true)
+    @XmlElement(name = "volume")
+    protected List<Volume> volumes;
 
-    public List<Filesystem.FileItem> getFileListing();
+    public List<Filesystem.FileItem> getFileListing() {
+        return fileListing;
+    }
 
-    public void setFileListing(List<Filesystem.FileItem> fileListing);
+    public void setFileListing(List<Filesystem.FileItem> fileListing) {
+        this.fileListing = fileListing;
+    }
 
-    public List<String> getDirectoryListing();
+    public List<String> getDirectoryListing() {
+        return directoryListing;
+    }
 
-    public void setDirectoryListing(List<String> directoryListing);
+    public void setDirectoryListing(List<String> directoryListing) {
+        this.directoryListing = directoryListing;
+    }
 
-    public List<Volume> getVolumes();
+    public List<Volume> getVolumes() {
+        return volumes;
+    }
 
-    public void setVolumes(List<Volume> volumes);
+    public void setVolumes(List<Volume> volumes) {
+        this.volumes = volumes;
+    }
 
 
     /**
@@ -92,7 +126,7 @@ public interface Filesystem
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;all>
      *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="size" type="{http://www.w3.org/2001/XMLSchema}integer"/>
+     *         &lt;element name="size" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *       &lt;/all>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -101,10 +135,18 @@ public interface Filesystem
      * 
      * 
      */
-    public interface FileItem
-        extends Serializable
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+
+    })
+    public static class FileItem
+        extends CommonBean
+        implements Cloneable
     {
 
+        @XmlElement(required = true)
+        protected String name;
+        protected int size;
 
         /**
          * Gets the value of the name property.
@@ -114,7 +156,9 @@ public interface Filesystem
          *     {@link String }
          *     
          */
-        String getName();
+        public String getName() {
+            return name;
+        }
 
         /**
          * Sets the value of the name property.
@@ -124,27 +168,25 @@ public interface Filesystem
          *     {@link String }
          *     
          */
-        void setName(String value);
+        public void setName(String value) {
+            this.name = value;
+        }
 
         /**
          * Gets the value of the size property.
          * 
-         * @return
-         *     possible object is
-         *     {@link BigInteger }
-         *     
          */
-        BigInteger getSize();
+        public int getSize() {
+            return size;
+        }
 
         /**
          * Sets the value of the size property.
          * 
-         * @param value
-         *     allowed object is
-         *     {@link BigInteger }
-         *     
          */
-        void setSize(BigInteger value);
+        public void setSize(int value) {
+            this.size = value;
+        }
 
     }
 

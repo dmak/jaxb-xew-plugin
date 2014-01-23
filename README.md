@@ -376,7 +376,6 @@ The plugin flow consists of the following parts:
   2. The candidate class should have exactly one non-static property.
   3. This property should be a collection.
   4. This collection should have exactly one parametrisation type.
-  5. This parametrisation type should not be `java.lang.Object` / `java.io.Serializable`.
 * Visit all classes again to check if the candidate is not eligible for removal:
   1. If there are classes that extend the candidate
   2. If there are class fields that refer the candidate by e.g. `@XmlElementRef` annotation

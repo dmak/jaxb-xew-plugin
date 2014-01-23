@@ -1,15 +1,8 @@
 
-package inner_element;
+package inner_element_value_objects;
 
-import java.math.BigInteger;
+import java.io.Serializable;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import com.sun.tools.xjc.addon.xew.CommonBean;
 
 
 /**
@@ -33,7 +26,7 @@ import com.sun.tools.xjc.addon.xew.CommonBean;
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;all>
  *                             &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                             &lt;element name="size" type="{http://www.w3.org/2001/XMLSchema}integer"/>
+ *                             &lt;element name="size" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                           &lt;/all>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -69,51 +62,22 @@ import com.sun.tools.xjc.addon.xew.CommonBean;
  * 
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "fileListing",
-    "directoryListing",
-    "volumes"
-})
-@XmlRootElement(name = "filesystem")
-public class Filesystem
-    extends CommonBean
-    implements Cloneable
+public interface Filesystem
+    extends Serializable
 {
 
-    @XmlElementWrapper(name = "file-listing", required = true)
-    @XmlElement(name = "file-item")
-    protected List<Filesystem.FileItem> fileListing;
-    @XmlElementWrapper(name = "directory-listing", required = true)
-    @XmlElement(name = "directory-item")
-    protected List<String> directoryListing;
-    @XmlElementWrapper(name = "volumes", required = true)
-    @XmlElement(name = "volume")
-    protected List<Volume> volumes;
 
-    public List<Filesystem.FileItem> getFileListing() {
-        return fileListing;
-    }
+    public List<Filesystem.FileItem> getFileListing();
 
-    public void setFileListing(List<Filesystem.FileItem> fileListing) {
-        this.fileListing = fileListing;
-    }
+    public void setFileListing(List<Filesystem.FileItem> fileListing);
 
-    public List<String> getDirectoryListing() {
-        return directoryListing;
-    }
+    public List<String> getDirectoryListing();
 
-    public void setDirectoryListing(List<String> directoryListing) {
-        this.directoryListing = directoryListing;
-    }
+    public void setDirectoryListing(List<String> directoryListing);
 
-    public List<Volume> getVolumes() {
-        return volumes;
-    }
+    public List<Volume> getVolumes();
 
-    public void setVolumes(List<Volume> volumes) {
-        this.volumes = volumes;
-    }
+    public void setVolumes(List<Volume> volumes);
 
 
     /**
@@ -127,7 +91,7 @@ public class Filesystem
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;all>
      *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="size" type="{http://www.w3.org/2001/XMLSchema}integer"/>
+     *         &lt;element name="size" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *       &lt;/all>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -136,19 +100,10 @@ public class Filesystem
      * 
      * 
      */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-
-    })
-    public static class FileItem
-        extends CommonBean
-        implements Cloneable
+    public interface FileItem
+        extends Serializable
     {
 
-        @XmlElement(required = true)
-        protected String name;
-        @XmlElement(required = true)
-        protected BigInteger size;
 
         /**
          * Gets the value of the name property.
@@ -158,9 +113,7 @@ public class Filesystem
          *     {@link String }
          *     
          */
-        public String getName() {
-            return name;
-        }
+        String getName();
 
         /**
          * Sets the value of the name property.
@@ -170,33 +123,19 @@ public class Filesystem
          *     {@link String }
          *     
          */
-        public void setName(String value) {
-            this.name = value;
-        }
+        void setName(String value);
 
         /**
          * Gets the value of the size property.
          * 
-         * @return
-         *     possible object is
-         *     {@link BigInteger }
-         *     
          */
-        public BigInteger getSize() {
-            return size;
-        }
+        int getSize();
 
         /**
          * Sets the value of the size property.
          * 
-         * @param value
-         *     allowed object is
-         *     {@link BigInteger }
-         *     
          */
-        public void setSize(BigInteger value) {
-            this.size = value;
-        }
+        void setSize(int value);
 
     }
 

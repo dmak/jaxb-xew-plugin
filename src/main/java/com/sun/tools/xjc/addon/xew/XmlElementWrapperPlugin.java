@@ -21,16 +21,24 @@
  */
 package com.sun.tools.xjc.addon.xew;
 
+import static com.sun.tools.xjc.addon.xew.CommonUtils.addAnnotation;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.getPrivateField;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.isListedAsParametrisation;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotationMember;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.setPrivateField;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,9 +48,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.sun.codemodel.JAnnotatable;
@@ -62,8 +73,6 @@ import com.sun.codemodel.JJavaName;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
-import com.sun.codemodel.JType;
-import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
@@ -117,6 +126,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 	private Instantiation       instantiation                          = Instantiation.EARLY;
 	private boolean             deleteCandidates                       = false;
 
+	private JClass              xmlElementDeclModelClass;
+
 	// This is currently an experimental and not properly working feature, so keep this field set to false.
 	// Waiting for this bug to be resolved: http://java.net/jira/browse/JAXB-883
 	//private boolean				applyPluralForm				= Ring.get(BIGlobalBinding.class).isSimpleMode();
@@ -124,9 +135,9 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 	private static final String FACTORY_CLASS_NAME                     = "ObjectFactory";
 
-	private Log                 logger;
-
 	static final String         COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY = "org.apache.commons.logging.simplelog.defaultlog";
+
+	private Log                 logger;
 
 	@Override
 	public String getOptionName() {
@@ -319,6 +330,15 @@ public class XmlElementWrapperPlugin extends Plugin {
 		writeSummary("\t" + candidatesMap.size() + " candidate(s) being considered.");
 		writeSummary("");
 
+		JCodeModel codeModel = outline.getCodeModel();
+		JClass xmlElementWrapperModelClass = codeModel.ref(XmlElementWrapper.class);
+		JClass xmlElementModelClass = codeModel.ref(XmlElement.class);
+		JClass xmlAnyElementModelClass = codeModel.ref(XmlAnyElement.class);
+		JClass xmlElementRefsModelClass = codeModel.ref(XmlElementRefs.class);
+		JClass xmlElementsModelClass = codeModel.ref(XmlElements.class);
+		JClass xmlJavaTypeAdapterModelClass = codeModel.ref(XmlJavaTypeAdapter.class);
+		xmlElementDeclModelClass = codeModel.ref(XmlElementDecl.class);
+
 		writeSummary("Modifications:");
 
 		int modificationCount = 0;
@@ -354,7 +374,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				for (Candidate c : candidatesMap.values()) {
 					// Skip fields with basic types as for example any class can be casted to Object.
-					if (fieldType.isAssignableFrom(c.getCandidateClass()) && !isTopClass(fieldType)) {
+					if (fieldType.isAssignableFrom(c.getCandidateClass()) && !isHiddenClass(fieldType)) {
 						// If the given field has type T, it cannot be also in the list of parametrisations (e.g. T<T>).
 						candidate = c;
 						break;
@@ -375,8 +395,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 				}
 
 				// We have a candidate field to be replaced with a wrapped version. Report finding to summary file.
-				writeSummary("\tReplacing field " + implClass.fullName() + "#" + fieldName + " with type "
-				            + fieldType.name());
+				writeSummary("\tReplacing field [" + fieldType.name() + " " + implClass.fullName() + "#" + fieldName
+				            + "]");
 				modificationCount++;
 
 				// The container class has to be deleted. Check that inner class has to be moved to it's parent.
@@ -389,10 +409,9 @@ public class XmlElementWrapperPlugin extends Plugin {
 				// Create the new interface and collection classes using the specified interface and
 				// collection classes (configuration) with an element type corresponding to
 				// the element type from the collection present in the candidate class (narrowing).
-				JClass collectionInterfaceClass = outline.getCodeModel().ref(this.collectionInterfaceClass)
-				            .narrow(fieldTypeParametrisations);
-				JClass collectionImplClass = outline.getCodeModel().ref(this.collectionImplClass)
-				            .narrow(fieldTypeParametrisations);
+				JClass collectionInterfaceClass = codeModel.ref(this.collectionInterfaceClass).narrow(
+				            fieldTypeParametrisations);
+				JClass collectionImplClass = codeModel.ref(this.collectionImplClass).narrow(fieldTypeParametrisations);
 
 				// Remove original field which refers to the inner class.
 				JFieldVar originalImplField = implClass.fields().get(fieldName);
@@ -438,9 +457,10 @@ public class XmlElementWrapperPlugin extends Plugin {
 				}
 
 				// Annotate the new field with the @XmlElementWrapper annotation using the original field name.
-				JAnnotationUse xmlElementWrapperAnnotation = implField.annotate(XmlElementWrapper.class);
+				JAnnotationUse xmlElementWrapperAnnotation = implField.annotate(xmlElementWrapperModelClass);
 
-				JExpression wrapperXmlName = getXmlElementMemberExpression(originalImplField, "name");
+				JExpression wrapperXmlName = getAnnotationMemberExpression(originalImplField, xmlElementModelClass,
+				            "name");
 				if (wrapperXmlName != null) {
 					xmlElementWrapperAnnotation.param("name", wrapperXmlName);
 				}
@@ -448,47 +468,66 @@ public class XmlElementWrapperPlugin extends Plugin {
 					xmlElementWrapperAnnotation.param("name", originalImplField.name());
 				}
 
-				JExpression warpperXmlRequired = getXmlElementMemberExpression(originalImplField, "required");
+				JExpression warpperXmlRequired = getAnnotationMemberExpression(originalImplField, xmlElementModelClass,
+				            "required");
 				if (warpperXmlRequired != null) {
 					xmlElementWrapperAnnotation.param("required", warpperXmlRequired);
 				}
 
 				// Namespace of the wrapper element
-				JExpression wrapperXmlNamespace = getXmlElementMemberExpression(originalImplField, "namespace");
+				JExpression wrapperXmlNamespace = getAnnotationMemberExpression(originalImplField,
+				            xmlElementModelClass, "namespace");
 				if (wrapperXmlNamespace != null) {
 					xmlElementWrapperAnnotation.param("namespace", wrapperXmlNamespace);
 				}
 
-				// Annotate the new field with the @XmlElement annotation using the field name from the wrapped type as name.
-				JAnnotationUse xmlElementAnnotation = implField.annotate(XmlElement.class);
+				boolean xmlElementInfoWasTransferred = false;
 
-				JExpression xmlName = getXmlElementMemberExpression(candidate.getField(), "name");
-				if (xmlName != null) {
-					xmlElementAnnotation.param("name", xmlName);
-				}
-				else {
-					xmlElementAnnotation.param("name", candidate.getFieldName());
-				}
+				// Transfer @XmlAnyElement, @XmlElementRefs, @XmlElements:
+				for (JClass annotationModelClass : new JClass[] { xmlAnyElementModelClass, xmlElementRefsModelClass,
+				        xmlElementsModelClass }) {
+					JAnnotationUse annotation = getAnnotation(candidate.getField(), annotationModelClass);
 
-				// Namespace of the element itself
-				JExpression xmlNamespace = getXmlElementMemberExpression(candidate.getField(), "namespace");
-				if (xmlNamespace != null) {
-					xmlElementAnnotation.param("namespace", xmlNamespace);
-				}
-				else if (wrapperXmlNamespace != null) {
-					// FIXME: Only theoretical case, as it cannot happen that element does not have a namespace, but wrapper element has:
-					xmlElementAnnotation.param("namespace", wrapperXmlNamespace);
+					if (annotation != null) {
+						xmlElementInfoWasTransferred = true;
+
+						addAnnotation(implField, annotation);
+					}
 				}
 
-				if (candidate.isValueObjectDisabled() && candidate.getFieldParametrisationImpl() != null) {
-					xmlElementAnnotation.param("type", candidate.getFieldParametrisationImpl());
+				if (!xmlElementInfoWasTransferred) {
+					// Annotate the new field with the @XmlElement annotation using the field name from the wrapped type as name.
+					JAnnotationUse xmlElementAnnotation = implField.annotate(xmlElementModelClass);
+
+					JExpression xmlName = getAnnotationMemberExpression(candidate.getField(), xmlElementModelClass,
+					            "name");
+					if (xmlName != null) {
+						xmlElementAnnotation.param("name", xmlName);
+					}
+					else {
+						xmlElementAnnotation.param("name", candidate.getFieldName());
+					}
+
+					// Namespace of the element itself
+					JExpression xmlNamespace = getAnnotationMemberExpression(candidate.getField(),
+					            xmlElementModelClass, "namespace");
+					if (xmlNamespace != null) {
+						xmlElementAnnotation.param("namespace", xmlNamespace);
+					}
+					else if (wrapperXmlNamespace != null) {
+						// FIXME: Only theoretical case, as it cannot happen that element does not have a namespace, but wrapper element has:
+						xmlElementAnnotation.param("namespace", wrapperXmlNamespace);
+					}
+
+					if (candidate.isValueObjectDisabled() && candidate.getFieldParametrisationImpl() != null) {
+						xmlElementAnnotation.param("type", candidate.getFieldParametrisationImpl());
+					}
 				}
 
-				// Custom java adapter
-				JExpression xmlJavaTypeAdapter = getXmlJavaTypeAdapterMemberExpression(candidate.getField());
+				JAnnotationUse annotation = getAnnotation(candidate.getField(), xmlJavaTypeAdapterModelClass);
 
-				if (xmlJavaTypeAdapter != null) {
-					implField.annotate(XmlJavaTypeAdapter.class).param("value", xmlJavaTypeAdapter);
+				if (annotation != null) {
+					addAnnotation(implField, annotation);
 				}
 
 				String fieldPublicName = field.getPropertyInfo().getName(true);
@@ -530,8 +569,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				// Add a new setter method:
 				// GENERATED CODE: public void setFieldName(I<T> fieldName) { this.fieldName = fieldName; }
-				JMethod setterMethod = implClass.method(JMod.PUBLIC, outline.getCodeModel().VOID, "set"
-				            + fieldPublicName);
+				JMethod setterMethod = implClass.method(JMod.PUBLIC, codeModel.VOID, "set" + fieldPublicName);
 
 				setterMethod.body().assign(JExpr._this().ref(fieldName),
 				            setterMethod.param(collectionInterfaceClass, fieldName));
@@ -541,8 +579,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 					writeSummary("\tCorrecting interface " + implementationInterface.fullName());
 
 					implementationInterface.method(JMod.PUBLIC, collectionInterfaceClass, "get" + fieldPublicName);
-					setterMethod = implementationInterface.method(JMod.PUBLIC, outline.getCodeModel().VOID, "set"
-					            + fieldPublicName);
+					setterMethod = implementationInterface.method(JMod.PUBLIC, codeModel.VOID, "set" + fieldPublicName);
 					setterMethod.param(collectionInterfaceClass, fieldName);
 				}
 			}
@@ -560,7 +597,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 		writeSummary("\t" + deletionCount + " deletion(s) from original code.");
 		writeSummary("");
 
-		logger.debug("Closing summary...");
 		closeSummary();
 
 		logger.debug("Done");
@@ -595,16 +631,16 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		String oldFactoryMethodName = fieldParametrisationClass.outer().name() + fieldParametrisationClass.name();
 
+		moveClassLevelUp(outline, fieldParametrisationImpl);
+
 		renameFactoryMethod(fieldParametrisationImpl._package()._getClass(FACTORY_CLASS_NAME), oldFactoryMethodName,
 		            fieldParametrisationClass.name());
 
-		moveClassLevelUp(outline, fieldParametrisationImpl);
-
 		if (candidate.isValueObjectDisabled()) {
+			moveClassLevelUp(outline, fieldParametrisationClass);
+
 			renameFactoryMethod(fieldParametrisationClass._package()._getClass(FACTORY_CLASS_NAME),
 			            oldFactoryMethodName, fieldParametrisationClass.name());
-
-			moveClassLevelUp(outline, fieldParametrisationClass);
 		}
 
 		return true;
@@ -633,7 +669,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		Collection<Candidate> candidates = new ArrayList<Candidate>();
 
-		JClass collectionClass = outline.getCodeModel().ref(Collection.class);
+		JClass collectionModelClass = outline.getCodeModel().ref(Collection.class);
 
 		// Visit all classes created by JAXB processing to collect all potential wrapper classes to be removed:
 		for (ClassOutline classOutline : outline.getClasses()) {
@@ -670,7 +706,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 			JClass fieldType = (JClass) field.type();
 
 			// * The property should be a collection
-			if (!collectionClass.isAssignableFrom(fieldType)) {
+			if (!collectionModelClass.isAssignableFrom(fieldType)) {
 				continue;
 			}
 
@@ -678,12 +714,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 			// FIXME: All known collections have exactly one parametrisation type.
 			assert fieldParametrisations.size() == 1;
-
-			// * The only one parametrisation type should not be java.lang.Object (the case for <xs:any>)
-			//   or java.io.Serializable / javax.xml.bind.JAXBElement (the case for <xs:complexType ... mixed="true">)
-			if (isTopClass(fieldParametrisations.get(0))) {
-				continue;
-			}
 
 			JDefinedClass fieldParametrisationClass = null;
 			JDefinedClass fieldParametrisationImpl = null;
@@ -739,16 +769,14 @@ public class XmlElementWrapperPlugin extends Plugin {
 			// Get the defined class for candidate class.
 			JDefinedClass candidateClass = candidate.getCandidateClass();
 
-			deleteFactoryMethod(candidate.getValueObjectFactoryClass(), candidateClass);
-			deletionCount++;
+			deletionCount += deleteFactoryMethods(candidate.getValueObjectFactoryClass(), candidateClass);
 
 			deleteClass(outline, candidateClass);
 			deletionCount++;
 
 			// Redo the same for interface:
 			if (candidate.isValueObjectDisabled()) {
-				deleteFactoryMethod(candidate.getObjectFactoryClass(), candidateClass);
-				deletionCount++;
+				deletionCount += deleteFactoryMethods(candidate.getObjectFactoryClass(), candidateClass);
 
 				for (Iterator<JClass> iter = candidateClass._implements(); iter.hasNext();) {
 					JClass interfaceClass = iter.next();
@@ -781,16 +809,19 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 			method.name(methodName.replace(oldMethodName, newMethodName));
 
-			writeSummary("Renamed " + methodName + " -> " + method.name() + " in " + factoryClass.fullName());
+			writeSummary("\tRenamed " + methodName + " -> " + method.name() + " in " + factoryClass.fullName());
 		}
 	}
 
 	/**
-	 * Remove method {@code ObjectFactory} that creates an object of a given {@code clazz}.
+	 * Remove methods in {@code ObjectFactory} that create an object of a given {@code clazz} or other helper methods.
 	 * 
-	 * @return {@code true} is such method was successfully located and removed
+	 * @return number of factory methods that where successfully located and removed or modified
 	 */
-	private boolean deleteFactoryMethod(JDefinedClass factoryClass, JDefinedClass clazz) {
+	private int deleteFactoryMethods(JDefinedClass factoryClass, JDefinedClass clazz) {
+		int modifiedMethods = 0;
+		String dotClazz = clazz.fullName() + ".class";
+
 		for (Iterator<JMethod> iter = factoryClass.methods().iterator(); iter.hasNext();) {
 			JMethod method = iter.next();
 
@@ -800,15 +831,33 @@ public class XmlElementWrapperPlugin extends Plugin {
 			// FIXME: The last case is mostly theoretical and live example is not known.
 			if ((method.type() instanceof JDefinedClass && ((JDefinedClass) method.type()).isAssignableFrom(clazz))
 			            || isListedAsParametrisation(clazz, method.type())) {
-				writeSummary("\tRemoving method " + method.type().fullName() + " " + method.name() + "() from "
+				writeSummary("\tRemoving method [" + method.type().fullName() + "#" + method.name() + "()] from "
 				            + factoryClass.fullName());
 				iter.remove();
+				modifiedMethods++;
+			}
 
-				return true;
+			// Mutate the method:
+			//   @XmlElementDecl(..., scope = T.class)
+			//   public JAXBElement<...> createT...(String value) { return new JAXBElement<...>(..._QNAME, ..., T.class, value); }
+			// to
+			//   @XmlElementDecl(...)
+			//   public JAXBElement<...> createT...(String value) { return new JAXBElement<...>(..._QNAME, ..., null, value); }
+
+			if (dotClazz.equals(generableToString(getAnnotationMemberExpression(method, xmlElementDeclModelClass,
+			            "scope")))) {
+				writeSummary("\tCorrecting method [" + method.type().fullName() + "#" + method.name() + "()] from "
+				            + factoryClass.fullName());
+				removeAnnotationMember(method, xmlElementDeclModelClass, "scope");
+				// Body content is a return statement which is a method invocation.
+				// FIXME: Very ugly 
+				((List<JExpression>) getPrivateField(getPrivateField(method.body().getContents().get(0), "expr"),
+				            "args")).set(2, JExpr._null());
+				modifiedMethods++;
 			}
 		}
 
-		return false;
+		return modifiedMethods;
 	}
 
 	//
@@ -838,9 +887,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 */
 	@SuppressWarnings("unchecked")
 	private void moveClassLevelUp(Outline outline, JDefinedClass clazz) {
-		// Container can be a class or package:
+		// Modify the container so it now refers the class. Container can be a class or package.
 		JClassContainer container = clazz.parentContainer().parentContainer();
-		setPrivateField(clazz, "outer", container);
 
 		// FIXME: Pending https://java.net/jira/browse/JAXB-957
 		if (container.isClass()) {
@@ -872,6 +920,9 @@ public class XmlElementWrapperPlugin extends Plugin {
 				}
 			}
 		}
+
+		// Finally modify the class so that it refers back the container:
+		setPrivateField(clazz, "outer", container);
 	}
 
 	/**
@@ -911,42 +962,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 	}
 
 	/**
-	 * Returns {@code true} if given class is a top of the class hierarchy like {@link Object} or {@link Serializable}
-	 * or {@link JAXBElement}, or it is a customized super-class for all model beans. Basic JVM classes like
-	 * {@link String} or {@link Integer} are not treated as top-classes: for them this method returns {@code false}.
-	 */
-	private static boolean isTopClass(JClass clazz) {
-		// We need a basis for narrowed class:
-		String className = clazz.erasure().fullName();
-
-		if ((className.equals(Object.class.getName()) || className.equals(Serializable.class.getName()) || className
-		            .equals(JAXBElement.class.getName()))) {
-			return true;
-		}
-
-		// See also https://java.net/jira/browse/JAXB-958
-		return clazz instanceof JDefinedClass && ((JDefinedClass) clazz).isHidden();
-	}
-
-	/**
-	 * Returns {@code true} if given class is hidden, that is not generated & saved by XJC. These are for example
-	 * instances of {@link JCodeModel.JReferencedClass} (JVM-wide classes) or instances of {@link JDefinedClass} with
-	 * hidden flag (customized super-class or super-interface).
-	 */
-	static boolean isHiddenClass(JClass clazz) {
-		// See also https://java.net/jira/browse/JAXB-958
-		return !(clazz instanceof JDefinedClass) || ((JDefinedClass) clazz).isHidden();
-	}
-
-	/**
-	 * Returns <code>true</code> of the given <code>type</code> is {@link JClass} and contains <code>classToCheck</code>
-	 * in the list of parametrisations.
-	 */
-	private static boolean isListedAsParametrisation(JClass classToCheck, JType type) {
-		return type instanceof JClass && ((JClass) type).getTypeParameters().contains(classToCheck);
-	}
-
-	/**
 	 * Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
 	 * plural form in more correct way, e.g. "fieldsOfScience" instead of "fieldOfSciences".
 	 */
@@ -968,10 +983,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 		// FIXME: Hopefully nobody will put quotes into annotation member value.
 		return w.toString().replace("\"", "");
 	}
-
-	//
-	// Annotation helpers.
-	//
 
 	/**
 	 * For the given annotatable check that all annotations (and all annotations within annotations recursively) do not
@@ -1010,98 +1021,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 				            + " is used in XmlElements/XmlElementRef and hence won't be removed.");
 				candidate.unmarkForRemoval();
 			}
-		}
-	}
-
-	/**
-	 * Returns the value of the given annotation member of {@link XmlElement} annotation for the given field.
-	 */
-	private static JExpression getXmlElementMemberExpression(JVar field, String annotationMember) {
-		return getAnnotationMemberExpression(field, "XmlElement", annotationMember);
-	}
-
-	/**
-	 * Returns the value of the "value" member of {@link XmlJavaTypeAdapter} annotation for the given field.
-	 */
-	private static JExpression getXmlJavaTypeAdapterMemberExpression(JVar field) {
-		return getAnnotationMemberExpression(field, "XmlJavaTypeAdapter", "value");
-	}
-
-	/**
-	 * Returns the value of the given annotation member of given annotation for the given field.
-	 */
-	private static JExpression getAnnotationMemberExpression(JVar field, String annotationClassName,
-	            String annotationMember) {
-		for (JAnnotationUse annotation : field.annotations()) {
-			if (annotation.getAnnotationClass().name().equals(annotationClassName)) {
-				return getAnnotationMemberExpression(annotation, annotationMember);
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the string value of annotation element. For example, for annotation
-	 * <code>@XmlElementRef(name = "last-name", namespace = "http://mycompany.org/exchange", type = JAXBElement.class)</code>
-	 * for member <code>name</code> the value <code>last-name</code> will be returned.
-	 */
-	private static final JExpression getAnnotationMemberExpression(JAnnotationUse annotation, String annotationMember) {
-		JAnnotationValue annotationValue = annotation.getAnnotationMembers().get(annotationMember);
-
-		if (annotationValue == null) {
-			return null;
-		}
-
-		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
-		return (JExpression) getPrivateField(annotationValue, "value");
-	}
-
-	//
-	// Reflection helpers.
-	//
-
-	private static void setPrivateField(Object obj, String fieldName, Object newValue) {
-		setPrivateField(obj, obj.getClass(), fieldName, newValue);
-	}
-
-	/**
-	 * Set the {@code newValue} to private field {@code fieldName} of given object {@code obj}.
-	 */
-	private static void setPrivateField(Object obj, Class<?> clazz, String fieldName, Object newValue) {
-		try {
-			Field field = clazz.getDeclaredField(fieldName);
-			field.setAccessible(true);
-			field.set(obj, newValue);
-		}
-		catch (NoSuchFieldException e) {
-			if (clazz.getSuperclass() == Object.class) {
-				// Field is really not found:
-				throw new RuntimeException(e);
-			}
-
-			// Try super class:
-			setPrivateField(obj, clazz.getSuperclass(), fieldName, newValue);
-		}
-		catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * Get the value of private field {@code fieldName} of given object {@code obj}.
-	 */
-	private static Object getPrivateField(Object obj, String fieldName) {
-		try {
-			Field field = obj.getClass().getDeclaredField(fieldName);
-			field.setAccessible(true);
-			return field.get(obj);
-		}
-		catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		}
-		catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
 		}
 	}
 

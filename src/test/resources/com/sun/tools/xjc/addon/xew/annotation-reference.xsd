@@ -25,14 +25,12 @@
 		</xs:sequence>
 	</xs:complexType>
 
-	<!--
-		This class won't be deleted due to generic field "List<Object>".
-	-->
 	<xs:complexType name="search-multi">
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="classes-eu" type="classes-eu" />
 			<xs:element name="classes-us" type="classes-us" />
 		</xs:choice>
+		<xs:attribute name="mode" type="xs:byte" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="class-common">

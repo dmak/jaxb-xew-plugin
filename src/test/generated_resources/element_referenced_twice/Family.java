@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
  *         &lt;element name="family-member" type="{}family-member" maxOccurs="unbounded"/>
- *         &lt;element name="parent-member" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *         &lt;element name="parent-member" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -39,7 +39,7 @@ public class Family {
     @XmlElement(name = "family-member")
     protected List<FamilyMember> familyMember;
     @XmlElement(name = "parent-member")
-    protected Object parentMember;
+    protected Boolean parentMember;
 
     /**
      * Gets the value of the familyMember property.
@@ -75,10 +75,10 @@ public class Family {
      * 
      * @return
      *     possible object is
-     *     {@link Object }
+     *     {@link Boolean }
      *     
      */
-    public Object getParentMember() {
+    public Boolean isParentMember() {
         return parentMember;
     }
 
@@ -87,10 +87,10 @@ public class Family {
      * 
      * @param value
      *     allowed object is
-     *     {@link Object }
+     *     {@link Boolean }
      *     
      */
-    public void setParentMember(Object value) {
+    public void setParentMember(Boolean value) {
         this.parentMember = value;
     }
 

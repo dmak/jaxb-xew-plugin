@@ -27,7 +27,10 @@
 
 	<xs:complexType name="types">
 		<xs:sequence>
-			<xs:element name="type" type="xs:string" maxOccurs="unbounded" />
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="type" type="xs:string" />
+				<xs:element name="primitive" type="xs:byte" />
+			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
 

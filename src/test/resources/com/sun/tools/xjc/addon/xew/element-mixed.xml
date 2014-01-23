@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<any-text xmlns="http://foo.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://foo.org/ element-mixed.xsd">
+	<formatted-text>
+		<b>This text<i>is</i> about us.</b>
+		<br/>
+		<i>Do you find it funny?</i>
+	</formatted-text>
+	<fixed-text>
+		<text>The story</text>
+		<ref>84</ref>
+	</fixed-text>
+	<prefixed-text>
+		<prefix>poly</prefix>
+		<text>sele</text>
+		<suffix>nide</suffix>
+	</prefixed-text>
+</any-text>

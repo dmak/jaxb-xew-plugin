@@ -16,7 +16,7 @@
 								<xs:complexType>
 									<xs:all>
 										<xs:element name="name" type="xs:string" />
-										<xs:element name="size" type="xs:integer" />
+										<xs:element name="size" type="xs:int" />
 									</xs:all>
 								</xs:complexType>
 							</xs:element>
@@ -51,7 +51,7 @@
 				<xs:complexType>
 					<xs:all>
 						<xs:element name="name" type="xs:string" />
-						<xs:element name="capacity" type="xs:integer" />
+						<xs:element name="capacity" type="xs:int" />
 					</xs:all>
 				</xs:complexType>
 			</xs:element>

@@ -20,14 +20,25 @@
  */
 package com.sun.tools.xjc.addon.xew;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import com.sun.tools.xjc.Driver;
 import com.sun.tools.xjc.reader.Const;
@@ -35,12 +46,18 @@ import com.sun.tools.xjc.reader.internalizer.DOMForest;
 import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.DifferenceConstants;
+import org.custommonkey.xmlunit.DifferenceListener;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -52,31 +69,29 @@ import org.xml.sax.SAXException;
  */
 public class XmlElementWrapperPluginTest {
 
-	private static final String PREGENERATED_SOURCES_PREFIX = "src/test/jaxb_resources/";
-	private static final String GENERATED_SOURCES_PREFIX    = "target/test/generated-xsd-classes/";
+	private static final String PREGENERATED_SOURCES_PREFIX = "src/test/generated_resources/";
+	private static final String GENERATED_SOURCES_PREFIX    = "target/test/generated_xsd_classes/";
 
 	private static final Log    logger                      = LogFactory.getLog(XmlElementWrapperPluginTest.class);
 
 	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
-		assertXsd("different-namespaces-for-wrapper-and-element.xsd", "different_namespaces", new String[] {
-		        "-Xxew:collection java.util.LinkedList", "-Xxew:instantiate lazy" }, false, "Container", "Entry",
-		            "package-info");
+		assertXsd("different-namespaces", new String[] { "-Xxew:collection java.util.LinkedList",
+		        "-Xxew:instantiate lazy" }, false, "Container", "Entry", "package-info");
 	}
 
 	@Test
 	public void testInnerElement() throws Exception {
-		assertXsd("inner-element.xsd", "inner_element", new String[] { "-verbose", "-Xxew:instantiate none",
+		assertXsd("inner-element", new String[] { "-verbose", "-Xxew:instantiate none",
 		        "-Xxew:includeFile " + getClass().getResource("inner-element-includes.txt").getFile() }, true,
 		            "Filesystem", "Volume");
 	}
 
 	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
-		assertXsd("inner-element-value-objects.xsd", "inner_element_value_objects", new String[] { "-debug" }, false,
-		            "Article", "Articles", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl",
-		            "impl.ArticlesImpl", "impl.FilesystemImpl", "impl.PublisherImpl", "impl.VolumeImpl",
-		            "impl.ObjectFactory", "impl.JAXBContextFactory");
+		assertXsd("inner-element-value-objects", new String[] { "-debug" }, false, "Article", "Articles", "Filesystem",
+		            "Publisher", "Volume", "impl.ArticleImpl", "impl.ArticlesImpl", "impl.FilesystemImpl",
+		            "impl.PublisherImpl", "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory");
 	}
 
 	@Test
@@ -84,27 +99,27 @@ public class XmlElementWrapperPluginTest {
 		// "Markup.java" cannot be verified for content because the content is changing from
 		// one compilation to other as order of @XmlElementRef/@XmlElement annotations is not pre-defined
 		// (set is used as their container).
-		assertXsd("annotation-reference.xsd", "annotation_reference", new String[] { "-verbose", "-debug" }, false,
-		            "ClassCommon", "ClassesEu", "ClassesUs", "ClassExt", "Markup", "Para", "SearchEu", "SearchMulti");
+		assertXsd("annotation-reference", new String[] { "-verbose", "-debug" }, false, "ClassCommon", "ClassesEu",
+		            "ClassesUs", "ClassExt", "Markup", "Para", "SearchEu", "SearchMulti");
 	}
 
 	@Test
 	public void testElementAsParametrisation() throws Exception {
-		assertXsd("element-as-parametrisation.xsd", "element_as_parametrisation", new String[] { "-Xxew:excludeFile "
-		            + getClass().getResource("element-as-parametrisation-excludes.txt").getFile() }, false, "Article",
-		            "Articles", "ArticlesCollections", "Publisher");
+		assertXsd("element-as-parametrisation",
+		            new String[] { "-Xxew:excludeFile "
+		                        + getClass().getResource("element-as-parametrisation-excludes.txt").getFile() }, false,
+		            "Article", "Articles", "ArticlesCollections", "Publisher");
 	}
 
 	@Test
 	public void testElementWithParent() throws Exception {
-		assertXsd("element-with-parent.xsd", "element_with_parent", new String[] { "-debug" }, false, "Group",
-		            "Organization");
+		assertXsd("element-with-parent", new String[] { "-debug" }, false, "Group", "Organization");
 	}
 
 	@Test
 	public void testElementReferencedTwice() throws Exception {
-		assertXsd("element-referenced-twice.xsd", "element_referenced_twice", new String[] { "-Xxew:summaryFile "
-		            + GENERATED_SOURCES_PREFIX + "summary.txt" }, false, "Family", "FamilyMember");
+		assertXsd("element-referenced-twice", new String[] { "-Xxew:summaryFile " + GENERATED_SOURCES_PREFIX
+		            + "summary.txt" }, false, "Family", "FamilyMember");
 
 		String summaryFile = FileUtils.readFileToString(new File(GENERATED_SOURCES_PREFIX + "summary.txt"));
 
@@ -115,33 +130,30 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementAny() throws Exception {
-		assertXsd("element-any.xsd", "element_any", new String[] { "-quiet" }, false, "Data");
+		assertXsd("element-any", new String[] { "-quiet" }, false, "Message");
 	}
 
 	@Test
 	public void testElementMixed() throws Exception {
 		// Most classes cannot be tested for content
-		assertXsd("element-mixed.xsd", "element_mixed", new String[] { "-debug" }, false, "B", "Br", "I", "FixedText",
-		            "FormattedText", "PrefixedText", "package-info");
+		assertXsd("element-mixed", new String[] { "-debug" }, false, "B", "Br", "I", "AnyText", "package-info");
 	}
 
 	@Test
 	public void testElementWithAdapter() throws Exception {
-		assertXsd("element-with-adapter.xsd", "element_with_adapter", null, false, "Calendar", "Adapter1");
+		assertXsd("element-with-adapter", null, false, "Calendar", "Adapter1");
 	}
 
 	@Test
 	public void testElementReservedWord() throws Exception {
-		assertXsd("element-reserved-word.xsd", "element_reserved_word", null, false, "Class", "Method");
+		assertXsd("element-reserved-word", null, false, "Class", "Method");
 	}
 
 	/**
 	 * Standard test for XSD examples.
 	 * 
-	 * @param resourceXsd
-	 *            XSD file name
-	 * @param packageName
-	 *            target package name
+	 * @param testName
+	 *            the prototype of XSD file name / package name
 	 * @param extraXewOptions
 	 *            to be passed to plugin
 	 * @param generateEpisode
@@ -150,8 +162,11 @@ public class XmlElementWrapperPluginTest {
 	 *            expected classes/files in target directory; these files content is checked if it is present in
 	 *            resources directory; {@code ObjectFactory.java} is automatically included
 	 */
-	private void assertXsd(String resourceXsd, String packageName, String[] extraXewOptions, boolean generateEpisode,
-	            String... classesToCheck) throws Exception {
+	private void assertXsd(String testName, String[] extraXewOptions, boolean generateEpisode, String... classesToCheck)
+	            throws Exception {
+		String resourceXsd = testName + ".xsd";
+		String packageName = testName.replace('-', '_');
+
 		// Force plugin to reinitialize the logger:
 		System.clearProperty(XmlElementWrapperPlugin.COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY);
 
@@ -191,33 +206,31 @@ public class XmlElementWrapperPluginTest {
 
 		targetDir = new File(targetDir, packageName);
 
-		Collection<String> generatedFileList = new HashSet<String>();
+		Collection<String> generatedJavaSources = new HashSet<String>();
 
 		// *.properties files are ignored:
 		for (File targetFile : FileUtils.listFiles(targetDir, new String[] { "java" }, true)) {
 			// This is effectively the path of targetFile relative to targetDir:
-			generatedFileList.add(targetFile.getPath().substring(targetDir.getPath().length() + 1).replace('\\', '/'));
+			generatedJavaSources.add(targetFile.getPath().substring(targetDir.getPath().length() + 1)
+			            .replace('\\', '/'));
 		}
 
 		// This class is added and checked by default:
 		classesToCheck = ArrayUtils.add(classesToCheck, "ObjectFactory");
 
-		assertEquals("Wrong number of generated classes;", classesToCheck.length, generatedFileList.size());
+		assertEquals("Wrong number of generated classes;", classesToCheck.length, generatedJavaSources.size());
 
 		for (String className : classesToCheck) {
 			className = className.replace('.', '/') + ".java";
 
-			assertTrue(className + " is missing in target directory", generatedFileList.contains(className));
+			assertTrue(className + " is missing in target directory", generatedJavaSources.contains(className));
 		}
-
-		String preGeneratedDir = PREGENERATED_SOURCES_PREFIX + getClass().getPackage().getName().replace('.', '/')
-		            + "/" + packageName;
 
 		// Check the contents for those files which exist in resources:
 		for (String className : classesToCheck) {
 			className = className.replace('.', '/') + ".java";
 
-			File sourceFile = new File(preGeneratedDir, className);
+			File sourceFile = new File(PREGENERATED_SOURCES_PREFIX + packageName, className);
 
 			if (sourceFile.exists()) {
 				// To avoid CR/LF conflicts:
@@ -225,6 +238,77 @@ public class XmlElementWrapperPluginTest {
 				            .readFileToString(new File(targetDir, className)).replace("\r", ""));
 			}
 		}
+
+		JAXBContext jaxbContext = compileAndLoad(packageName, targetDir, generatedJavaSources);
+
+		URL xmlTestFile = getClass().getResource(testName + ".xml");
+
+		if (xmlTestFile != null) {
+			StringWriter writer = new StringWriter();
+
+			Marshaller marshaller = jaxbContext.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			marshaller.marshal(jaxbContext.createUnmarshaller().unmarshal(xmlTestFile), writer);
+
+			Diff xmlDiff = new Diff(IOUtils.toString(xmlTestFile), writer.toString());
+
+			// This listener ignores text nodes that differ only by leading/trailing whitespace:
+			xmlDiff.overrideDifferenceListener(new DifferenceListener() {
+
+				public int differenceFound(Difference difference) {
+					if (difference.getId() == DifferenceConstants.TEXT_VALUE_ID
+					            && difference.getControlNodeDetail().getValue().trim()
+					                        .equals(difference.getTestNodeDetail().getValue().trim())) {
+						return RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR;
+					}
+
+					return RETURN_ACCEPT_DIFFERENCE;
+				}
+
+				public void skippedComparison(Node control, Node test) {
+				}
+			});
+
+			assertXMLEqual("Generated XML is wrong: " + writer.toString(), xmlDiff, true);
+		}
+	}
+
+	/**
+	 * The method performs:
+	 * <ul>
+	 * <li>Compilation of given set of Java source files
+	 * <li>Construction of custom class loader
+	 * <li>Creation of JAXB context
+	 * </ul>
+	 * 
+	 * @param packageName
+	 *            package name to which java classes belong to
+	 * @param targetDir
+	 *            the target directory
+	 * @param generatedJavaSources
+	 *            list of Java source files which should become a part of JAXB context
+	 */
+	private JAXBContext compileAndLoad(String packageName, File targetDir, Collection<String> generatedJavaSources)
+	            throws MalformedURLException, JAXBException {
+		String[] javaSources = new String[generatedJavaSources.size()];
+
+		int i = 0;
+		for (String javaSource : generatedJavaSources) {
+			javaSources[i++] = (new File(targetDir, javaSource)).toString();
+		}
+
+		StringWriter writer = new StringWriter();
+
+		if (com.sun.tools.javac.Main.compile(javaSources, new PrintWriter(writer)) != 0) {
+			fail("javac failed with message: " + writer.toString());
+		}
+
+		ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+
+		URLClassLoader newClassLoader = new URLClassLoader(new URL[] { new File(GENERATED_SOURCES_PREFIX).toURI()
+		            .toURL() }, currentClassLoader);
+
+		return JAXBContext.newInstance(packageName, newClassLoader);
 	}
 
 	/**

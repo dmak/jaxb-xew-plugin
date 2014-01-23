@@ -1,12 +1,14 @@
 
 package element_reserved_word;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -40,28 +42,34 @@ import javax.xml.bind.annotation.XmlType;
 public class Class {
 
     @XmlElementWrapper(name = "extends", required = true)
-    @XmlElement(name = "type")
-    protected List<String> _extends = new ArrayList<String>();
+    @XmlElements({
+        @XmlElement(name = "type", type = String.class),
+        @XmlElement(name = "primitive", type = Byte.class)
+    })
+    protected List<Serializable> _extends = new ArrayList<Serializable>();
     @XmlElementWrapper(name = "implements", required = true)
-    @XmlElement(name = "type")
-    protected List<String> _implements = new ArrayList<String>();
+    @XmlElements({
+        @XmlElement(name = "type", type = String.class),
+        @XmlElement(name = "primitive", type = Byte.class)
+    })
+    protected List<Serializable> _implements = new ArrayList<Serializable>();
     @XmlElementWrapper(name = "methods", required = true)
     @XmlElement(name = "method")
     protected List<Method> methods = new ArrayList<Method>();
 
-    public List<String> getExtends() {
+    public List<Serializable> getExtends() {
         return _extends;
     }
 
-    public void setExtends(List<String> _extends) {
+    public void setExtends(List<Serializable> _extends) {
         this._extends = _extends;
     }
 
-    public List<String> getImplements() {
+    public List<Serializable> getImplements() {
         return _implements;
     }
 
-    public void setImplements(List<String> _implements) {
+    public void setImplements(List<Serializable> _implements) {
         this._implements = _implements;
     }
 

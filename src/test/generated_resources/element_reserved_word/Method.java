@@ -1,12 +1,14 @@
 
 package element_reserved_word;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -36,14 +38,17 @@ import javax.xml.bind.annotation.XmlType;
 public class Method {
 
     @XmlElementWrapper(name = "return", required = true)
-    @XmlElement(name = "type")
-    protected List<String> _return = new ArrayList<String>();
+    @XmlElements({
+        @XmlElement(name = "type", type = String.class),
+        @XmlElement(name = "primitive", type = Byte.class)
+    })
+    protected List<Serializable> _return = new ArrayList<Serializable>();
 
-    public List<String> getReturn() {
+    public List<Serializable> getReturn() {
         return _return;
     }
 
-    public void setReturn(List<String> _return) {
+    public void setReturn(List<Serializable> _return) {
         this._return = _return;
     }
 

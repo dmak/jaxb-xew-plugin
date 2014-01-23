@@ -1,7 +1,6 @@
 
 package inner_element_value_objects.impl;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,8 +16,7 @@ public class VolumeImpl implements Volume
 
     @XmlElement(required = true)
     protected String name;
-    @XmlElement(required = true)
-    protected BigInteger capacity;
+    protected int capacity;
 
     public String getName() {
         return name;
@@ -28,11 +26,11 @@ public class VolumeImpl implements Volume
         this.name = value;
     }
 
-    public BigInteger getCapacity() {
+    public int getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(BigInteger value) {
+    public void setCapacity(int value) {
         this.capacity = value;
     }
 

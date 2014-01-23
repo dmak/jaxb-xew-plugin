@@ -1,7 +1,6 @@
 
 package inner_element_value_objects.impl;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -66,8 +65,7 @@ public class FilesystemImpl implements Filesystem
 
         @XmlElement(required = true)
         protected String name;
-        @XmlElement(required = true)
-        protected BigInteger size;
+        protected int size;
 
         public String getName() {
             return name;
@@ -77,11 +75,11 @@ public class FilesystemImpl implements Filesystem
             this.name = value;
         }
 
-        public BigInteger getSize() {
+        public int getSize() {
             return size;
         }
 
-        public void setSize(BigInteger value) {
+        public void setSize(int value) {
             this.size = value;
         }
 

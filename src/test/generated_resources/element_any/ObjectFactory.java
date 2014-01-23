@@ -30,11 +30,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Data }
+     * Create an instance of {@link Message }
      * 
      */
-    public Data createData() {
-        return new Data();
+    public Message createMessage() {
+        return new Message();
     }
 
 }

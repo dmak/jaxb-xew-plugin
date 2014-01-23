@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
@@ -23,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="classes-eu" type="{}classes-eu"/>
  *         &lt;element name="classes-us" type="{}classes-us"/>
  *       &lt;/choice>
+ *       &lt;attribute name="mode" use="required" type="{http://www.w3.org/2001/XMLSchema}byte" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -41,6 +43,8 @@ public class SearchMulti {
         @XmlElement(name = "classes-us", type = ClassesUs.class)
     })
     protected List<Object> classesEuOrClassesUs;
+    @XmlAttribute(name = "mode", required = true)
+    protected byte mode;
 
     /**
      * Gets the value of the classesEuOrClassesUs property.
@@ -70,6 +74,22 @@ public class SearchMulti {
             classesEuOrClassesUs = new ArrayList<Object>();
         }
         return this.classesEuOrClassesUs;
+    }
+
+    /**
+     * Gets the value of the mode property.
+     * 
+     */
+    public byte getMode() {
+        return mode;
+    }
+
+    /**
+     * Sets the value of the mode property.
+     * 
+     */
+    public void setMode(byte value) {
+        this.mode = value;
     }
 
 }
