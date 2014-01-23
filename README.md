@@ -318,7 +318,8 @@ If you provide the code in any way you automatically agree with a [project licen
 #### Build and release procedure
 
 * Read [Sonatype OSS Maven Repository Usage Guide](https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide) from cover to cover.
-* Use the following `settings.xml` for your Maven:
+* Use the following `settings.xml` for your Maven (see [Sharing Files with Build Agents](http://wiki.cloudbees.com/bin/view/DEV/Sharing+Files+with+Build+Executors) about how to share `settings.xml` with build nodes on CloudBees):
+
         <settings>
         	<!-- Optional proxy configuration (if applicable to your environment) -->
         	<proxies>
@@ -360,12 +361,16 @@ If you provide the code in any way you automatically agree with a [project licen
         		</profile>
         	</profiles>
         </settings>
+
 * Make sure you have git ≥ v1.7.10 installed, otherwise you may face [this bug#341221](https://bugs.eclipse.org/bugs/show_bug.cgi?id=341221).
 * You need to put JAXB API ≥ v2.2.3 to `jre/lib/endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
 * For Hudson freestyle job specify:
   * Pre-release step `git checkout master; git reset --hard origin/master` (see [Can't get automated release working with Hudson + Git + Maven Release Plugin](http://stackoverflow.com/questions/1877027) for more details about the problem).
-  * Next step (release): `release:prepare release:perform -Pstage-release,gpg -Dresume=false -Dusername=<github_user> -Dpassword=<github_password>`
-	
+  * Next step (release):  
+    `release:prepare release:perform -Pstage-release,gpg -Dresume=false -Dusername=<github_user> -Dpassword=<github_password>`  
+    In chain with [Mask Passwords Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Mask+Passwords+Plugin) and [Build Secret Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Build+Secret+Plugin) that can look like  
+    `release:prepare release:perform -B -Dresume=false -Pstage-release -Dusername=smith -Dpassword=${SCM_PASSWORD} -Darguments="-Dgpg.homedir=${KEYS_DIR} -Dgpg.passphrase=${PGP_PASSWORD}"`
+
 ### Algorithm description
 
 The plugin flow consists of the following parts:
