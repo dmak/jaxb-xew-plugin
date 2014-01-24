@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
-	jaxb:version="2.0"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified"
->
+<xs:schema jaxb:version="2.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xs:annotation>
 		<xs:appinfo>
 			<jaxb:schemaBindings>
@@ -13,10 +9,16 @@
 		</xs:appinfo>
 	</xs:annotation>
 
+
+	<xs:complexType name="form">
+		<xs:sequence>
+			<xs:element name="dataList" nillable="true" type="data"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="data">
-		<!--
-			Important is that @XmlElementWrapper() is not generated for this case.
-		-->
+		<!-- Important is that @XmlElementWrapper() is generated for this case. -->
 		<xs:sequence>
 			<xs:any minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>

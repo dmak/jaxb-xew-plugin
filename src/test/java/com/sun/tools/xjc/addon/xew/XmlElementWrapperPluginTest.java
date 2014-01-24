@@ -109,7 +109,7 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementAny() throws Exception {
-		assertXsd("element-any.xsd", "element_any", new String[] { "-quiet" }, false, "Data");
+		assertXsd("element-any.xsd", "element_any", new String[] { "-quiet" }, false, "Form");
 	}
 
 	@Test
