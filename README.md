@@ -130,6 +130,10 @@ The following options are applicable for plugin:
 	<td>-Xxew:delete</td>
 	<td>Delete candidate classes having been replaced during compilation.</td>
 </tr>
+<tr>
+	<td>-Xxew:pluralForm</td>
+	<td>[experimental] Apply plural form to collection property (e.g. turn "item" into "items").</td>
+</tr>
 </table>
 
 ### Episode file

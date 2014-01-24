@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="data" type="{}data"/>
+ *         &lt;element name="item" type="{}item"/>
  *         &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}byte"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -33,16 +33,16 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "data",
+    "items",
     "type"
 })
 @XmlRootElement(name = "message")
 public class Message {
 
     protected byte type;
-    @XmlElementWrapper(name = "data", required = true)
+    @XmlElementWrapper(name = "item", required = true)
     @XmlAnyElement(lax = true)
-    protected List<Object> data = new ArrayList<Object>();
+    protected List<Object> items = new ArrayList<Object>();
 
     /**
      * Gets the value of the type property.
@@ -60,12 +60,12 @@ public class Message {
         this.type = value;
     }
 
-    public List<Object> getData() {
-        return data;
+    public List<Object> getItems() {
+        return items;
     }
 
-    public void setData(List<Object> data) {
-        this.data = data;
+    public void setItems(List<Object> items) {
+        this.items = items;
     }
 
 }

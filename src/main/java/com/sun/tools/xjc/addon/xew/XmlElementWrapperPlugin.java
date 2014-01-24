@@ -37,8 +37,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,6 +52,7 @@ import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.sun.codemodel.JAnnotatable;
@@ -67,8 +66,6 @@ import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JFormatter;
-import com.sun.codemodel.JGenerable;
 import com.sun.codemodel.JJavaName;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -106,6 +103,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 	private static final String OPTION_NAME_SUMMARY                    = "-" + PLUGIN_NAME + ":summaryFile";
 	private static final String OPTION_NAME_COLLECTION                 = "-" + PLUGIN_NAME + ":collection";
 	private static final String OPTION_NAME_INSTANTIATE                = "-" + PLUGIN_NAME + ":instantiate";
+	private static final String OPTION_NAME_APPLY_PLURAL_FORM          = "-" + PLUGIN_NAME + ":pluralForm";
 
 	private File                includeFile                            = null;
 	/**
@@ -128,10 +126,10 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 	private JClass              xmlElementDeclModelClass;
 
-	// This is currently an experimental and not properly working feature, so keep this field set to false.
 	// Waiting for this bug to be resolved: http://java.net/jira/browse/JAXB-883
-	//private boolean				applyPluralForm				= Ring.get(BIGlobalBinding.class).isSimpleMode();
-	private static boolean      applyPluralForm                        = false;
+	//private boolean             applyPluralForm                        = Ring.get(BIGlobalBinding.class).isSimpleMode();
+	// This is currently an experimental and not properly working feature, so keep this field set to false.
+	private boolean             applyPluralForm                        = false;
 
 	private static final String FACTORY_CLASS_NAME                     = "ObjectFactory";
 
@@ -200,7 +198,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 		initLoggerIfNecessary(opts);
 
 		int recognized = 0;
-		String filename;
 
 		String arg = args[i];
 		logger.debug("Argument[" + i + "] = " + arg);
@@ -210,78 +207,58 @@ public class XmlElementWrapperPlugin extends Plugin {
 			deleteCandidates = true;
 		}
 		else if (arg.startsWith(OPTION_NAME_INCLUDE)) {
-			recognized++;
-			include = new HashSet<String>();
-
 			if (arg.length() > OPTION_NAME_INCLUDE.length()) {
-				filename = arg.substring(OPTION_NAME_INCLUDE.length()).trim();
-			}
-			else {
-				filename = args[i + 1];
 				recognized++;
-			}
 
-			includeFile = new File(filename);
-			readCandidates(includeFile, include);
+				include = new HashSet<String>();
+				includeFile = new File(arg.substring(OPTION_NAME_INCLUDE.length()).trim());
+
+				readCandidates(includeFile, include);
+			}
 		}
 		else if (arg.startsWith(OPTION_NAME_EXCLUDE)) {
-			recognized++;
-			exclude = new HashSet<String>();
-
 			if (arg.length() > OPTION_NAME_EXCLUDE.length()) {
-				filename = arg.substring(OPTION_NAME_EXCLUDE.length()).trim();
-			}
-			else {
-				filename = args[i + 1];
 				recognized++;
-			}
 
-			excludeFile = new File(filename);
-			readCandidates(excludeFile, exclude);
+				exclude = new HashSet<String>();
+				excludeFile = new File(arg.substring(OPTION_NAME_EXCLUDE.length()).trim());
+
+				readCandidates(excludeFile, exclude);
+			}
 		}
 		else if (arg.startsWith(OPTION_NAME_SUMMARY)) {
-			recognized++;
 			if (arg.length() > OPTION_NAME_SUMMARY.length()) {
-				filename = arg.substring(OPTION_NAME_SUMMARY.length()).trim();
-			}
-			else {
-				filename = args[i + 1];
 				recognized++;
-			}
 
-			summaryFile = new File(filename);
-			summary = new PrintWriter(new FileOutputStream(summaryFile));
+				summaryFile = new File(arg.substring(OPTION_NAME_SUMMARY.length()).trim());
+				summary = new PrintWriter(new FileOutputStream(summaryFile));
+			}
 		}
 		else if (arg.startsWith(OPTION_NAME_COLLECTION)) {
-			String ccn;
-
-			recognized++;
 			if (arg.length() > OPTION_NAME_COLLECTION.length()) {
-				ccn = arg.substring(OPTION_NAME_COLLECTION.length()).trim();
-			}
-			else {
-				ccn = args[i + 1];
 				recognized++;
-			}
-			try {
-				collectionImplClass = Class.forName(ccn);
-			}
-			catch (ClassNotFoundException e) {
-				throw new BadCommandLineException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.");
+
+				String ccn = arg.substring(OPTION_NAME_COLLECTION.length()).trim();
+
+				try {
+					collectionImplClass = Class.forName(ccn);
+				}
+				catch (ClassNotFoundException e) {
+					throw new BadCommandLineException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.");
+				}
 			}
 		}
 		else if (arg.startsWith(OPTION_NAME_INSTANTIATE)) {
-			String instantiate;
-			recognized++;
-
 			if (arg.length() > OPTION_NAME_INSTANTIATE.length()) {
-				instantiate = arg.substring(OPTION_NAME_INSTANTIATE.length()).trim().toUpperCase();
-			}
-			else {
-				instantiate = args[i + 1].trim().toUpperCase();
 				recognized++;
+
+				instantiation = Instantiation.valueOf(arg.substring(OPTION_NAME_INSTANTIATE.length()).trim()
+				            .toUpperCase());
 			}
-			instantiation = Instantiation.valueOf(instantiate);
+		}
+		else if (arg.equals(OPTION_NAME_APPLY_PLURAL_FORM)) {
+			recognized++;
+			applyPluralForm = true;
 		}
 		else if (arg.startsWith("-" + PLUGIN_NAME + ":")) {
 			throw new BadCommandLineException("Invalid argument " + arg);
@@ -304,6 +281,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 		writeSummary("  Collection impl      : " + collectionImplClass);
 		writeSummary("  Collection interface : " + collectionInterfaceClass);
 		writeSummary("  Delete candidates    : " + deleteCandidates);
+		writeSummary("  Plural form          : " + applyPluralForm);
 		writeSummary("");
 
 		// Visit all classes generated by JAXB and find candidate classes for transformation.
@@ -337,6 +315,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 		JClass xmlElementRefsModelClass = codeModel.ref(XmlElementRefs.class);
 		JClass xmlElementsModelClass = codeModel.ref(XmlElements.class);
 		JClass xmlJavaTypeAdapterModelClass = codeModel.ref(XmlJavaTypeAdapter.class);
+		JClass xmlTypeModelClass = codeModel.ref(XmlType.class);
 		xmlElementDeclModelClass = codeModel.ref(XmlElementDecl.class);
 
 		writeSummary("Modifications:");
@@ -417,31 +396,32 @@ public class XmlElementWrapperPlugin extends Plugin {
 				JFieldVar originalImplField = implClass.fields().get(fieldName);
 				implClass.removeField(originalImplField);
 
+				boolean pluralFormWasApplied = false;
+
 				if (isPluralFormApplicable(field)) {
 					String oldFieldName = fieldName;
 
 					// Taken from com.sun.tools.xjc.reader.xmlschema.ParticleBinder#makeJavaName():
 					fieldName = JJavaName.getPluralForm(fieldName);
-					field.getPropertyInfo().setName(false, fieldName);
 
-					// Correct the @XmlType class-level annotation:
-					for (JAnnotationUse annotation : implClass.annotations()) {
-						String annotationClassName = annotation.getAnnotationClass().name();
+					if (!fieldName.equals(oldFieldName)) {
+						pluralFormWasApplied = true;
 
-						if (!annotationClassName.equals("XmlType")) {
-							continue;
+						field.getPropertyInfo().setName(false, fieldName);
+
+						// Correct the @XmlType class-level annotation:
+						JAnnotationValue propOrderValue = getAnnotation(implClass, xmlTypeModelClass)
+						            .getAnnotationMembers().get("propOrder");
+
+						if (propOrderValue != null) {
+							for (JAnnotationValue annotationValue : (List<JAnnotationValue>) getPrivateField(
+							            propOrderValue, "values")) {
+								if (oldFieldName.equals(generableToString(annotationValue))) {
+									setPrivateField(annotationValue, "value", JExpr.lit(fieldName));
+									break;
+								}
+							}
 						}
-
-						// FIXME: Pending for https://java.net/jira/browse/JAXB-884
-						for (JAnnotationValue ann : ((JAnnotationArrayMember) annotation.getAnnotationMembers().get(
-						            "propOrder")).annotations()) {
-							// FIXME: There is no way to set the correct property name back to annotation.
-							//if (oldFieldName.equals(getAnnotationStringValue(ann))) {
-							//	break;
-							//}
-						}
-
-						break;
 					}
 				}
 
@@ -530,7 +510,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 					addAnnotation(implField, annotation);
 				}
 
-				String fieldPublicName = field.getPropertyInfo().getName(true);
+				// Same as fieldName, but used as getter/setter method name:
+				String propertyName = field.getPropertyInfo().getName(true);
 
 				JDefinedClass implementationInterface = null;
 
@@ -539,23 +520,23 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 					// If value class implements some JVM interface it is not considered as such interface cannot be modified:
 					if (interfaceClass instanceof JDefinedClass
-					            && deleteSettersGetters((JDefinedClass) interfaceClass, fieldPublicName)) {
+					            && deleteSettersGetters((JDefinedClass) interfaceClass, propertyName)) {
 						implementationInterface = (JDefinedClass) interfaceClass;
 						break;
 					}
 				}
 
 				// Find original getter and setter methods to remove.
-				deleteSettersGetters(implClass, fieldPublicName);
+				deleteSettersGetters(implClass, propertyName);
 
-				if (isPluralFormApplicable(field)) {
-					fieldPublicName = JJavaName.getPluralForm(fieldPublicName);
-					field.getPropertyInfo().setName(true, fieldPublicName);
+				if (pluralFormWasApplied) {
+					propertyName = JJavaName.getPluralForm(propertyName);
+					field.getPropertyInfo().setName(true, propertyName);
 				}
 
 				// Add a new getter method returning the (wrapped) field added.
 				// GENERATED CODE: public I<T> getFieldName() { ... return fieldName; }
-				JMethod getterMethod = implClass.method(JMod.PUBLIC, collectionInterfaceClass, "get" + fieldPublicName);
+				JMethod getterMethod = implClass.method(JMod.PUBLIC, collectionInterfaceClass, "get" + propertyName);
 
 				if (instantiation == Instantiation.LAZY) {
 					logger.debug("Applying LAZY instantiation...");
@@ -569,7 +550,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				// Add a new setter method:
 				// GENERATED CODE: public void setFieldName(I<T> fieldName) { this.fieldName = fieldName; }
-				JMethod setterMethod = implClass.method(JMod.PUBLIC, codeModel.VOID, "set" + fieldPublicName);
+				JMethod setterMethod = implClass.method(JMod.PUBLIC, codeModel.VOID, "set" + propertyName);
 
 				setterMethod.body().assign(JExpr._this().ref(fieldName),
 				            setterMethod.param(collectionInterfaceClass, fieldName));
@@ -578,8 +559,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 				if (implementationInterface != null) {
 					writeSummary("\tCorrecting interface " + implementationInterface.fullName());
 
-					implementationInterface.method(JMod.PUBLIC, collectionInterfaceClass, "get" + fieldPublicName);
-					setterMethod = implementationInterface.method(JMod.PUBLIC, codeModel.VOID, "set" + fieldPublicName);
+					implementationInterface.method(JMod.PUBLIC, collectionInterfaceClass, "get" + propertyName);
+					setterMethod = implementationInterface.method(JMod.PUBLIC, codeModel.VOID, "set" + propertyName);
 					setterMethod.param(collectionInterfaceClass, fieldName);
 				}
 			}
@@ -611,9 +592,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * we need to get<br>
 	 * {@code TopClass (will have a collection) -> ElementClass}.<br>
 	 * Also this move should be reflected on factory method names.
-	 * 
-	 * @param context
-	 *            TODO
 	 */
 	private boolean moveInnerClassToParentIfNecessary(Outline outline, Candidate candidate) {
 		// Skip basic parametrisations like "List<String>":
@@ -835,6 +813,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				            + factoryClass.fullName());
 				iter.remove();
 				modifiedMethods++;
+				continue;
 			}
 
 			// Mutate the method:
@@ -843,18 +822,20 @@ public class XmlElementWrapperPlugin extends Plugin {
 			// to
 			//   @XmlElementDecl(...)
 			//   public JAXBElement<...> createT...(String value) { return new JAXBElement<...>(..._QNAME, ..., null, value); }
+			JExpression scopeValue = getAnnotationMemberExpression(method, xmlElementDeclModelClass, "scope");
 
-			if (dotClazz.equals(generableToString(getAnnotationMemberExpression(method, xmlElementDeclModelClass,
-			            "scope")))) {
-				writeSummary("\tCorrecting method [" + method.type().fullName() + "#" + method.name() + "()] from "
-				            + factoryClass.fullName());
-				removeAnnotationMember(method, xmlElementDeclModelClass, "scope");
-				// Body content is a return statement which is a method invocation.
-				// FIXME: Very ugly 
-				((List<JExpression>) getPrivateField(getPrivateField(method.body().getContents().get(0), "expr"),
-				            "args")).set(2, JExpr._null());
-				modifiedMethods++;
+			if (scopeValue == null || !dotClazz.equals(generableToString(scopeValue))) {
+				continue;
 			}
+
+			writeSummary("\tCorrecting method [" + method.type().fullName() + "#" + method.name() + "()] from "
+			            + factoryClass.fullName());
+			removeAnnotationMember(method, xmlElementDeclModelClass, "scope");
+			// Body content is a return statement which is a method invocation.
+			// FIXME: Very ugly access via reflection. Forgive me.
+			((List<JExpression>) getPrivateField(getPrivateField(method.body().getContents().get(0), "expr"), "args"))
+			            .set(2, JExpr._null());
+			modifiedMethods++;
 		}
 
 		return modifiedMethods;
@@ -964,24 +945,13 @@ public class XmlElementWrapperPlugin extends Plugin {
 	/**
 	 * Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
 	 * plural form in more correct way, e.g. "fieldsOfScience" instead of "fieldOfSciences".
+	 * 
+	 * @see com.sun.xml.bind.api.impl.NameUtil
+	 * @see com.sun.codemodel.JJavaName
 	 */
-	private static boolean isPluralFormApplicable(FieldOutline field) {
+	private boolean isPluralFormApplicable(FieldOutline field) {
 		// FIXME: It looks like customizations are always empty:
 		return applyPluralForm && field.getPropertyInfo().getCustomizations().isEmpty();
-	}
-
-	/**
-	 * Returns the string value of passed argument.
-	 */
-	private static final String toString(JGenerable generable) {
-		// There is hardly any clean universal way to get the value from e.g. JExpression except of serializing it.
-		// Compare JStringLiteral and JExp#dotclass().
-		Writer w = new StringWriter();
-
-		generable.generate(new JFormatter(w));
-
-		// FIXME: Hopefully nobody will put quotes into annotation member value.
-		return w.toString().replace("\"", "");
 	}
 
 	/**
@@ -1012,9 +982,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				continue;
 			}
 
-			String typeClassName = toString(type).replace(".class", "");
-
-			Candidate candidate = candidatesMap.get(typeClassName);
+			Candidate candidate = candidatesMap.get(generableToString(type).replace(".class", ""));
 
 			if (candidate != null) {
 				logger.debug("Candidate " + candidate.getClassName()

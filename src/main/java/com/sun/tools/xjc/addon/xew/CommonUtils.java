@@ -1,13 +1,10 @@
 package com.sun.tools.xjc.addon.xew;
 
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.JAXBElement;
 
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
@@ -22,16 +19,6 @@ import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 
 public class CommonUtils {
-
-	/**
-	 * Returns {@code true} if given class is a top of the class hierarchy like {@link Object} or {@link Serializable}
-	 * or {@link JAXBElement}, or it is a customized super-class for all model beans. Basic JVM classes like
-	 * {@link String} or {@link Integer} are not treated as top-classes: for them this method returns {@code false}.
-	 */
-	public static boolean isTopClass(JClass clazz) {
-		// See also https://java.net/jira/browse/JAXB-958
-		return clazz instanceof JDefinedClass && ((JDefinedClass) clazz).isHidden();
-	}
 
 	/**
 	 * Returns {@code true} if given class is hidden, that is not generated & saved by XJC. These are for example
@@ -81,14 +68,8 @@ public class CommonUtils {
 	 */
 	public static boolean removeAnnotationMember(JAnnotatable annotatable, JClass annotationClass,
 	            String annotationMember) {
-		JAnnotationUse annotation = getAnnotation(annotatable, annotationClass);
-
-		if (annotation != null) {
-			return ((Map<String, JAnnotationValue>) getPrivateField(annotation, "memberValues"))
-			            .remove(annotationMember) != null;
-		}
-
-		return false;
+		return ((Map<String, JAnnotationValue>) getPrivateField(getAnnotation(annotatable, annotationClass),
+		            "memberValues")).remove(annotationMember) != null;
 	}
 
 	/**
@@ -125,10 +106,6 @@ public class CommonUtils {
 	 * Returns the string value of passed argument.
 	 */
 	public static final String generableToString(JGenerable generable) {
-		if (generable == null) {
-			return null;
-		}
-
 		// There is hardly any clean universal way to get the value from e.g. JExpression except of serializing it.
 		// Compare JStringLiteral and JExp#dotclass().
 		Writer w = new StringWriter();

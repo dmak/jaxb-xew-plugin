@@ -16,13 +16,13 @@
 	<xs:element name="message">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="data" type="data" />
+				<xs:element name="item" type="item" />
 				<xs:element name="type" type="xs:byte" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
-	<xs:complexType name="data">
+	<xs:complexType name="item">
 		<xs:sequence>
 			<xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
 		</xs:sequence>

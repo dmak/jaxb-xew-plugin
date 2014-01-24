@@ -76,22 +76,23 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
-		assertXsd("different-namespaces", new String[] { "-Xxew:collection java.util.LinkedList",
+		assertXsd("different-namespaces", new String[] { "-Xxew:delete", "-Xxew:collection java.util.LinkedList",
 		        "-Xxew:instantiate lazy" }, false, "Container", "Entry", "package-info");
 	}
 
 	@Test
 	public void testInnerElement() throws Exception {
-		assertXsd("inner-element", new String[] { "-verbose", "-Xxew:instantiate none",
+		assertXsd("inner-element", new String[] { "-verbose", "-Xxew:delete", "-Xxew:instantiate none",
 		        "-Xxew:includeFile " + getClass().getResource("inner-element-includes.txt").getFile() }, true,
 		            "Filesystem", "Volume");
 	}
 
 	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
-		assertXsd("inner-element-value-objects", new String[] { "-debug" }, false, "Article", "Articles", "Filesystem",
-		            "Publisher", "Volume", "impl.ArticleImpl", "impl.ArticlesImpl", "impl.FilesystemImpl",
-		            "impl.PublisherImpl", "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory");
+		assertXsd("inner-element-value-objects", new String[] { "-debug", "-Xxew:delete" }, false, "Article",
+		            "Articles", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl", "impl.ArticlesImpl",
+		            "impl.FilesystemImpl", "impl.PublisherImpl", "impl.VolumeImpl", "impl.ObjectFactory",
+		            "impl.JAXBContextFactory");
 	}
 
 	@Test
@@ -113,7 +114,8 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementWithParent() throws Exception {
-		assertXsd("element-with-parent", new String[] { "-debug" }, false, "Group", "Organization");
+		assertXsd("element-with-parent", new String[] { "-debug", "-Xxew:delete false" }, false, "Group",
+		            "Organization");
 	}
 
 	@Test
@@ -130,23 +132,24 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementAny() throws Exception {
-		assertXsd("element-any", new String[] { "-quiet" }, false, "Message");
+		assertXsd("element-any", new String[] { "-quiet", "-Xxew:delete", "-Xxew:pluralForm" }, false, "Message");
 	}
 
 	@Test
 	public void testElementMixed() throws Exception {
 		// Most classes cannot be tested for content
-		assertXsd("element-mixed", new String[] { "-debug" }, false, "B", "Br", "I", "AnyText", "package-info");
+		assertXsd("element-mixed", new String[] { "-debug", "-Xxew:delete" }, false, "B", "Br", "I", "AnyText",
+		            "package-info");
 	}
 
 	@Test
 	public void testElementWithAdapter() throws Exception {
-		assertXsd("element-with-adapter", null, false, "Calendar", "Adapter1");
+		assertXsd("element-with-adapter", new String[] { "-Xxew:delete" }, false, "Calendar", "Adapter1");
 	}
 
 	@Test
 	public void testElementReservedWord() throws Exception {
-		assertXsd("element-reserved-word", null, false, "Class", "Method");
+		assertXsd("element-reserved-word", new String[] { "-Xxew:delete" }, false, "Class", "Method");
 	}
 
 	/**
@@ -179,7 +182,7 @@ public class XmlElementWrapperPluginTest {
 		PrintStream loggingPrintStream = new PrintStream(new LoggingOutputStream(logger,
 		            LoggingOutputStream.LogLevel.INFO, "[XJC] "));
 
-		String[] opts = ArrayUtils.addAll(extraXewOptions, "-no-header", "-extension", "-Xxew", "-Xxew:delete", "-d",
+		String[] opts = ArrayUtils.addAll(extraXewOptions, "-no-header", "-extension", "-Xxew", "-d",
 		            targetDir.getPath(), xsdUrl);
 
 		String episodeFile = new File(targetDir, "episode.xml").getPath();
