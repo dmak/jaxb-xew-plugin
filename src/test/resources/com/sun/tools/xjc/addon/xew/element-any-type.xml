@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<conversion xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="element-any-type.xsd">
+	<accept>
+		<elements>
+			<number type="real">1.2231</number>
+			<number type="complex">
+				<real>53.1</real>
+				<imaginary>44.9</imaginary>
+			</number>
+			<number type="integer">-491</number>
+			<number type="real">-1.22</number>
+		</elements>
+	</accept>
+	<return>
+		<entry>
+			<key>
+				<operation name="aggregation" />
+			</key>
+			<value>
+				<number type="real">0.0031</number>
+				<number type="complex">
+					<real>53.1</real>
+					<imaginary>44.9</imaginary>
+				</number>
+				<number type="integer">-491</number>
+			</value>
+		</entry>
+		<entry>
+			<key>
+				<operation name="average" />
+			</key>
+			<value>
+				<number type="real">0.00155</number>
+				<number type="complex">
+					<real>53.1</real>
+					<imaginary>44.9</imaginary>
+				</number>
+				<number type="integer">-491</number>
+			</value>
+		</entry>
+	</return>
+</conversion>

@@ -1,4 +1,4 @@
-# The only class for inclusion:
-inner_element.Filesystem.FileListing
+# Classes for inclusion:
 inner_element.Filesystem.DirectoryListing
-inner_element.Volumes
+# This one is marked both for inclusion and exclusion:
+inner_element.Filesystem.FileListing

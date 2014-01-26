@@ -8,7 +8,7 @@
 	<xs:annotation>
 		<xs:appinfo>
 			<jaxb:schemaBindings>
-				<jaxb:package name="element_referenced_twice" />
+				<jaxb:package name="element_as_parametrisation_2" />
 			</jaxb:schemaBindings>
 		</xs:appinfo>
 	</xs:annotation>
@@ -16,7 +16,7 @@
 	<xs:complexType name="family">
 		<xs:choice>
 			<xs:element name="family-member" type="family-member" maxOccurs="unbounded"/>
-			<xs:element name="parent-member" type="xs:boolean" />
+			<xs:element name="parent" type="xs:boolean" />
 		</xs:choice>
 	</xs:complexType>
 

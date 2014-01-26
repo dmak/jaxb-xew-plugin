@@ -1,2 +1,0 @@
-# This class is explicitly kept from being removed
-element_as_parametrisation.ArticlesCollections

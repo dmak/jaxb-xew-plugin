@@ -1,0 +1,83 @@
+
+package element_with_parent;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import com.sun.tools.xjc.addon.xew.CommonBean;
+
+
+/**
+ * <p>Java class for anonymous complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType>
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;choice maxOccurs="unbounded">
+ *         &lt;element name="organization" type="{}organization"/>
+ *         &lt;element name="group" type="{}group"/>
+ *       &lt;/choice>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = {
+    "organizationOrGroup"
+})
+@XmlRootElement(name = "alliance")
+public class Alliance
+    extends CommonBean
+    implements Serializable
+{
+
+    private final static long serialVersionUID = 1L;
+    @XmlElements({
+        @XmlElement(name = "organization", type = Organization.class),
+        @XmlElement(name = "group")
+    })
+    protected List<Group> organizationOrGroup;
+
+    /**
+     * Gets the value of the organizationOrGroup property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the organizationOrGroup property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getOrganizationOrGroup().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Organization }
+     * {@link Group }
+     * 
+     * 
+     */
+    public List<Group> getOrganizationOrGroup() {
+        if (organizationOrGroup == null) {
+            organizationOrGroup = new ArrayList<Group>();
+        }
+        return this.organizationOrGroup;
+    }
+
+}

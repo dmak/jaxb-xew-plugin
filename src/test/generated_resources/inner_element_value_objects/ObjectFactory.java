@@ -3,6 +3,7 @@ package inner_element_value_objects;
 
 import javax.xml.bind.annotation.XmlRegistry;
 import inner_element_value_objects.impl.ArticleImpl;
+import inner_element_value_objects.impl.ArticlesCollectionsImpl;
 import inner_element_value_objects.impl.ArticlesImpl;
 import inner_element_value_objects.impl.FilesystemImpl;
 import inner_element_value_objects.impl.PublisherImpl;
@@ -65,6 +66,14 @@ public class ObjectFactory {
      */
     public Publisher createPublisher() {
         return new PublisherImpl();
+    }
+
+    /**
+     * Create an instance of {@link ArticlesCollections }
+     * 
+     */
+    public ArticlesCollections createArticlesCollections() {
+        return new ArticlesCollectionsImpl();
     }
 
     /**

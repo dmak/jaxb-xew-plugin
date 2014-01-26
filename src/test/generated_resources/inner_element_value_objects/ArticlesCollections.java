@@ -1,12 +1,8 @@
 
-package element_as_parametrisation;
+package inner_element_value_objects;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -28,14 +24,9 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "articles-collections", propOrder = {
-    "articles"
-})
-public class ArticlesCollections {
+public interface ArticlesCollections extends Serializable
+{
 
-    @XmlElement(required = true)
-    protected List<Articles> articles;
 
     /**
      * Gets the value of the articles property.
@@ -59,11 +50,6 @@ public class ArticlesCollections {
      * 
      * 
      */
-    public List<Articles> getArticles() {
-        if (articles == null) {
-            articles = new ArrayList<Articles>();
-        }
-        return this.articles;
-    }
+    List<Articles> getArticles();
 
 }

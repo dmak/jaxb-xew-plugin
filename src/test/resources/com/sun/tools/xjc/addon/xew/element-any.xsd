@@ -16,15 +16,16 @@
 	<xs:element name="message">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="item" type="item" />
-				<xs:element name="type" type="xs:byte" />
+				<xs:element ref="item" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
-	<xs:complexType name="item">
-		<xs:sequence>
-			<xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
-		</xs:sequence>
-	</xs:complexType>
+	<xs:element name="item">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>

@@ -1,5 +1,5 @@
 
-package element_as_parametrisation;
+package element_as_parametrisation_1;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

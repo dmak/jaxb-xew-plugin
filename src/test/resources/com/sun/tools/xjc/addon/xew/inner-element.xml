@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<filesystem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="inner-element.xsd">
+	<file-listing>
+		<file-item>
+			<name>my.txt</name>
+			<size>47491</size>
+		</file-item>
+		<file-item>
+			<name>out.log</name>
+			<size>67118201</size>
+		</file-item>
+		<file-item>
+			<name>config</name>
+			<size>571</size>
+		</file-item>
+	</file-listing>
+	<directory-listing>
+		<directory-item>INBOX</directory-item>
+		<directory-item>OUTBOX</directory-item>
+		<directory-item>DRAFTS</directory-item>
+	</directory-listing>
+	<volumes>
+		<volume>
+			<name>/mnt/nfs</name>
+			<capacity>459591833</capacity>
+		</volume>
+		<volume>
+			<name>/mnt/external</name>
+			<capacity>59119281</capacity>
+		</volume>
+	</volumes>
+</filesystem>

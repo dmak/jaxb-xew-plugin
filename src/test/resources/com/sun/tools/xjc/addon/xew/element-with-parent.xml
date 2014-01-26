@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<alliance xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="element-with-parent.xsd">
+	<organization>
+		<person>
+			<first-name>Bill</first-name>
+			<second-name>Smith</second-name>
+		</person>
+		<person>
+			<first-name>Anthony</first-name>
+			<second-name>Williams</second-name>
+		</person>
+		<address>Hall avenue 12, New York</address>
+	</organization>
+	<group>
+		<person>
+			<first-name>Sandy</first-name>
+			<second-name>Morth</second-name>
+		</person>
+		<person>
+			<first-name>Jim</first-name>
+			<second-name>Simpson</second-name>
+		</person>
+		<person>
+			<first-name>Larry</first-name>
+			<second-name>Hook</second-name>
+		</person>
+	</group>
+	<organization>
+		<person>
+			<first-name>Tom</first-name>
+			<second-name>Sayer</second-name>
+		</person>
+		<address>Station street 10, New Jersey</address>
+	</organization>
+</alliance>

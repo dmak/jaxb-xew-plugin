@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container
+	xmlns="http://example.com/container"
+	xmlns:e="http://example.com/entries"
+	xmlns:r="http://example.com/entry"
+	xmlns:i="http://example.com/items"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://example.com/container different-namespaces.xsd"
+>
+	<e:entries>
+		<r:entry name="son" />
+		<r:entry name="daughter" />
+	</e:entries>
+	<i:items>
+		<r:entry name="car" />
+		<r:entry name="house" />
+		<r:entry name="tree" />
+	</i:items>
+</container>

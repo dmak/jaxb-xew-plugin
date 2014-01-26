@@ -22,6 +22,7 @@ package com.sun.tools.xjc.addon.xew;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -36,10 +37,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.SchemaFactory;
 
+import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Driver;
 import com.sun.tools.xjc.reader.Const;
 import com.sun.tools.xjc.reader.internalizer.DOMForest;
@@ -75,24 +80,41 @@ public class XmlElementWrapperPluginTest {
 	private static final Log    logger                      = LogFactory.getLog(XmlElementWrapperPluginTest.class);
 
 	@Test
+	public void testUsage() throws Exception {
+		assertNotNull(new XmlElementWrapperPlugin().getUsage());
+	}
+
+	@Test(expected = BadCommandLineException.class)
+	public void testUnknownOption() throws Exception {
+		assertXsd("different-namespaces", new String[] { "-Xxew:unknown" }, false);
+	}
+
+	@Test(expected = BadCommandLineException.class)
+	public void testInvalidCollectionClass() throws Exception {
+		assertXsd("different-namespaces", new String[] { "-Xxew:collection nonexistent.LinkedList" }, false);
+	}
+
+	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
-		assertXsd("different-namespaces", new String[] { "-Xxew:delete", "-Xxew:collection java.util.LinkedList",
-		        "-Xxew:instantiate lazy" }, false, "Container", "Entry", "package-info");
+		// Plural form in this case will have no impact as all properties are already in plural:
+		assertXsd("different-namespaces", new String[] { "-Xxew:delete", "-Xxew:collection", "java.util.LinkedList",
+		        "-Xxew:instantiate", "lazy", "-Xxew:plural" }, false, "Container", "Entry", "package-info");
 	}
 
 	@Test
 	public void testInnerElement() throws Exception {
 		assertXsd("inner-element", new String[] { "-verbose", "-Xxew:delete", "-Xxew:instantiate none",
-		        "-Xxew:includeFile " + getClass().getResource("inner-element-includes.txt").getFile() }, true,
-		            "Filesystem", "Volume");
+		        "-Xxew:include " + getClass().getResource("inner-element-includes.txt").getFile(),
+		        "-Xxew:exclude " + getClass().getResource("inner-element-excludes.txt").getFile(), }, true,
+		            "Filesystem", "Volumes");
 	}
 
 	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
 		assertXsd("inner-element-value-objects", new String[] { "-debug", "-Xxew:delete" }, false, "Article",
-		            "Articles", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl", "impl.ArticlesImpl",
-		            "impl.FilesystemImpl", "impl.PublisherImpl", "impl.VolumeImpl", "impl.ObjectFactory",
-		            "impl.JAXBContextFactory");
+		            "Articles", "ArticlesCollections", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl",
+		            "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl", "impl.PublisherImpl",
+		            "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory");
 	}
 
 	@Test
@@ -105,23 +127,21 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
-	public void testElementAsParametrisation() throws Exception {
-		assertXsd("element-as-parametrisation",
-		            new String[] { "-Xxew:excludeFile "
-		                        + getClass().getResource("element-as-parametrisation-excludes.txt").getFile() }, false,
-		            "Article", "Articles", "ArticlesCollections", "Publisher");
+	public void testElementAsParametrisation1() throws Exception {
+		assertXsd("element-as-parametrisation-1",
+		            new String[] { "-Xxew:exclude "
+		                        + getClass().getResource("element-as-parametrisation-1-excludes.txt").getFile() },
+		            false, "Article", "Articles", "ArticlesCollections", "Publisher");
 	}
 
 	@Test
-	public void testElementWithParent() throws Exception {
-		assertXsd("element-with-parent", new String[] { "-debug", "-Xxew:delete false" }, false, "Group",
-		            "Organization");
-	}
-
-	@Test
-	public void testElementReferencedTwice() throws Exception {
-		assertXsd("element-referenced-twice", new String[] { "-Xxew:summaryFile " + GENERATED_SOURCES_PREFIX
-		            + "summary.txt" }, false, "Family", "FamilyMember");
+	public void testElementAsParametrisation2() throws Exception {
+		assertXsd("element-as-parametrisation-2",
+		            new String[] {
+		                    "-Xxew:include "
+		                                + getClass().getResource("element-as-parametrisation-2-includes.txt").getFile(),
+		                    "-Xxew:summary " + GENERATED_SOURCES_PREFIX + "summary.txt" }, false, "Family",
+		            "FamilyMember");
 
 		String summaryFile = FileUtils.readFileToString(new File(GENERATED_SOURCES_PREFIX + "summary.txt"));
 
@@ -131,8 +151,20 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
+	public void testElementWithParent() throws Exception {
+		assertXsd("element-with-parent", new String[] { "-debug", "-Xxew:delete false" }, false, "Alliance", "Group",
+		            "Organization");
+	}
+
+	@Test
 	public void testElementAny() throws Exception {
-		assertXsd("element-any", new String[] { "-quiet", "-Xxew:delete", "-Xxew:pluralForm" }, false, "Message");
+		// Plural form is applied:
+		assertXsd("element-any", new String[] { "-quiet", "-Xxew:delete", "-Xxew:plural" }, false, "Message");
+	}
+
+	@Test
+	public void testElementAnyType() throws Exception {
+		assertXsd("element-any-type", new String[] { "-Xxew:delete", "-Xxew:plural" }, false, "Conversion", "Entry");
 	}
 
 	@Test
@@ -144,7 +176,9 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementWithAdapter() throws Exception {
-		assertXsd("element-with-adapter", new String[] { "-Xxew:delete" }, false, "Calendar", "Adapter1");
+		// Plural form in this case will have no impact as there is property parametrization:
+		assertXsd("element-with-adapter", new String[] { "-Xxew:delete", "-Xxew:plural" }, false, "Calendar",
+		            "Adapter1");
 	}
 
 	@Test
@@ -173,7 +207,7 @@ public class XmlElementWrapperPluginTest {
 		// Force plugin to reinitialize the logger:
 		System.clearProperty(XmlElementWrapperPlugin.COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY);
 
-		String xsdUrl = getClass().getResource(resourceXsd).getFile();
+		URL xsdUrl = getClass().getResource(resourceXsd);
 
 		File targetDir = new File(GENERATED_SOURCES_PREFIX);
 
@@ -183,7 +217,7 @@ public class XmlElementWrapperPluginTest {
 		            LoggingOutputStream.LogLevel.INFO, "[XJC] "));
 
 		String[] opts = ArrayUtils.addAll(extraXewOptions, "-no-header", "-extension", "-Xxew", "-d",
-		            targetDir.getPath(), xsdUrl);
+		            targetDir.getPath(), xsdUrl.getFile());
 
 		String episodeFile = new File(targetDir, "episode.xml").getPath();
 
@@ -249,9 +283,14 @@ public class XmlElementWrapperPluginTest {
 		if (xmlTestFile != null) {
 			StringWriter writer = new StringWriter();
 
+			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			unmarshaller.setSchema(schemaFactory.newSchema(xsdUrl));
+
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(jaxbContext.createUnmarshaller().unmarshal(xmlTestFile), writer);
+			marshaller.marshal(unmarshaller.unmarshal(xmlTestFile), writer);
 
 			Diff xmlDiff = new Diff(IOUtils.toString(xmlTestFile), writer.toString());
 

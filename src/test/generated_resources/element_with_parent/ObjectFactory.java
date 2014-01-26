@@ -38,6 +38,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Alliance }
+     * 
+     */
+    public Alliance createAlliance() {
+        return new Alliance();
+    }
+
+    /**
      * Create an instance of {@link Organization }
      * 
      */

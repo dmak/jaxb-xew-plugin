@@ -18,11 +18,14 @@
 	<xs:import schemaLocation="different-namespaces-entries.xsd" namespace="http://example.com/entries" />
 	<xs:import schemaLocation="different-namespaces-items.xsd" namespace="http://example.com/items" />
 
+	<!--
+		All XML elements are in different namespaces.
+	-->
 	<xs:element name="container">
 		<xs:complexType>
 			<xs:sequence>
 				<!--
-					Example of element which does not generate @XmlElementWrapper(..., required = true)
+					Example of element which does not generate "required = true" in @XmlElementWrapper:
 				-->
 				<xs:element ref="entries:entries" minOccurs="0" />
 				<xs:element ref="items:items" />

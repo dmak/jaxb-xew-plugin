@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema jaxb:version="2.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="element_any_type" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:complexType name="Entry">
+		<xs:sequence>
+			<xs:element name="key" minOccurs="0" nillable="true" type="xs:anyType" />
+			<xs:element name="value" minOccurs="0" nillable="true" type="xs:anyType" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Map">
+		<xs:sequence>
+			<xs:element name="entry" maxOccurs="unbounded" nillable="true" type="Entry" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="List">
+		<xs:sequence>
+			<xs:element name="elements" maxOccurs="unbounded" nillable="true" type="xs:anyType" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="conversion">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="accept" type="List" />
+				<xs:element name="return" type="Map" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

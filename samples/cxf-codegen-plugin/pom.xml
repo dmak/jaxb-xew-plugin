@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.jaxb-xew-plugin.sample</groupId>
+	<artifactId>cxf-codegen-plugin</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>2.7.8</version>
+				<executions>
+					<execution>
+						<id>generate-client</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<wsdlOptions>
+								<wsdlOption>
+									<wsdl>src/xsd/test.wsdl</wsdl>
+									<extraargs>
+										<extraarg>-xjc-Xxew</extraarg>
+										<extraarg>-xjc-Xxew:summaryFile target/summary.txt</extraarg>
+										<extraarg>-xjc-Xxew:instantiate lazy</extraarg>
+										<extraarg>-xjc-Xxew:delete</extraarg>
+									</extraargs>
+								</wsdlOption>
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.github.jaxb-xew-plugin</groupId>
+						<artifactId>jaxb-xew-plugin</artifactId>
+						<version>1.1</version>
+						<exclusions>
+							<exclusion>
+								<groupId>org.codehaus.woodstox</groupId>
+								<artifactId>wstx-asl</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>com.sun.xml.bind</groupId>
+						<artifactId>jaxb-xjc</artifactId>
+						<version>2.2.4-1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+</project>

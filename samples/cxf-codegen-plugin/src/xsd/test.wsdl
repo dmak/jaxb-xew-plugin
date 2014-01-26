@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="wsdl-viewer.xsl"?>
+<wsdl:definitions xmlns="http://jax-ws-commons.jvnet.org/test" targetNamespace="http://jax-ws-commons.jvnet.org/test"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  name="testService">
+	<wsdl:types>
+		<xsd:schema elementFormDefault="unqualified" targetNamespace="http://jax-ws-commons.jvnet.org/test">
+			<xsd:element name="listRequest" type="xsd:string" />
+			<xsd:element name="listResponse" type="xsd:string" />
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="listReqMsg">
+		<wsdl:part name="parameters" element="listRequest"/>
+	</wsdl:message>
+	<wsdl:message name="listRespMsg">
+		<wsdl:part name="parameters" element="listResponse"/>
+	</wsdl:message>
+
+	<wsdl:portType name="testPort">
+		<wsdl:operation name="list">
+			<wsdl:input message="listReqMsg"/>
+			<wsdl:output message="listRespMsg"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="testBinding" type="testPort">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+
+		<wsdl:operation name="list">
+			<soap:operation soapAction=""/>
+
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<wsdl:service name="testService">
+		<wsdl:port name="testPort" binding="testBinding">
+			<soap:address location="REPLACE_WITH_ACTUAL_URL"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

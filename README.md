@@ -265,9 +265,15 @@ Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which 
     	</dependencies>
     </plugin>
 
-You can find more examples of this plugin in [`samples`](samples/) directory (including how to call this plugin from `jaxws:wsimport`).
+You can find more examples of this plugin in [`samples`](samples/) directory (including how to call this plugin using `jaxws-maven-plugin` or `cxf-codegen-plugin`).
 
 ## What's new
+
+### v1.2
+
+* Plugin is improved ([#14](https://github.com/dmak/jaxb-xew-plugin/issues/14)). Bugs fixed ([#13](https://github.com/dmak/jaxb-xew-plugin/issues/13)).
+* Plugin can now automatically apply plural form to collection properties.
+* Unit tests now compile the model with `javac` and create JAXB context. Some test involve also XML marshalling/unmarshalling/comparing.
 
 ### v1.1
 

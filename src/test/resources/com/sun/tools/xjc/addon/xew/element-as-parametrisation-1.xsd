@@ -8,10 +8,10 @@
 	<xs:annotation>
 		<xs:appinfo>
 			<jaxb:schemaBindings>
-				<jaxb:package name="element_as_parametrisation" />
+				<jaxb:package name="element_as_parametrisation_1" />
 			</jaxb:schemaBindings>
 		</xs:appinfo>
 	</xs:annotation>
 
-	<xs:include schemaLocation="element-as-parametrisation-shared.xsd" />
+	<xs:include schemaLocation="publisher-shared.xsd" />
 </xs:schema>

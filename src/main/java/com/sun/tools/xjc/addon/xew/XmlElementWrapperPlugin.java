@@ -73,11 +73,13 @@ import com.sun.codemodel.JPackage;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
+import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
+import com.sun.xml.xsom.XSParticle;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -98,12 +100,12 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 	private static final String PLUGIN_NAME                            = "Xxew";
 	private static final String OPTION_NAME_DELETE                     = "-" + PLUGIN_NAME + ":delete";
-	private static final String OPTION_NAME_INCLUDE                    = "-" + PLUGIN_NAME + ":includeFile";
-	private static final String OPTION_NAME_EXCLUDE                    = "-" + PLUGIN_NAME + ":excludeFile";
-	private static final String OPTION_NAME_SUMMARY                    = "-" + PLUGIN_NAME + ":summaryFile";
+	private static final String OPTION_NAME_INCLUDE                    = "-" + PLUGIN_NAME + ":include";
+	private static final String OPTION_NAME_EXCLUDE                    = "-" + PLUGIN_NAME + ":exclude";
+	private static final String OPTION_NAME_SUMMARY                    = "-" + PLUGIN_NAME + ":summary";
 	private static final String OPTION_NAME_COLLECTION                 = "-" + PLUGIN_NAME + ":collection";
 	private static final String OPTION_NAME_INSTANTIATE                = "-" + PLUGIN_NAME + ":instantiate";
-	private static final String OPTION_NAME_APPLY_PLURAL_FORM          = "-" + PLUGIN_NAME + ":pluralForm";
+	private static final String OPTION_NAME_APPLY_PLURAL_FORM          = "-" + PLUGIN_NAME + ":plural";
 
 	private File                includeFile                            = null;
 	/**
@@ -193,6 +195,38 @@ public class XmlElementWrapperPlugin extends Plugin {
 		}
 	}
 
+	/**
+	 * Parse argument at a given index. Option value may go within the same argument, or as following argument.
+	 * 
+	 * @param args
+	 *            list of arguments
+	 * @param index
+	 *            current index
+	 * @param optionName
+	 *            the option to parse
+	 * @param value
+	 *            parser option value
+	 * @return number of arguments processed
+	 */
+	private int parseArgument(String[] args, int index, String optionName, StringBuilder value) {
+		int recognized = 0;
+		String arg = args[index];
+
+		if (arg.startsWith(optionName)) {
+			recognized++;
+
+			if (arg.length() > optionName.length()) {
+				value.append(arg.substring(optionName.length()).trim());
+			}
+			else {
+				value.append(args[index + 1]);
+				recognized++;
+			}
+		}
+
+		return recognized;
+	}
+
 	@Override
 	public int parseArgument(Options opts, String[] args, int i) throws BadCommandLineException, IOException {
 		initLoggerIfNecessary(opts);
@@ -201,60 +235,40 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		String arg = args[i];
 		logger.debug("Argument[" + i + "] = " + arg);
+		StringBuilder value = new StringBuilder();
 
 		if (arg.startsWith(OPTION_NAME_DELETE)) {
 			recognized++;
 			deleteCandidates = true;
 		}
-		else if (arg.startsWith(OPTION_NAME_INCLUDE)) {
-			if (arg.length() > OPTION_NAME_INCLUDE.length()) {
-				recognized++;
+		else if ((recognized = parseArgument(args, i, OPTION_NAME_INCLUDE, value)) > 0) {
+			include = new HashSet<String>();
+			includeFile = new File(value.toString());
 
-				include = new HashSet<String>();
-				includeFile = new File(arg.substring(OPTION_NAME_INCLUDE.length()).trim());
+			readCandidates(includeFile, include);
+		}
+		else if ((recognized = parseArgument(args, i, OPTION_NAME_EXCLUDE, value)) > 0) {
+			exclude = new HashSet<String>();
+			excludeFile = new File(value.toString());
 
-				readCandidates(includeFile, include);
+			readCandidates(excludeFile, exclude);
+		}
+		else if ((recognized = parseArgument(args, i, OPTION_NAME_SUMMARY, value)) > 0) {
+			summaryFile = new File(value.toString());
+			summary = new PrintWriter(new FileOutputStream(summaryFile));
+		}
+		else if ((recognized = parseArgument(args, i, OPTION_NAME_COLLECTION, value)) > 0) {
+			String ccn = value.toString();
+
+			try {
+				collectionImplClass = Class.forName(ccn);
+			}
+			catch (ClassNotFoundException e) {
+				throw new BadCommandLineException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.", e);
 			}
 		}
-		else if (arg.startsWith(OPTION_NAME_EXCLUDE)) {
-			if (arg.length() > OPTION_NAME_EXCLUDE.length()) {
-				recognized++;
-
-				exclude = new HashSet<String>();
-				excludeFile = new File(arg.substring(OPTION_NAME_EXCLUDE.length()).trim());
-
-				readCandidates(excludeFile, exclude);
-			}
-		}
-		else if (arg.startsWith(OPTION_NAME_SUMMARY)) {
-			if (arg.length() > OPTION_NAME_SUMMARY.length()) {
-				recognized++;
-
-				summaryFile = new File(arg.substring(OPTION_NAME_SUMMARY.length()).trim());
-				summary = new PrintWriter(new FileOutputStream(summaryFile));
-			}
-		}
-		else if (arg.startsWith(OPTION_NAME_COLLECTION)) {
-			if (arg.length() > OPTION_NAME_COLLECTION.length()) {
-				recognized++;
-
-				String ccn = arg.substring(OPTION_NAME_COLLECTION.length()).trim();
-
-				try {
-					collectionImplClass = Class.forName(ccn);
-				}
-				catch (ClassNotFoundException e) {
-					throw new BadCommandLineException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.");
-				}
-			}
-		}
-		else if (arg.startsWith(OPTION_NAME_INSTANTIATE)) {
-			if (arg.length() > OPTION_NAME_INSTANTIATE.length()) {
-				recognized++;
-
-				instantiation = Instantiation.valueOf(arg.substring(OPTION_NAME_INSTANTIATE.length()).trim()
-				            .toUpperCase());
-			}
+		else if ((recognized = parseArgument(args, i, OPTION_NAME_INSTANTIATE, value)) > 0) {
+			instantiation = Instantiation.valueOf(value.toString().toUpperCase());
 		}
 		else if (arg.equals(OPTION_NAME_APPLY_PLURAL_FORM)) {
 			recognized++;
@@ -294,10 +308,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 			Candidate candidate = iter.next();
 
 			if (isIncluded(candidate)) {
+				writeSummary("\t[+]: " + getIncludeOrExcludeReason() + ":\t" + candidate.getClassName());
 				candidatesMap.put(candidate.getClassName(), candidate);
-
-				writeSummary("\t[" + (candidate.isMarkedForRemoval() ? "!" : "+") + "]: " + getIncludeOrExcludeReason()
-				            + ":\t" + candidate.getClassName());
 			}
 			else {
 				writeSummary("\t[-]: " + getIncludeOrExcludeReason() + ":\t" + candidate.getClassName());
@@ -346,8 +358,9 @@ public class XmlElementWrapperPlugin extends Plugin {
 				}
 
 				JClass fieldType = (JClass) field.getRawType();
+				CPropertyInfo fieldPropertyInfo = field.getPropertyInfo();
 
-				String fieldName = field.getPropertyInfo().getName(false);
+				String fieldName = fieldPropertyInfo.getName(false);
 
 				Candidate candidate = null;
 
@@ -376,6 +389,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				// We have a candidate field to be replaced with a wrapped version. Report finding to summary file.
 				writeSummary("\tReplacing field [" + fieldType.name() + " " + implClass.fullName() + "#" + fieldName
 				            + "]");
+				candidate.incrementSubstitutions();
 				modificationCount++;
 
 				// The container class has to be deleted. Check that inner class has to be moved to it's parent.
@@ -398,16 +412,24 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				boolean pluralFormWasApplied = false;
 
-				if (isPluralFormApplicable(field)) {
+				// Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
+				// plural form in more correct way, e.g. "field[s]OfScience" instead of "fieldOfScience[s]".
+				if (applyPluralForm && hasNoPropertyNameCustomization(fieldName, fieldPropertyInfo)) {
 					String oldFieldName = fieldName;
 
 					// Taken from com.sun.tools.xjc.reader.xmlschema.ParticleBinder#makeJavaName():
 					fieldName = JJavaName.getPluralForm(fieldName);
 
+					// The field e.g. "return" was escaped as "_return", but after conversion to plural
+					// it became valid Java identifier, so we remove the leading "_":
+					if (fieldName.startsWith("_") && JJavaName.isJavaIdentifier(fieldName.substring(1))) {
+						fieldName = fieldName.substring(1);
+					}
+
 					if (!fieldName.equals(oldFieldName)) {
 						pluralFormWasApplied = true;
 
-						field.getPropertyInfo().setName(false, fieldName);
+						fieldPropertyInfo.setName(false, fieldName);
 
 						// Correct the @XmlType class-level annotation:
 						JAnnotationValue propOrderValue = getAnnotation(implClass, xmlTypeModelClass)
@@ -511,7 +533,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				}
 
 				// Same as fieldName, but used as getter/setter method name:
-				String propertyName = field.getPropertyInfo().getName(true);
+				String propertyName = fieldPropertyInfo.getName(true);
 
 				JDefinedClass implementationInterface = null;
 
@@ -531,7 +553,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				if (pluralFormWasApplied) {
 					propertyName = JJavaName.getPluralForm(propertyName);
-					field.getPropertyInfo().setName(true, propertyName);
+					fieldPropertyInfo.setName(true, propertyName);
 				}
 
 				// Add a new getter method returning the (wrapped) field added.
@@ -740,7 +762,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 		// Visit all candidate classes.
 		for (Candidate candidate : candidates) {
 			// Only consider candidates that are actually included...
-			if (!isIncluded(candidate) || !candidate.isMarkedForRemoval()) {
+			if (!isIncluded(candidate) || !candidate.canBeRemoved()) {
 				continue;
 			}
 
@@ -937,21 +959,28 @@ public class XmlElementWrapperPlugin extends Plugin {
 				if (classOutline.implClass == clazz) {
 					outline.getModel().beans().remove(classOutline.target);
 					iter.remove();
+					break;
 				}
 			}
 		}
 	}
 
 	/**
-	 * Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
-	 * plural form in more correct way, e.g. "fieldsOfScience" instead of "fieldOfSciences".
+	 * Check that given field property has no name customizations.
 	 * 
 	 * @see com.sun.xml.bind.api.impl.NameUtil
 	 * @see com.sun.codemodel.JJavaName
+	 * @see com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty#getCustomization(XSComponent)
 	 */
-	private boolean isPluralFormApplicable(FieldOutline field) {
-		// FIXME: It looks like customizations are always empty:
-		return applyPluralForm && field.getPropertyInfo().getCustomizations().isEmpty();
+	private boolean hasNoPropertyNameCustomization(String fieldName, CPropertyInfo fieldPropertyInfo) {
+		// Customizations are not available after model is created as Ring is released. Correct code would look like this:
+		// return BIProperty.getCustomization(((XSParticle) field.getPropertyInfo().getSchemaComponent()).getTerm()).getName() != null;
+		String schemaElementName = ((XSDeclaration) ((XSParticle) fieldPropertyInfo.getSchemaComponent()).getTerm())
+		            .getName();
+
+		// The names should match either exactly, or Java name may be prefixed with "_":
+		return fieldName.equals(schemaElementName)
+		            || (fieldName.length() - schemaElementName.length() == 1 && fieldName.endsWith(schemaElementName));
 	}
 
 	/**
@@ -1018,7 +1047,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 		else if (hasIncludes() && !hasExcludes()) {
 			return include.contains(candidate.getClassName()); // [+/-] (included)
 		}
-		else if (!hasIncludes() && hasExcludes()) {
+		else if (!hasIncludes()) {
 			return !exclude.contains(candidate.getClassName()); // [+/-] (excluded)
 		}
 		else {
@@ -1033,7 +1062,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 		else if (hasIncludes() && !hasExcludes()) {
 			return "(included)";
 		}
-		else if (!hasIncludes() && hasExcludes()) {
+		else if (!hasIncludes()) {
 			return "(excluded)";
 		}
 		else {
@@ -1115,7 +1144,15 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		private final JDefinedClass fieldParametrisationImpl;
 
+		/**
+		 * By default the candidate is marked for removal unless something prevents it from being removed.
+		 */
 		private boolean             markedForRemoval = true;
+
+		/**
+		 * Number of times this candidate has been substituted in the model.
+		 */
+		private int                 substitutionsCount;
 
 		Candidate(JDefinedClass candidateClass, JFieldVar field, JDefinedClass fieldParametrizationClass,
 		            JDefinedClass fieldParametrisationImpl) {
@@ -1217,10 +1254,17 @@ public class XmlElementWrapperPlugin extends Plugin {
 		}
 
 		/**
-		 * This flag controls if given candidate has green light to be removed.
+		 * Has given candidate green light to be removed?
 		 */
-		public boolean isMarkedForRemoval() {
-			return markedForRemoval;
+		public boolean canBeRemoved() {
+			return markedForRemoval && substitutionsCount > 0;
+		}
+
+		/**
+		 * Increments number of substitutions for this candidate.
+		 */
+		public void incrementSubstitutions() {
+			substitutionsCount++;
 		}
 
 		/**

@@ -22,5 +22,5 @@
 	</xs:annotation>
 
 	<xs:include schemaLocation="inner-element-shared.xsd" />
-	<xs:include schemaLocation="element-as-parametrisation-shared.xsd" />
+	<xs:include schemaLocation="publisher-shared.xsd" />
 </xs:schema>

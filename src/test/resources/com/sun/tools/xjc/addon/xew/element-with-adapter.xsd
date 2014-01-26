@@ -19,7 +19,7 @@
 			<xs:element name="appointments">
 				<xs:annotation>
 					<xs:appinfo>
-						<jaxb:property name="custom-appointments" />
+						<jaxb:property name="items-appointed" />
 					</xs:appinfo>
 				</xs:annotation>
 				<xs:complexType>

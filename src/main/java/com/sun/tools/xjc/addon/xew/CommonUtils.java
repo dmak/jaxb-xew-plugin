@@ -18,7 +18,7 @@ import com.sun.codemodel.JGenerable;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 
-public class CommonUtils {
+public final class CommonUtils {
 
 	/**
 	 * Returns {@code true} if given class is hidden, that is not generated & saved by XJC. These are for example

@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "calendar", propOrder = {
     "url",
-    "customAppointments"
+    "itemsAppointed"
 })
 public class Calendar {
 
@@ -56,7 +56,7 @@ public class Calendar {
     @XmlElementWrapper(name = "appointments", required = true)
     @XmlElement(name = "appointment")
     @XmlJavaTypeAdapter(Adapter1 .class)
-    protected List<Date> customAppointments = new ArrayList<Date>();
+    protected List<Date> itemsAppointed = new ArrayList<Date>();
 
     /**
      * Gets the value of the url property.
@@ -82,12 +82,12 @@ public class Calendar {
         this.url = value;
     }
 
-    public List<Date> getCustomAppointments() {
-        return customAppointments;
+    public List<Date> getItemsAppointed() {
+        return itemsAppointed;
     }
 
-    public void setCustomAppointments(List<Date> customAppointments) {
-        this.customAppointments = customAppointments;
+    public void setItemsAppointed(List<Date> itemsAppointed) {
+        this.itemsAppointed = itemsAppointed;
     }
 
 }

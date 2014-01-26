@@ -1,5 +1,5 @@
 
-package element_referenced_twice;
+package element_as_parametrisation_2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
  *         &lt;element name="family-member" type="{}family-member" maxOccurs="unbounded"/>
- *         &lt;element name="parent-member" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *         &lt;element name="parent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -32,14 +32,13 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "family", propOrder = {
     "familyMember",
-    "parentMember"
+    "parent"
 })
 public class Family {
 
     @XmlElement(name = "family-member")
     protected List<FamilyMember> familyMember;
-    @XmlElement(name = "parent-member")
-    protected Boolean parentMember;
+    protected Boolean parent;
 
     /**
      * Gets the value of the familyMember property.
@@ -71,27 +70,27 @@ public class Family {
     }
 
     /**
-     * Gets the value of the parentMember property.
+     * Gets the value of the parent property.
      * 
      * @return
      *     possible object is
      *     {@link Boolean }
      *     
      */
-    public Boolean isParentMember() {
-        return parentMember;
+    public Boolean isParent() {
+        return parent;
     }
 
     /**
-     * Sets the value of the parentMember property.
+     * Sets the value of the parent property.
      * 
      * @param value
      *     allowed object is
      *     {@link Boolean }
      *     
      */
-    public void setParentMember(Boolean value) {
-        this.parentMember = value;
+    public void setParent(Boolean value) {
+        this.parent = value;
     }
 
 }

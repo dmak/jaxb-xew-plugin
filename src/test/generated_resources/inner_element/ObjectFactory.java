@@ -38,19 +38,35 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Volume }
+     * Create an instance of {@link Volumes }
      * 
      */
-    public Volume createVolume() {
-        return new Volume();
+    public Volumes createVolumes() {
+        return new Volumes();
     }
 
     /**
-     * Create an instance of {@link Filesystem.FileItem }
+     * Create an instance of {@link Filesystem.FileListing }
      * 
      */
-    public Filesystem.FileItem createFilesystemFileItem() {
-        return new Filesystem.FileItem();
+    public Filesystem.FileListing createFilesystemFileListing() {
+        return new Filesystem.FileListing();
+    }
+
+    /**
+     * Create an instance of {@link Volumes.Volume }
+     * 
+     */
+    public Volumes.Volume createVolumesVolume() {
+        return new Volumes.Volume();
+    }
+
+    /**
+     * Create an instance of {@link Filesystem.FileListing.FileItem }
+     * 
+     */
+    public Filesystem.FileListing.FileItem createFilesystemFileListingFileItem() {
+        return new Filesystem.FileListing.FileItem();
     }
 
 }

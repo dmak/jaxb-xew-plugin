@@ -47,4 +47,13 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+
+	<xs:element name="alliance">
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="organization" type="organization" />
+				<xs:element name="group" type="group" />
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>

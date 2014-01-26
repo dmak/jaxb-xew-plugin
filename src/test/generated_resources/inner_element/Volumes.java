@@ -1,5 +1,5 @@
 
-package element_referenced_twice;
+package inner_element;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,26 +7,27 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import com.sun.tools.xjc.addon.xew.CommonBean;
 
 
 /**
- * <p>Java class for family-member complex type.
+ * <p>Java class for volumes complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="family-member">
+ * &lt;complexType name="volumes">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="id" maxOccurs="unbounded">
+ *         &lt;element name="volume" maxOccurs="unbounded">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;sequence>
- *                   &lt;element name="number" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
- *                   &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
- *                 &lt;/sequence>
+ *                 &lt;all>
+ *                   &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                   &lt;element name="capacity" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *                 &lt;/all>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -40,41 +41,44 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "family-member", propOrder = {
-    "id"
+@XmlType(name = "volumes", propOrder = {
+    "volume"
 })
-public class FamilyMember {
+public class Volumes
+    extends CommonBean
+    implements Cloneable
+{
 
     @XmlElement(required = true)
-    protected List<FamilyMember.Id> id;
+    protected List<Volumes.Volume> volume;
 
     /**
-     * Gets the value of the id property.
+     * Gets the value of the volume property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the id property.
+     * This is why there is not a <CODE>set</CODE> method for the volume property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getId().add(newItem);
+     *    getVolume().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link FamilyMember.Id }
+     * {@link Volumes.Volume }
      * 
      * 
      */
-    public List<FamilyMember.Id> getId() {
-        if (id == null) {
-            id = new ArrayList<FamilyMember.Id>();
+    public List<Volumes.Volume> getVolume() {
+        if (volume == null) {
+            volume = new ArrayList<Volumes.Volume>();
         }
-        return this.id;
+        return this.volume;
     }
 
 
@@ -87,10 +91,10 @@ public class FamilyMember {
      * &lt;complexType>
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="number" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
-     *         &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
-     *       &lt;/sequence>
+     *       &lt;all>
+     *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *         &lt;element name="capacity" type="{http://www.w3.org/2001/XMLSchema}int"/>
+     *       &lt;/all>
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -100,62 +104,55 @@ public class FamilyMember {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "number",
-        "type"
+
     })
-    public static class Id {
+    public static class Volume
+        extends CommonBean
+        implements Cloneable
+    {
 
         @XmlElement(required = true)
-        protected Object number;
-        @XmlElement(required = true)
-        protected Object type;
+        protected String name;
+        protected int capacity;
 
         /**
-         * Gets the value of the number property.
+         * Gets the value of the name property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link String }
          *     
          */
-        public Object getNumber() {
-            return number;
+        public String getName() {
+            return name;
         }
 
         /**
-         * Sets the value of the number property.
+         * Sets the value of the name property.
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link String }
          *     
          */
-        public void setNumber(Object value) {
-            this.number = value;
+        public void setName(String value) {
+            this.name = value;
         }
 
         /**
-         * Gets the value of the type property.
+         * Gets the value of the capacity property.
          * 
-         * @return
-         *     possible object is
-         *     {@link Object }
-         *     
          */
-        public Object getType() {
-            return type;
+        public int getCapacity() {
+            return capacity;
         }
 
         /**
-         * Sets the value of the type property.
+         * Sets the value of the capacity property.
          * 
-         * @param value
-         *     allowed object is
-         *     {@link Object }
-         *     
          */
-        public void setType(Object value) {
-            this.type = value;
+        public void setCapacity(int value) {
+            this.capacity = value;
         }
 
     }
