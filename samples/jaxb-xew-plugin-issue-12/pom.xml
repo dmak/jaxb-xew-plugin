@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jvnet.jax-ws-commons</groupId>
+	<artifactId>jaxb-xew-plugin-issue-12</artifactId>
+	<version>0.1</version>
+	<name>Test for jaxb-xew-plugin issue 12</name>
+	<packaging>jar</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jvnet.jax-ws-commons</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>2.3.1-b03</version>
+
+				<executions>
+					<execution>
+						<id>generate-stubs</id>
+						<goals>
+							<goal>wsimport</goal>
+						</goals>
+
+						<configuration>
+							<xjcArgs>
+								<xjcArg>-no-header</xjcArg>
+								<xjcArg>-Xxew</xjcArg>
+								<xjcArg>-Xxew:instantiate lazy</xjcArg>
+								<!-- https://github.com/dmak/jaxb-xew-plugin/issues/12 -->
+								<xjcArg>-Xxew:delete</xjcArg>
+							</xjcArgs>
+
+							<sourceDestDir>${project.build.directory}/generated-sources/jaxws/wsimport/java</sourceDestDir>
+							<wsdlDirectory>src/main/resources</wsdlDirectory>
+
+							<extension>true</extension>
+
+							<keep>true</keep>
+						</configuration>
+					</execution>
+				</executions>
+
+				<dependencies>
+					<dependency>
+						<groupId>com.sun.xml.ws</groupId>
+						<artifactId>jaxws-tools</artifactId>
+						<version>2.2.8</version>
+
+						<exclusions>
+							<exclusion>
+								<groupId>org.jvnet.staxex</groupId>
+								<artifactId>stax-ex</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>com.github.jaxb-xew-plugin</groupId>
+						<artifactId>jaxb-xew-plugin</artifactId>
+						<version>1.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies/>
+</project>
