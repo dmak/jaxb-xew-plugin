@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.jaxb-xew-plugin.sample</groupId>
+	<artifactId>jaxws-maven-plugin-exclude</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Sample project for jaxb-xew-plugin with deletion excludes.</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jax-ws-commons</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>2.3.1-b03</version>
+
+				<executions>
+					<execution>
+						<id>generate-stubs</id>
+						<goals>
+							<goal>wsimport</goal>
+						</goals>
+
+						<configuration>
+							<xjcArgs>
+								<xjcArg>-debug</xjcArg>
+								<xjcArg>-no-header</xjcArg>
+								<xjcArg>-Xxew</xjcArg>
+								<xjcArg>-Xxew:instantiate lazy</xjcArg>
+								<xjcArg>-Xxew:delete</xjcArg>
+								<xjcArg>-Xxew:excludeFile src/main/wsdl/classes-to-exclude.txt</xjcArg>
+							</xjcArgs>
+
+							<sourceDestDir>${project.build.directory}/generated-sources/jaxws</sourceDestDir>
+							<wsdlDirectory>src/main/wsdl</wsdlDirectory>
+
+							<extension>true</extension>
+							<keep>true</keep>
+						</configuration>
+					</execution>
+				</executions>
+
+				<dependencies>
+					<dependency>
+						<groupId>com.github.jaxb-xew-plugin</groupId>
+						<artifactId>jaxb-xew-plugin</artifactId>
+						<version>1.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+</project>

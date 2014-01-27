@@ -9,7 +9,7 @@
 	<xsd:element name="listResponse" type="listResponse"/>
 
 	<xsd:complexType name="listRequest">
-		<xsd:sequence/>
+		<xsd:sequence />
 	</xsd:complexType>
 
 	<xsd:complexType name="listResponse">
