@@ -52,6 +52,7 @@ import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -324,6 +325,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 		JClass xmlElementWrapperModelClass = codeModel.ref(XmlElementWrapper.class);
 		JClass xmlElementModelClass = codeModel.ref(XmlElement.class);
 		JClass xmlAnyElementModelClass = codeModel.ref(XmlAnyElement.class);
+		JClass xmlMixedModelClass = codeModel.ref(XmlMixed.class);
 		JClass xmlElementRefsModelClass = codeModel.ref(XmlElementRefs.class);
 		JClass xmlElementsModelClass = codeModel.ref(XmlElements.class);
 		JClass xmlJavaTypeAdapterModelClass = codeModel.ref(XmlJavaTypeAdapter.class);
@@ -486,8 +488,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 				boolean xmlElementInfoWasTransferred = false;
 
 				// Transfer @XmlAnyElement, @XmlElementRefs, @XmlElements:
-				for (JClass annotationModelClass : new JClass[] { xmlAnyElementModelClass, xmlElementRefsModelClass,
-				        xmlElementsModelClass }) {
+				for (JClass annotationModelClass : new JClass[] { xmlAnyElementModelClass, xmlMixedModelClass,
+				        xmlElementRefsModelClass, xmlElementsModelClass }) {
 					JAnnotationUse annotation = getAnnotation(candidate.getField(), annotationModelClass);
 
 					if (annotation != null) {
@@ -850,7 +852,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				continue;
 			}
 
-			writeSummary("\tCorrecting method [" + method.type().fullName() + "#" + method.name() + "()] from "
+			writeSummary("\tCorrecting method [" + method.type().fullName() + "#" + method.name() + "()] in "
 			            + factoryClass.fullName());
 			removeAnnotationMember(method, xmlElementDeclModelClass, "scope");
 			// Body content is a return statement which is a method invocation.
