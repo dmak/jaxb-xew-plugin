@@ -131,7 +131,7 @@ The following options are applicable for plugin:
 	<td>Delete candidate classes having been replaced during compilation.</td>
 </tr>
 <tr>
-	<td>-Xxew:pluralForm</td>
+	<td>-Xxew:plural</td>
 	<td>[experimental] Apply plural form to collection property (e.g. turn "item" into "items").</td>
 </tr>
 </table>
@@ -213,7 +213,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
     					<plugin>
     						<groupId>com.github.jaxb-xew-plugin</groupId>
     						<artifactId>jaxb-xew-plugin</artifactId>
-    						<version>1.0</version>
+    						<version>1.2</version>
     					</plugin>
     				</plugins>
     			</configuration>
@@ -250,7 +250,7 @@ Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which 
     		<dependency>
     			<groupId>com.github.jaxb-xew-plugin</groupId>
     			<artifactId>jaxb-xew-plugin</artifactId>
-    			<version>1.0</version>
+    			<version>1.2</version>
     		</dependency>
     		<!-- 
     		 | We need to update the jaxb-xjc plugin version from 2.1.13 to the 2.2.4-1 version 
@@ -271,8 +271,8 @@ You can find more examples of this plugin in [`samples`](samples/) directory (in
 
 ### v1.2
 
-* Plugin is improved ([#14](https://github.com/dmak/jaxb-xew-plugin/issues/14)). Bugs fixed ([#13](https://github.com/dmak/jaxb-xew-plugin/issues/13)).
-* Plugin can now automatically apply plural form to collection properties.
+* Plugin is improved ([#14](https://github.com/dmak/jaxb-xew-plugin/issues/14)). Bugs fixed ([#12](https://github.com/dmak/jaxb-xew-plugin/issues/12)).
+* Plugin can now automatically apply plural form to collection properties (`-Xxew:plural`).
 * Unit tests now compile the model with `javac` and create JAXB context. Some test involve also XML marshalling/unmarshalling/comparing.
 
 ### v1.1

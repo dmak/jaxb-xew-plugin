@@ -24,7 +24,7 @@
 									<wsdl>src/xsd/test.wsdl</wsdl>
 									<extraargs>
 										<extraarg>-xjc-Xxew</extraarg>
-										<extraarg>-xjc-Xxew:summaryFile target/summary.txt</extraarg>
+										<extraarg>-xjc-Xxew:summary target/summary.txt</extraarg>
 										<extraarg>-xjc-Xxew:instantiate lazy</extraarg>
 										<extraarg>-xjc-Xxew:delete</extraarg>
 									</extraargs>
@@ -40,13 +40,7 @@
 					<dependency>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.1</version>
-						<exclusions>
-							<exclusion>
-								<groupId>org.codehaus.woodstox</groupId>
-								<artifactId>wstx-asl</artifactId>
-							</exclusion>
-						</exclusions>
+						<version>1.2</version>
 					</dependency>
 					<dependency>
 						<groupId>com.sun.xml.bind</groupId>

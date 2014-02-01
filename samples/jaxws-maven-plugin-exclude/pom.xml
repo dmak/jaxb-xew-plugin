@@ -31,7 +31,7 @@
 								<xjcArg>-Xxew</xjcArg>
 								<xjcArg>-Xxew:instantiate lazy</xjcArg>
 								<xjcArg>-Xxew:delete</xjcArg>
-								<xjcArg>-Xxew:excludeFile src/main/wsdl/classes-to-exclude.txt</xjcArg>
+								<xjcArg>-Xxew:exclude src/main/wsdl/classes-to-exclude.txt</xjcArg>
 							</xjcArgs>
 
 							<sourceDestDir>${project.build.directory}/generated-sources/jaxws</sourceDestDir>
@@ -47,7 +47,7 @@
 					<dependency>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.1</version>
+						<version>1.2</version>
 					</dependency>
 				</dependencies>
 			</plugin>
