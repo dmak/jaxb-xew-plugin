@@ -478,6 +478,12 @@ public class XmlElementWrapperPlugin extends Plugin {
 					xmlElementWrapperAnnotation.param("required", warpperXmlRequired);
 				}
 
+				JExpression warpperXmlNillable = getAnnotationMemberExpression(originalImplField, xmlElementModelClass,
+				            "nillable");
+				if (warpperXmlNillable != null) {
+					xmlElementWrapperAnnotation.param("nillable", warpperXmlNillable);
+				}
+
 				// Namespace of the wrapper element
 				JExpression wrapperXmlNamespace = getAnnotationMemberExpression(originalImplField,
 				            xmlElementModelClass, "namespace");
