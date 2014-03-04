@@ -271,8 +271,8 @@ You can find more examples of this plugin in [`samples`](samples/) directory (in
 
 ### v1.2
 
-* Plugin is improved ([#14](https://github.com/dmak/jaxb-xew-plugin/issues/14)). Bugs fixed ([#12](https://github.com/dmak/jaxb-xew-plugin/issues/12)).
-* Plugin can now automatically apply plural form to collection properties (`-Xxew:plural`).
+* Plugin is improved ([#14](https://github.com/dmak/jaxb-xew-plugin/issues/14)). Bugs fixed ([#12](https://github.com/dmak/jaxb-xew-plugin/issues/12), [#19](https://github.com/dmak/jaxb-xew-plugin/issues/19)).
+* Plugin can now automatically apply plural form to collection properties (see `-Xxew:plural`).
 * Unit tests now compile the model with `javac` and create JAXB context. Some test involve also XML marshalling/unmarshalling/comparing.
 
 ### v1.1
