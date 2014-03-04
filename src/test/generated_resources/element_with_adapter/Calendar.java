@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="url" type="{http://www.w3.org/2001/XMLSchema}anyURI"/>
- *         &lt;element name="appointments">
+ *         &lt;element name="appointments" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -53,7 +53,7 @@ public class Calendar {
     @XmlElement(required = true)
     @XmlSchemaType(name = "anyURI")
     protected String url;
-    @XmlElementWrapper(name = "appointments", required = true)
+    @XmlElementWrapper(name = "appointments")
     @XmlElement(name = "appointment")
     @XmlJavaTypeAdapter(Adapter1 .class)
     protected List<Date> itemsAppointed = new ArrayList<Date>();

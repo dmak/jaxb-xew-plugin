@@ -21,7 +21,7 @@
 
 	<xs:complexType name="search-eu">
 		<xs:sequence>
-			<xs:element name="classes-eu" type="classes-eu" />
+			<xs:element name="classes-eu" type="classes-eu" nillable="true" />
 		</xs:sequence>
 	</xs:complexType>
 

@@ -31,7 +31,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="accept" type="List" />
-				<xs:element name="return" type="Map" />
+				<xs:element name="return" type="Map" nillable="false" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

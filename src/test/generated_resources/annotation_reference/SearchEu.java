@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class SearchEu {
 
-    @XmlElementWrapper(name = "classes-eu", required = true)
+    @XmlElementWrapper(name = "classes-eu", required = true, nillable = true)
     @XmlElement(name = "class-eu")
     protected List<ClassCommon> classesEu = new ArrayList<ClassCommon>();
 

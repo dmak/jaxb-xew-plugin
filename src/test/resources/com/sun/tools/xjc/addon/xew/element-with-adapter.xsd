@@ -16,7 +16,7 @@
 	<xs:complexType name="calendar">
 		<xs:sequence>
 			<xs:element name="url" type="xs:anyURI" />
-			<xs:element name="appointments">
+			<xs:element name="appointments" minOccurs="0">
 				<xs:annotation>
 					<xs:appinfo>
 						<jaxb:property name="items-appointed" />
