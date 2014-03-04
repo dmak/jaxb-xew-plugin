@@ -78,6 +78,7 @@ import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+import com.sun.xml.bind.api.impl.NameConverter;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 import com.sun.xml.xsom.XSParticle;
@@ -985,10 +986,12 @@ public class XmlElementWrapperPlugin extends Plugin {
 		// return BIProperty.getCustomization(((XSParticle) field.getPropertyInfo().getSchemaComponent()).getTerm()).getName() != null;
 		String schemaElementName = ((XSDeclaration) ((XSParticle) fieldPropertyInfo.getSchemaComponent()).getTerm())
 		            .getName();
+		String originalFieldName = NameConverter.standard.toVariableName(NameConverter.standard
+		            .toPropertyName(schemaElementName));
 
 		// The names should match either exactly, or Java name may be prefixed with "_":
-		return fieldName.equals(schemaElementName)
-		            || (fieldName.length() - schemaElementName.length() == 1 && fieldName.endsWith(schemaElementName));
+		return fieldName.equals(originalFieldName)
+		            || (fieldName.length() - originalFieldName.length() == 1 && fieldName.endsWith(originalFieldName));
 	}
 
 	/**

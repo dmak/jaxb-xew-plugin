@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="element_with_customization" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<!--
+		Elements use Java reserved words.
+	-->
+
+	<xs:element name="post-office">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="type-of-message" />
+				<xs:element ref="class" />
+				<xs:element ref="misc" minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="type-of-message">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="type" type="xs:string" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="class">
+		<xs:annotation>
+			<xs:appinfo>
+				<!-- Otherwise this property becomes "clazzs" -->
+				<jaxb:property name="classes" />
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" maxOccurs="unbounded">
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="misc">
+		<xs:annotation>
+			<xs:appinfo>
+				<!-- Unfortunately, this property becomes "miscs": -->
+				<jaxb:property name="misc" />
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

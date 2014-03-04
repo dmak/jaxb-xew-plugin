@@ -158,7 +158,6 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementAny() throws Exception {
-		// Plural form is applied:
 		assertXsd("element-any", new String[] { "-quiet", "-Xxew:delete", "-Xxew:plural" }, false, "Message");
 	}
 
@@ -176,9 +175,15 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementWithAdapter() throws Exception {
-		// Plural form in this case will have no impact as there is property parametrization:
+		// Plural form in this case will have no impact as there is property customization:
 		assertXsd("element-with-adapter", new String[] { "-Xxew:delete", "-Xxew:plural" }, false, "Calendar",
 		            "Adapter1");
+	}
+
+	@Test
+	public void testElementWithCustomization() throws Exception {
+		assertXsd("element-with-customization", new String[] { "-debug", "-Xxew:delete", "-Xxew:plural" }, false,
+		            "PostOffice");
 	}
 
 	@Test
