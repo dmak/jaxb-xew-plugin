@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<return
+	xmlns="http://example.com/scope"
+	xmlns:x="http://example.com/extra"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://example.com/scope element-scoped.xsd"
+>
+	<users>
+		<name>Dennis</name>
+		<age>23</age>
+		<name>Sandra</name>
+		<age>16</age>
+		<name>Tonny</name>
+		<age>26</age>
+	</users>
+	<x:age>12</x:age>
+</return>

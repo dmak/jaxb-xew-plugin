@@ -174,6 +174,12 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
+	public void testElementScoped() throws Exception {
+		// Most classes cannot be tested for content
+		assertXsd("element-scoped", new String[] { "-debug", "-Xxew:delete" }, false, "Return", "package-info");
+	}
+
+	@Test
 	public void testElementWithAdapter() throws Exception {
 		// Plural form in this case will have no impact as there is property customization:
 		assertXsd("element-with-adapter", new String[] { "-Xxew:delete", "-Xxew:plural" }, false, "Calendar",

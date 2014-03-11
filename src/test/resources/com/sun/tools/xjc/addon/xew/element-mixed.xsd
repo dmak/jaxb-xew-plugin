@@ -64,11 +64,12 @@
 	<!--
 		Example of "List<JAXBElement<String>>" field + @XmlElementRefs annotation.
 		Results scoped declarations @XmlElementDecl(..., scope = PrefixedText.class) in ObjectFactory.
+		However as PrefixedText class is removed, the scope needs to be adapted accordingly.
 	-->
 	<xs:complexType name="prefixed-text">
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="prefix" type="foo:text" />
-			<xs:element name="text" type="foo:text" />
+			<xs:element name="title" type="foo:text" />
 			<xs:element name="suffix" type="foo:text" />
 		</xs:choice>
 	</xs:complexType>

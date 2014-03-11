@@ -132,7 +132,7 @@ The following options are applicable for plugin:
 </tr>
 <tr>
 	<td>-Xxew:plural</td>
-	<td>[experimental] Apply plural form to collection property (e.g. turn "item" into "items").</td>
+	<td>[experimental, [see problems](http://stackoverflow.com/a/9899174/267197)] Apply plural form to collection property (e.g. turn "item" into "items").</td>
 </tr>
 </table>
 
@@ -404,6 +404,7 @@ There are many pitfalls in JAXB Code Model API which are forcing the developer t
 * [JAXB-878](https://java.net/jira/browse/JAXB-878) and [JAXB-879](https://java.net/jira/browse/JAXB-879) describe the lack of public getters for class fields.
 * [JAXB-957](https://java.net/jira/browse/JAXB-957) mentions what need to be added to make it possible for the inner class to be moved to another class or package. 
 * [JAXB-883](http://java.net/jira/browse/JAXB-883) does not allow to learn if "simpleMode" setting is enabled, which in its turn controls plural form for collection property names. There are however some more difficulties to overcome.
+* [Marshalling of text nodes for mixed-mode contents](http://stackoverflow.com/questions/21444292/)
 
 ## Authors
 

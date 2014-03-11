@@ -64,15 +64,6 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Removes the given annotation member of given annotation for the given field.
-	 */
-	public static boolean removeAnnotationMember(JAnnotatable annotatable, JClass annotationClass,
-	            String annotationMember) {
-		return ((Map<String, JAnnotationValue>) getPrivateField(getAnnotation(annotatable, annotationClass),
-		            "memberValues")).remove(annotationMember) != null;
-	}
-
-	/**
 	 * Returns the value of the given annotation member of given annotation for the given field.
 	 */
 	public static JExpression getAnnotationMemberExpression(JAnnotatable annotatable, JClass annotationClass,
