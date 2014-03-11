@@ -22,6 +22,7 @@
 package com.sun.tools.xjc.addon.xew;
 
 import static com.sun.tools.xjc.addon.xew.CommonUtils.addAnnotation;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
@@ -414,13 +415,15 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				// Remove original field which refers to the inner class.
 				JFieldVar originalImplField = targetClass.fields().get(fieldName);
-				targetClass.removeField(originalImplField);
+
+				String schemaElementName = ((XSDeclaration) ((XSParticle) fieldPropertyInfo.getSchemaComponent())
+				            .getTerm()).getName();
 
 				boolean pluralFormWasApplied = false;
 
 				// Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
 				// plural form in more correct way, e.g. "field[s]OfScience" instead of "fieldOfScience[s]".
-				if (applyPluralForm && hasNoPropertyNameCustomization(fieldName, fieldPropertyInfo)) {
+				if (applyPluralForm && hasNoPropertyNameCustomization(fieldName, schemaElementName)) {
 					String oldFieldName = fieldName;
 
 					// Taken from com.sun.tools.xjc.reader.xmlschema.ParticleBinder#makeJavaName():
@@ -435,7 +438,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 					if (!fieldName.equals(oldFieldName)) {
 						pluralFormWasApplied = true;
 
-						//fieldPropertyInfo.setName(false, fieldName);
+						originalImplField.name(fieldName);
+						fieldPropertyInfo.setName(false, fieldName);
 
 						// Correct the @XmlType class-level annotation:
 						JAnnotationValue propOrderValue = getAnnotation(targetClass, xmlTypeModelClass)
@@ -453,46 +457,54 @@ public class XmlElementWrapperPlugin extends Plugin {
 					}
 				}
 
-				// Add new wrapped version of the field using the original field name.
-				// GENERATED CODE: protected I<T> fieldName;
-				JFieldVar implField = targetClass.field(JMod.PROTECTED, collectionInterfaceClass, fieldName);
+				// Transform the field accordingly.
+				originalImplField.type(collectionInterfaceClass);
 
 				// If instantiation is specified to be "early", add code for creating new instance of the collection class.
 				if (instantiation == Instantiation.EARLY) {
 					logger.debug("Applying EARLY instantiation...");
 					// GENERATED CODE: ... fieldName = new C<T>();
-					implField.init(JExpr._new(collectionImplClass));
+					originalImplField.init(JExpr._new(collectionImplClass));
 				}
 
 				// Annotate the new field with the @XmlElementWrapper annotation using the original field name.
-				JAnnotationUse xmlElementWrapperAnnotation = implField.annotate(xmlElementWrapperModelClass);
+				JAnnotationUse xmlElementWrapperAnnotation = originalImplField.annotate(xmlElementWrapperModelClass);
+				JAnnotationUse xmlElementOriginalAnnotation = getAnnotation(originalImplField, xmlElementModelClass);
+				JExpression wrapperXmlNamespace = null;
 
-				JExpression wrapperXmlName = getAnnotationMemberExpression(originalImplField, xmlElementModelClass,
-				            "name");
-				if (wrapperXmlName != null) {
-					xmlElementWrapperAnnotation.param("name", wrapperXmlName);
+				if (xmlElementOriginalAnnotation != null) {
+					JExpression wrapperXmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
+					if (wrapperXmlName != null) {
+						xmlElementWrapperAnnotation.param("name", wrapperXmlName);
+					}
+					else if (pluralFormWasApplied) {
+						xmlElementWrapperAnnotation.param("name", schemaElementName);
+					}
+
+					JExpression wrapperXmlRequired = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
+					            "required");
+					if (wrapperXmlRequired != null) {
+						xmlElementWrapperAnnotation.param("required", wrapperXmlRequired);
+					}
+
+					JExpression wrapperXmlNillable = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
+					            "nillable");
+					if (wrapperXmlNillable != null) {
+						xmlElementWrapperAnnotation.param("nillable", wrapperXmlNillable);
+					}
+
+					// Namespace of the wrapper element
+					wrapperXmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "namespace");
+					if (wrapperXmlNamespace != null) {
+						xmlElementWrapperAnnotation.param("namespace", wrapperXmlNamespace);
+					}
+
+					removeAnnotation(originalImplField, xmlElementOriginalAnnotation);
 				}
 				else {
-					xmlElementWrapperAnnotation.param("name", originalImplField.name());
-				}
-
-				JExpression warpperXmlRequired = getAnnotationMemberExpression(originalImplField, xmlElementModelClass,
-				            "required");
-				if (warpperXmlRequired != null) {
-					xmlElementWrapperAnnotation.param("required", warpperXmlRequired);
-				}
-
-				JExpression warpperXmlNillable = getAnnotationMemberExpression(originalImplField, xmlElementModelClass,
-				            "nillable");
-				if (warpperXmlNillable != null) {
-					xmlElementWrapperAnnotation.param("nillable", warpperXmlNillable);
-				}
-
-				// Namespace of the wrapper element
-				JExpression wrapperXmlNamespace = getAnnotationMemberExpression(originalImplField,
-				            xmlElementModelClass, "namespace");
-				if (wrapperXmlNamespace != null) {
-					xmlElementWrapperAnnotation.param("namespace", wrapperXmlNamespace);
+					if (pluralFormWasApplied) {
+						xmlElementWrapperAnnotation.param("name", schemaElementName);
+					}
 				}
 
 				boolean xmlElementInfoWasTransferred = false;
@@ -505,15 +517,16 @@ public class XmlElementWrapperPlugin extends Plugin {
 					if (annotation != null) {
 						xmlElementInfoWasTransferred = true;
 
-						addAnnotation(implField, annotation);
+						addAnnotation(originalImplField, annotation);
 					}
 				}
 
 				if (!xmlElementInfoWasTransferred) {
 					// Annotate the new field with the @XmlElement annotation using the field name from the wrapped type as name.
-					JAnnotationUse xmlElementAnnotation = implField.annotate(xmlElementModelClass);
-					JAnnotationUse xmlElementOriginalAnnotation = getAnnotation(candidate.getField(),
-					            xmlElementModelClass);
+					// We cannot just re-use the same annotation object instance, as for example, we need to set XML name and this
+					// will impact the candidate field annotation in case candidate is unmarked from removal.
+					JAnnotationUse xmlElementAnnotation = originalImplField.annotate(xmlElementModelClass);
+					xmlElementOriginalAnnotation = getAnnotation(candidate.getField(), xmlElementModelClass);
 
 					JExpression xmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
 					if (xmlName != null) {
@@ -523,7 +536,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 						xmlElementAnnotation.param("name", candidate.getFieldName());
 					}
 
-					// Namespace of the element itself
 					JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "namespace");
 					if (xmlNamespace != null) {
 						xmlElementAnnotation.param("namespace", xmlNamespace);
@@ -533,15 +545,16 @@ public class XmlElementWrapperPlugin extends Plugin {
 						xmlElementAnnotation.param("namespace", wrapperXmlNamespace);
 					}
 
-					if (candidate.isValueObjectDisabled() && candidate.getFieldParametrisationImpl() != null) {
-						xmlElementAnnotation.param("type", candidate.getFieldParametrisationImpl());
+					JExpression type = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "type");
+					if (type != null) {
+						xmlElementAnnotation.param("type", type);
 					}
 				}
 
 				JAnnotationUse adapterAnnotation = getAnnotation(candidate.getField(), xmlJavaTypeAdapterModelClass);
 
 				if (adapterAnnotation != null) {
-					addAnnotation(implField, adapterAnnotation);
+					addAnnotation(originalImplField, adapterAnnotation);
 				}
 
 				// Same as fieldName, but used as getter/setter method name:
@@ -565,7 +578,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				if (pluralFormWasApplied) {
 					propertyName = JJavaName.getPluralForm(propertyName);
-					//fieldPropertyInfo.setName(true, propertyName);
+					fieldPropertyInfo.setName(true, propertyName);
 				}
 
 				// Add a new getter method returning the (wrapped) field added.
@@ -1047,11 +1060,9 @@ public class XmlElementWrapperPlugin extends Plugin {
 	 * @see com.sun.codemodel.JJavaName
 	 * @see com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty#getCustomization(XSComponent)
 	 */
-	private boolean hasNoPropertyNameCustomization(String fieldName, CPropertyInfo fieldPropertyInfo) {
+	private boolean hasNoPropertyNameCustomization(String fieldName, String schemaElementName) {
 		// Customizations are not available after model is created as Ring is released. Correct code would look like this:
 		// return BIProperty.getCustomization(((XSParticle) field.getPropertyInfo().getSchemaComponent()).getTerm()).getName() != null;
-		String schemaElementName = ((XSDeclaration) ((XSParticle) fieldPropertyInfo.getSchemaComponent()).getTerm())
-		            .getName();
 		String originalFieldName = NameConverter.standard.toVariableName(NameConverter.standard
 		            .toPropertyName(schemaElementName));
 

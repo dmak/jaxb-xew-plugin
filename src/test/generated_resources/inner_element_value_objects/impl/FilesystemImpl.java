@@ -28,7 +28,7 @@ public class FilesystemImpl implements Filesystem
     @XmlElementWrapper(name = "directory-listing", required = true)
     @XmlElement(name = "directory-item")
     protected List<String> directoryListing = new ArrayList<String>();
-    @XmlElementWrapper(name = "volumes", required = true)
+    @XmlElementWrapper(required = true)
     @XmlElement(name = "volume", type = VolumeImpl.class)
     protected List<Volume> volumes = new ArrayList<Volume>();
 

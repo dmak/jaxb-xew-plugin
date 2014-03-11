@@ -64,6 +64,14 @@ public final class CommonUtils {
 	}
 
 	/**
+	 * Remove the given annotation from the list of annotations.
+	 */
+	@SuppressWarnings("unchecked")
+	public static void removeAnnotation(JVar field, JAnnotationUse annotation) {
+		((List<JAnnotationUse>) getPrivateField(field, JVar.class, "annotations")).remove(annotation);
+	}
+
+	/**
 	 * Returns the value of the given annotation member of given annotation for the given field.
 	 */
 	public static JExpression getAnnotationMemberExpression(JAnnotatable annotatable, JClass annotationClass,

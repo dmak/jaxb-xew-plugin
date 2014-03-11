@@ -83,11 +83,11 @@ public class Filesystem
 
     @XmlElement(name = "file-listing", required = true)
     protected Filesystem.FileListing fileListing;
-    @XmlElement(required = true)
-    protected Volumes volumes;
     @XmlElementWrapper(name = "directory-listing", required = true)
     @XmlElement(name = "directory-item")
     protected List<String> directoryListing;
+    @XmlElement(required = true)
+    protected Volumes volumes;
 
     /**
      * Gets the value of the fileListing property.

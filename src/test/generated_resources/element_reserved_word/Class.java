@@ -53,7 +53,7 @@ public class Class {
         @XmlElement(name = "primitive", type = Byte.class)
     })
     protected List<Serializable> _implements = new ArrayList<Serializable>();
-    @XmlElementWrapper(name = "methods", required = true)
+    @XmlElementWrapper(required = true)
     @XmlElement(name = "method")
     protected List<Method> methods = new ArrayList<Method>();
 

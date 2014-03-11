@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Publisher {
 
-    @XmlElementWrapper(name = "articles", required = true)
+    @XmlElementWrapper(required = true)
     @XmlElement(name = "article")
     protected List<Article> articles = new ArrayList<Article>();
 

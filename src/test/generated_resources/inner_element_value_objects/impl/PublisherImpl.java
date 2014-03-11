@@ -18,7 +18,7 @@ import inner_element_value_objects.Publisher;
 public class PublisherImpl implements Publisher
 {
 
-    @XmlElementWrapper(name = "articles", required = true)
+    @XmlElementWrapper(required = true)
     @XmlElement(name = "article", type = ArticleImpl.class)
     protected List<Article> articles = new ArrayList<Article>();
 

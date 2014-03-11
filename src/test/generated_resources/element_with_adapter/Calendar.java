@@ -54,7 +54,7 @@ public class Calendar {
     @XmlSchemaType(name = "anyURI")
     protected String url;
     @XmlElementWrapper(name = "appointments")
-    @XmlElement(name = "appointment")
+    @XmlElement(name = "appointment", type = String.class)
     @XmlJavaTypeAdapter(Adapter1 .class)
     protected List<Date> itemsAppointed = new ArrayList<Date>();
 

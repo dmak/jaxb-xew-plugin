@@ -42,12 +42,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "post-office")
 public class PostOffice {
 
-    @XmlElementWrapper(name = "type-of-message", required = true)
-    @XmlElement(name = "type")
-    protected List<String> typeOfMessages = new ArrayList<String>();
     @XmlElementWrapper(name = "class", required = true)
     @XmlElement(name = "name")
     protected List<String> classes = new ArrayList<String>();
+    @XmlElementWrapper(name = "type-of-message", required = true)
+    @XmlElement(name = "type")
+    protected List<String> typeOfMessages = new ArrayList<String>();
     @XmlElementWrapper(name = "misc")
     @XmlAnyElement(lax = true)
     protected List<Object> miscs = new ArrayList<Object>();

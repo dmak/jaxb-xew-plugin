@@ -39,10 +39,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "container", namespace = "http://example.com/container")
 public class Container {
 
-    @XmlElementWrapper(name = "entries")
+    @XmlElementWrapper
     @XmlElement(name = "entry", namespace = "http://example.com/entry")
     protected List<Entry> entries;
-    @XmlElementWrapper(name = "items", required = true, namespace = "http://example.com/items")
+    @XmlElementWrapper(required = true, namespace = "http://example.com/items")
     @XmlElement(name = "entry", namespace = "http://example.com/entry")
     protected List<Entry> items;
 
