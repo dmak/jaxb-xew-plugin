@@ -27,6 +27,7 @@ import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getPrivateField;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.getXsdDeclaration;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isListedAsParametrisation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.setPrivateField;
@@ -85,7 +86,6 @@ import com.sun.tools.xjc.outline.Outline;
 import com.sun.xml.bind.api.impl.NameConverter;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
-import com.sun.xml.xsom.XSParticle;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -416,8 +416,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				// Remove original field which refers to the inner class.
 				JFieldVar originalImplField = targetClass.fields().get(fieldName);
 
-				String schemaElementName = ((XSDeclaration) ((XSParticle) fieldPropertyInfo.getSchemaComponent())
-				            .getTerm()).getName();
+				String schemaElementName = getXsdDeclaration(fieldPropertyInfo).getName();
 
 				boolean pluralFormWasApplied = false;
 
@@ -540,9 +539,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 					if (xmlNamespace != null) {
 						xmlElementAnnotation.param("namespace", xmlNamespace);
 					}
-					else if (wrapperXmlNamespace != null) {
-						// FIXME: Only theoretical case, as it cannot happen that element does not have a namespace, but wrapper element has:
-						xmlElementAnnotation.param("namespace", wrapperXmlNamespace);
+					else if (candidate.getFieldTargetNamespace() != null) {
+						xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
 					}
 
 					JExpression type = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "type");
@@ -843,8 +841,16 @@ public class XmlElementWrapperPlugin extends Plugin {
 				}
 			}
 
+			String fieldTargetNamespace = null;
+
+			XSDeclaration xsdDeclaration = getXsdDeclaration(classOutline.target.getProperty(field.name()));
+
+			if (xsdDeclaration != null && !xsdDeclaration.getTargetNamespace().isEmpty()) {
+				fieldTargetNamespace = xsdDeclaration.getTargetNamespace();
+			}
+
 			// We have a candidate class:
-			Candidate candidate = new Candidate(candidateClass, field, fieldParametrisationClass,
+			Candidate candidate = new Candidate(candidateClass, field, fieldTargetNamespace, fieldParametrisationClass,
 			            fieldParametrisationImpl, xmlElementDeclModelClass);
 			candidates.add(candidate);
 
@@ -1250,6 +1256,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		private final JFieldVar                      field;
 
+		private final String                         fieldTargetNamespace;
+
 		private final JDefinedClass                  fieldParametrisationClass;
 
 		private final JDefinedClass                  fieldParametrisationImpl;
@@ -1270,10 +1278,12 @@ public class XmlElementWrapperPlugin extends Plugin {
 		 */
 		private int                                  substitutionsCount;
 
-		Candidate(JDefinedClass candidateClass, JFieldVar field, JDefinedClass fieldParametrizationClass,
-		            JDefinedClass fieldParametrisationImpl, JClass xmlElementDeclModelClass) {
+		Candidate(JDefinedClass candidateClass, JFieldVar field, String fieldTargetNamespace,
+		            JDefinedClass fieldParametrizationClass, JDefinedClass fieldParametrisationImpl,
+		            JClass xmlElementDeclModelClass) {
 			this.candidateClass = candidateClass;
 			this.field = field;
+			this.fieldTargetNamespace = fieldTargetNamespace;
 			this.fieldParametrisationClass = fieldParametrizationClass;
 			this.fieldParametrisationImpl = fieldParametrisationImpl;
 
@@ -1349,6 +1359,13 @@ public class XmlElementWrapperPlugin extends Plugin {
 		 */
 		public JClass getFieldClass() {
 			return (JClass) field.type();
+		}
+
+		/**
+		 * The XSD namespace of the property associated with a field.
+		 */
+		public String getFieldTargetNamespace() {
+			return fieldTargetNamespace;
 		}
 
 		/**

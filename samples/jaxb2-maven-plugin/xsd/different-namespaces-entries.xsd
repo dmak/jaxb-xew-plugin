@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	targetNamespace="http://sample.jaxb-xew-plugin.github.com/entries"
+	xmlns:entries="http://sample.jaxb-xew-plugin.github.com/entries"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+
+	<xs:complexType name="entries">
+		<xs:sequence>
+			<xs:element ref="entries:entry" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="entry">
+		<xs:complexType>
+			<xs:attribute name="name" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

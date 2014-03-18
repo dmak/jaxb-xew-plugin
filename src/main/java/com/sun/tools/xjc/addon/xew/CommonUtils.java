@@ -4,7 +4,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
@@ -17,6 +16,11 @@ import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JGenerable;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
+import com.sun.tools.xjc.model.CPropertyInfo;
+import com.sun.xml.xsom.XSComponent;
+import com.sun.xml.xsom.XSDeclaration;
+import com.sun.xml.xsom.XSParticle;
+import com.sun.xml.xsom.XSTerm;
 
 public final class CommonUtils {
 
@@ -175,5 +179,26 @@ public final class CommonUtils {
 		catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Returns XSD declaration of given property.
+	 */
+	public static XSDeclaration getXsdDeclaration(CPropertyInfo propertyInfo) {
+		XSComponent schemaComponent = propertyInfo.getSchemaComponent();
+
+		if (!(schemaComponent instanceof XSParticle)) {
+			// XSComplexType for example:
+			return null;
+		}
+
+		XSTerm term = ((XSParticle) schemaComponent).getTerm();
+
+		if (!(term instanceof XSDeclaration)) {
+			// XSModelGroup for example:
+			return null;
+		}
+
+		return (XSDeclaration) term;
 	}
 }

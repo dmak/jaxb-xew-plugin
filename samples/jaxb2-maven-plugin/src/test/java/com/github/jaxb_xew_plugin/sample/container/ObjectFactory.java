@@ -1,5 +1,5 @@
 
-package generated;
+package com.github.jaxb_xew_plugin.sample.container;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the generated package. 
+ * generated in the com.github.jaxb_xew_plugin.sample.container package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -23,18 +23,18 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: generated
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.github.jaxb_xew_plugin.sample.container
      * 
      */
     public ObjectFactory() {
     }
 
     /**
-     * Create an instance of {@link Order }
+     * Create an instance of {@link Container }
      * 
      */
-    public Order createOrder() {
-        return new Order();
+    public Container createContainer() {
+        return new Container();
     }
 
 }
