@@ -24,7 +24,14 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="classes-eu" type="{}classes-eu"/>
  *         &lt;element name="classes-us" type="{}classes-us"/>
  *       &lt;/choice>
- *       &lt;attribute name="mode" use="required" type="{http://www.w3.org/2001/XMLSchema}byte" />
+ *       &lt;attribute name="mode" use="required" fixed="OTH">
+ *         &lt;simpleType>
+ *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *             &lt;minLength value="3"/>
+ *             &lt;maxLength value="3"/>
+ *           &lt;/restriction>
+ *         &lt;/simpleType>
+ *       &lt;/attribute>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -43,8 +50,12 @@ public class SearchMulti {
         @XmlElement(name = "classes-us", type = ClassesUs.class)
     })
     protected List<Object> classesEuOrClassesUs;
+    /**
+     * 
+     * 
+     */
     @XmlAttribute(name = "mode", required = true)
-    protected byte mode;
+    public final static String MODE = "OTH";
 
     /**
      * Gets the value of the classesEuOrClassesUs property.
@@ -74,22 +85,6 @@ public class SearchMulti {
             classesEuOrClassesUs = new ArrayList<Object>();
         }
         return this.classesEuOrClassesUs;
-    }
-
-    /**
-     * Gets the value of the mode property.
-     * 
-     */
-    public byte getMode() {
-        return mode;
-    }
-
-    /**
-     * Sets the value of the mode property.
-     * 
-     */
-    public void setMode(byte value) {
-        this.mode = value;
     }
 
 }

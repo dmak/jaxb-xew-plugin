@@ -22,7 +22,6 @@
 package com.sun.tools.xjc.addon.xew;
 
 import static com.sun.tools.xjc.addon.xew.CommonUtils.addAnnotation;
-import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
@@ -30,6 +29,7 @@ import static com.sun.tools.xjc.addon.xew.CommonUtils.getPrivateField;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getXsdDeclaration;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isListedAsParametrisation;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.setPrivateField;
 
 import java.io.BufferedReader;
@@ -84,6 +84,7 @@ import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 import com.sun.xml.bind.api.impl.NameConverter;
+import com.sun.xml.bind.v2.model.core.PropertyKind;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 
@@ -367,6 +368,11 @@ public class XmlElementWrapperPlugin extends Plugin {
 				JClass fieldType = (JClass) field.getRawType();
 				CPropertyInfo fieldPropertyInfo = field.getPropertyInfo();
 
+				// For example, XSD attributes (PropertyKind.ATTRIBUTE) are always simple types:
+				if (!(fieldPropertyInfo.kind() == PropertyKind.ELEMENT || fieldPropertyInfo.kind() == PropertyKind.REFERENCE)) {
+					continue;
+				}
+
 				String fieldName = fieldPropertyInfo.getName(false);
 
 				Candidate candidate = null;
@@ -387,8 +393,10 @@ public class XmlElementWrapperPlugin extends Plugin {
 					}
 				}
 
+				JFieldVar originalImplField = targetClass.fields().get(fieldName);
+
 				if (candidate == null) {
-					checkAnnotationReference(candidatesMap, targetClass.fields().get(fieldName));
+					checkAnnotationReference(candidatesMap, originalImplField);
 
 					continue;
 				}
@@ -412,9 +420,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 				JClass collectionInterfaceClass = codeModel.ref(this.collectionInterfaceClass).narrow(
 				            fieldTypeParametrisations);
 				JClass collectionImplClass = codeModel.ref(this.collectionImplClass).narrow(fieldTypeParametrisations);
-
-				// Remove original field which refers to the inner class.
-				JFieldVar originalImplField = targetClass.fields().get(fieldName);
 
 				String schemaElementName = getXsdDeclaration(fieldPropertyInfo).getName();
 
@@ -466,7 +471,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 					originalImplField.init(JExpr._new(collectionImplClass));
 				}
 
-				// Annotate the new field with the @XmlElementWrapper annotation using the original field name.
+				// Annotate the field with the @XmlElementWrapper annotation using the original field name.
 				JAnnotationUse xmlElementWrapperAnnotation = originalImplField.annotate(xmlElementWrapperModelClass);
 				JAnnotationUse xmlElementOriginalAnnotation = getAnnotation(originalImplField, xmlElementModelClass);
 				JExpression wrapperXmlNamespace = null;
@@ -521,7 +526,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				}
 
 				if (!xmlElementInfoWasTransferred) {
-					// Annotate the new field with the @XmlElement annotation using the field name from the wrapped type as name.
+					// Annotate the field with the @XmlElement annotation using the field name from the wrapped type as name.
 					// We cannot just re-use the same annotation object instance, as for example, we need to set XML name and this
 					// will impact the candidate field annotation in case candidate is unmarked from removal.
 					JAnnotationUse xmlElementAnnotation = originalImplField.annotate(xmlElementModelClass);

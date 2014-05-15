@@ -7,6 +7,7 @@
 >
 	<xs:annotation>
 		<xs:appinfo>
+			<jaxb:globalBindings fixedAttributeAsConstantProperty="true" />
 			<jaxb:schemaBindings>
 				<jaxb:package name="annotation_reference" />
 			</jaxb:schemaBindings>
@@ -30,8 +31,16 @@
 			<xs:element name="classes-eu" type="classes-eu" />
 			<xs:element name="classes-us" type="classes-us" />
 		</xs:choice>
-		<xs:attribute name="mode" type="xs:byte" use="required" />
+		<xs:attribute name="mode" use="required" fixed="OTH">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="3" />
+					<xs:maxLength value="3" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
+
 
 	<xs:complexType name="class-common">
 		<xs:sequence>
