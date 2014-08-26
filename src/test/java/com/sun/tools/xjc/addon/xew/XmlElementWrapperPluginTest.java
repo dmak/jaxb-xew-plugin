@@ -180,6 +180,11 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
+	public void testElementListExtended1() throws Exception {
+		assertXsd("element-list-extended_1", new String[] { "-debug", "-Xxew:delete", "-Xxew:plural" }, false, "Foo");
+	}
+
+	@Test
 	public void testElementWithAdapter() throws Exception {
 		// Plural form in this case will have no impact as there is property customization:
 		assertXsd("element-with-adapter", new String[] { "-Xxew:delete", "-Xxew:plural" }, false, "Calendar",
