@@ -174,6 +174,13 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
+	public void testElementListExtended() throws Exception {
+		// TODO add all the others expected but this test demonstrates the NPE as is
+		assertXsd("element-list-extended", new String[] { "-debug", "-Xxew:delete" }, false, "CouponBookType", "CouponType",
+		            "package-info");
+	}
+	
+	@Test
 	public void testElementScoped() throws Exception {
 		// Most classes cannot be tested for content
 		assertXsd("element-scoped", new String[] { "-debug", "-Xxew:delete" }, false, "Return", "package-info");
