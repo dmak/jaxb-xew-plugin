@@ -1,8 +1,9 @@
 
 package element_with_customization;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
@@ -44,13 +45,13 @@ public class PostOffice {
 
     @XmlElementWrapper(name = "class", required = true)
     @XmlElement(name = "name")
-    protected List<String> classes = new ArrayList<String>();
+    protected List<String> classes = new LinkedList<String>();
     @XmlElementWrapper(name = "type-of-message", required = true)
     @XmlElement(name = "type")
-    protected List<String> typeOfMessages = new ArrayList<String>();
+    protected List<String> typeOfMessages = new Vector<String>();
     @XmlElementWrapper(name = "misc")
     @XmlAnyElement(lax = true)
-    protected List<Object> miscs = new ArrayList<Object>();
+    protected List<Object> miscs = new LinkedList<Object>();
 
     public List<String> getTypeOfMessages() {
         return typeOfMessages;

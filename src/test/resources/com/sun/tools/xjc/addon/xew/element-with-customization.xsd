@@ -2,7 +2,9 @@
 <xs:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xew="http://github.com/jaxb-xew-plugin"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	jaxb:extensionBindingPrefixes="xew"
 	elementFormDefault="qualified"
 >
 	<xs:annotation>
@@ -19,10 +21,37 @@
 
 	<xs:element name="post-office">
 		<xs:complexType>
+			<!-- Example of class customization: all fields in this class will inherit given settings. -->
+			<xs:annotation>
+				<xs:appinfo>
+					<xew:xew collection="java.util.LinkedList" />
+				</xs:appinfo>
+			</xs:annotation>
 			<xs:sequence>
-				<xs:element ref="type-of-message" />
-				<xs:element ref="class" />
-				<xs:element ref="misc" minOccurs="0" />
+				<xs:element ref="type-of-message">
+					<!-- Example of field customization: this very field uses different settings -->
+					<xs:annotation>
+						<xs:appinfo>
+							<xew:xew collection="java.util.Vector" />
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="class">
+					<xs:annotation>
+						<xs:appinfo>
+							<!-- Otherwise this property becomes "clazzs" -->
+							<jaxb:property name="classes" />
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="misc" minOccurs="0">
+					<xs:annotation>
+						<xs:appinfo>
+							<!-- FIXME: Unfortunately, this property becomes "miscs": -->
+							<jaxb:property name="misc" />
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -36,27 +65,14 @@
 	</xs:element>
 
 	<xs:element name="class">
-		<xs:annotation>
-			<xs:appinfo>
-				<!-- Otherwise this property becomes "clazzs" -->
-				<jaxb:property name="classes" />
-			</xs:appinfo>
-		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="name" type="xs:string" maxOccurs="unbounded">
-				</xs:element>
+				<xs:element name="name" type="xs:string" maxOccurs="unbounded" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
 	<xs:element name="misc">
-		<xs:annotation>
-			<xs:appinfo>
-				<!-- Unfortunately, this property becomes "miscs": -->
-				<jaxb:property name="misc" />
-			</xs:appinfo>
-		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />

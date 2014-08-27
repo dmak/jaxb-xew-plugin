@@ -169,16 +169,9 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
-	public void testElementListExtended1() throws Exception {
+	public void testElementListExtended() throws Exception {
 		// This run is configured from XSD (<xew:xew ... >):
-		assertXsd("element-list-extended-1", null, false, "Foo");
-	}
-
-	@Test(expected = NullPointerException.class)
-	public void testElementListExtended2() throws Exception {
-		// This run is configured from XSD (<xew:xew ... >):
-		assertXsd("element-list-extended-2", null, false, "CouponBookType", "CouponType", "CurrencyAmountType",
-		            "MetaObjectType", "package-info");
+		assertXsd("element-list-extended", null, false, "Foo");
 	}
 
 	@Test
@@ -196,6 +189,7 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementWithCustomization() throws Exception {
+		// This run is additionally configured from XSD (<xew:xew ... >):
 		assertXsd("element-with-customization", new String[] { "-debug", "-Xxew:delete", "-Xxew:plural" }, false,
 		            "PostOffice");
 	}

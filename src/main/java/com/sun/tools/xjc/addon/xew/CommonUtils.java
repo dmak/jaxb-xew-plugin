@@ -80,13 +80,7 @@ public final class CommonUtils {
 	 */
 	public static JExpression getAnnotationMemberExpression(JAnnotatable annotatable, JClass annotationClass,
 	            String annotationMember) {
-		JAnnotationUse annotation = getAnnotation(annotatable, annotationClass);
-
-		if (annotation != null) {
-			return getAnnotationMemberExpression(annotation, annotationMember);
-		}
-
-		return null;
+		return getAnnotationMemberExpression(getAnnotation(annotatable, annotationClass), annotationMember);
 	}
 
 	/**
@@ -98,6 +92,7 @@ public final class CommonUtils {
 		if (annotation == null) {
 			return null;
 		}
+
 		JAnnotationValue annotationValue = annotation.getAnnotationMembers().get(annotationMember);
 
 		if (annotationValue == null) {
