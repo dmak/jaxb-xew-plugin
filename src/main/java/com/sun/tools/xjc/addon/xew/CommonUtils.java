@@ -95,6 +95,9 @@ public final class CommonUtils {
 	 * for member <code>name</code> the value <code>last-name</code> will be returned.
 	 */
 	public static final JExpression getAnnotationMemberExpression(JAnnotationUse annotation, String annotationMember) {
+		if (annotation == null) {
+			return null;
+		}
 		JAnnotationValue annotationValue = annotation.getAnnotationMembers().get(annotationMember);
 
 		if (annotationValue == null) {

@@ -39,6 +39,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,8 +79,10 @@ import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
+import com.sun.tools.xjc.model.CCustomizations;
+import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.model.CPropertyInfo;
+import com.sun.tools.xjc.model.Model;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
@@ -90,6 +93,9 @@ import com.sun.xml.xsom.XSDeclaration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
+import org.jvnet.jaxb2_commons.util.CustomizationUtils;
+import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 
 /**
@@ -103,7 +109,10 @@ import org.xml.sax.ErrorHandler;
  * @author Bjarne Hansen
  * @author Dmitry Katsubo
  */
-public class XmlElementWrapperPlugin extends Plugin {
+public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
+
+    private static final String NAMESPACE_URI = "http://github.com/jaxb-xew-plugin";
+    private static final QName XEW_QNAME = new QName(NAMESPACE_URI, "xew");
 
 	private static final String PLUGIN_NAME                            = "Xxew";
 	private static final String OPTION_NAME_DELETE                     = "-" + PLUGIN_NAME + ":delete";
@@ -121,6 +130,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 	private Set<String>         include                                = null;
 
 	private File                excludeFile                            = null;
+
 	/**
 	 * List of classes for exclusion
 	 */
@@ -128,17 +138,10 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 	private File                summaryFile                            = null;
 	private PrintWriter         summary                                = null;
-	private Class<?>            collectionInterfaceClass               = java.util.List.class;
-	private Class<?>            collectionImplClass                    = java.util.ArrayList.class;
-	private Instantiation       instantiation                          = Instantiation.EARLY;
-	private boolean             deleteCandidates                       = false;
+
+	private Configuration       globalConfiguration                    = new Configuration();
 
 	private JClass              xmlElementDeclModelClass;
-
-	// Waiting for this bug to be resolved: http://java.net/jira/browse/JAXB-883
-	//private boolean             applyPluralForm                        = Ring.get(BIGlobalBinding.class).isSimpleMode();
-	// This is currently an experimental and not properly working feature, so keep this field set to false.
-	private boolean             applyPluralForm                        = false;
 
 	private static final String FACTORY_CLASS_NAME                     = "ObjectFactory";
 
@@ -246,7 +249,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		if (arg.startsWith(OPTION_NAME_DELETE)) {
 			recognized++;
-			deleteCandidates = true;
+			globalConfiguration.setDeleteCandidates(true);
 		}
 		else if ((recognized = parseArgument(args, i, OPTION_NAME_INCLUDE, value)) > 0) {
 			include = new HashSet<String>();
@@ -268,18 +271,18 @@ public class XmlElementWrapperPlugin extends Plugin {
 			String ccn = value.toString();
 
 			try {
-				collectionImplClass = Class.forName(ccn);
+				globalConfiguration.setCollectionImplClass(Class.forName(ccn));
 			}
 			catch (ClassNotFoundException e) {
 				throw new BadCommandLineException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.", e);
 			}
 		}
 		else if ((recognized = parseArgument(args, i, OPTION_NAME_INSTANTIATE, value)) > 0) {
-			instantiation = Instantiation.valueOf(value.toString().toUpperCase());
+			globalConfiguration.setInstantiation(Configuration.Instantiation.valueOf(value.toString().toUpperCase()));
 		}
 		else if (arg.equals(OPTION_NAME_APPLY_PLURAL_FORM)) {
 			recognized++;
-			applyPluralForm = true;
+			globalConfiguration.setApplyPluralForm(true);
 		}
 		else if (arg.startsWith("-" + PLUGIN_NAME + ":")) {
 			throw new BadCommandLineException("Invalid argument " + arg);
@@ -309,11 +312,11 @@ public class XmlElementWrapperPlugin extends Plugin {
 		writeSummary("  Include file         : " + (includeFile == null ? "<none>" : includeFile));
 		writeSummary("  Exclude file         : " + (excludeFile == null ? "<none>" : excludeFile));
 		writeSummary("  Summary file         : " + (summaryFile == null ? "<none>" : summaryFile));
-		writeSummary("  Instantiation mode   : " + instantiation);
-		writeSummary("  Collection impl      : " + collectionImplClass);
-		writeSummary("  Collection interface : " + collectionInterfaceClass);
-		writeSummary("  Delete candidates    : " + deleteCandidates);
-		writeSummary("  Plural form          : " + applyPluralForm);
+		writeSummary("  Instantiation mode   : " + globalConfiguration.getInstantiation());
+		writeSummary("  Collection impl      : " + globalConfiguration.getCollectionImplClass());
+		writeSummary("  Collection interface : " + globalConfiguration.getCollectionInterfaceClass());
+		writeSummary("  Delete candidates    : " + globalConfiguration.isDeleteCandidates());
+		writeSummary("  Plural form          : " + globalConfiguration.isApplyPluralForm());
 		writeSummary("");
 
 		// Visit all classes generated by JAXB and find candidate classes for transformation.
@@ -342,12 +345,18 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		int modificationCount = 0;
 
+		Configuration modelConfiguration = globalConfiguration.clone();
+		applyConfiguration(modelConfiguration, CustomizationUtils.getCustomizations(outline.getModel()));
+
 		// Visit all classes again to check if the candidate is not eligible for removal:
 		// * If there are classes that extend the candidate
 		// * If there are class fields, that refer the candidate by e.g. @XmlElementRef annotation
 		for (ClassOutline outlineClass : outline.getClasses()) {
 			// Get the implementation class for the current class.
 			JDefinedClass targetClass = outlineClass.implClass;
+
+			Configuration classConfiguration = modelConfiguration.clone();
+			applyConfiguration(classConfiguration, CustomizationUtils.getCustomizations(outlineClass));
 
 			// We cannot remove candidates that have parent classes, but we can still substitute them:
 			Candidate parentCandidate = candidatesMap.get(targetClass._extends().fullName());
@@ -367,6 +376,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				JClass fieldType = (JClass) field.getRawType();
 				CPropertyInfo fieldPropertyInfo = field.getPropertyInfo();
+				Configuration fieldConfiguration = classConfiguration.clone();
+				applyConfiguration(fieldConfiguration, CustomizationUtils.getCustomizations(field));
 
 				// For example, XSD attributes (PropertyKind.ATTRIBUTE) are always simple types:
 				if (!(fieldPropertyInfo.kind() == PropertyKind.ELEMENT || fieldPropertyInfo.kind() == PropertyKind.REFERENCE)) {
@@ -417,9 +428,8 @@ public class XmlElementWrapperPlugin extends Plugin {
 				// Create the new interface and collection classes using the specified interface and
 				// collection classes (configuration) with an element type corresponding to
 				// the element type from the collection present in the candidate class (narrowing).
-				JClass collectionInterfaceClass = codeModel.ref(this.collectionInterfaceClass).narrow(
-				            fieldTypeParametrisations);
-				JClass collectionImplClass = codeModel.ref(this.collectionImplClass).narrow(fieldTypeParametrisations);
+				JClass collectionInterfaceClass = codeModel.ref(fieldConfiguration.getCollectionInterfaceClass()).narrow(fieldTypeParametrisations);
+				JClass collectionImplClass = codeModel.ref(fieldConfiguration.getCollectionImplClass()).narrow(fieldTypeParametrisations);
 
 				String schemaElementName = getXsdDeclaration(fieldPropertyInfo).getName();
 
@@ -427,7 +437,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 				// Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
 				// plural form in more correct way, e.g. "field[s]OfScience" instead of "fieldOfScience[s]".
-				if (applyPluralForm && hasNoPropertyNameCustomization(fieldName, schemaElementName)) {
+				if (fieldConfiguration.isApplyPluralForm() && hasNoPropertyNameCustomization(fieldName, schemaElementName)) {
 					String oldFieldName = fieldName;
 
 					// Taken from com.sun.tools.xjc.reader.xmlschema.ParticleBinder#makeJavaName():
@@ -465,7 +475,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				originalImplField.type(collectionInterfaceClass);
 
 				// If instantiation is specified to be "early", add code for creating new instance of the collection class.
-				if (instantiation == Instantiation.EARLY) {
+				if (fieldConfiguration.getInstantiation() == Configuration.Instantiation.EARLY) {
 					logger.debug("Applying EARLY instantiation...");
 					// GENERATED CODE: ... fieldName = new C<T>();
 					originalImplField.init(JExpr._new(collectionImplClass));
@@ -481,7 +491,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 					if (wrapperXmlName != null) {
 						xmlElementWrapperAnnotation.param("name", wrapperXmlName);
 					}
-					else if (pluralFormWasApplied) {
+					else if (fieldConfiguration.isApplyPluralForm()) {
 						xmlElementWrapperAnnotation.param("name", schemaElementName);
 					}
 
@@ -506,7 +516,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 					removeAnnotation(originalImplField, xmlElementOriginalAnnotation);
 				}
 				else {
-					if (pluralFormWasApplied) {
+					if (fieldConfiguration.isApplyPluralForm()) {
 						xmlElementWrapperAnnotation.param("name", schemaElementName);
 					}
 				}
@@ -588,7 +598,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 				// GENERATED CODE: public I<T> getFieldName() { ... return fieldName; }
 				JMethod getterMethod = targetClass.method(JMod.PUBLIC, collectionInterfaceClass, "get" + propertyName);
 
-				if (instantiation == Instantiation.LAZY) {
+				if (fieldConfiguration.getInstantiation() == Configuration.Instantiation.LAZY) {
 					logger.debug("Applying LAZY instantiation...");
 					// GENERATED CODE: if (fieldName == null) fieldName = new C<T>();
 					getterMethod.body()._if(JExpr.ref(fieldName).eq(JExpr._null()))._then()
@@ -629,7 +639,7 @@ public class XmlElementWrapperPlugin extends Plugin {
 
 		int deletionCount = 0;
 
-		if (deleteCandidates) {
+		if (modelConfiguration.isDeleteCandidates()) {
 			deletionCount = deleteCandidates(outline, candidatesMap.values());
 		}
 
@@ -1188,6 +1198,46 @@ public class XmlElementWrapperPlugin extends Plugin {
 		input.close();
 	}
 
+	private void applyConfiguration(Configuration configuration, CCustomizations customizations) {
+		for (final CPluginCustomization customization : customizations) {
+			final Element element = customization.element;
+			final QName name = new QName(element.getNamespaceURI(),
+					element.getLocalName());
+			if (NAMESPACE_URI.equals(name.getNamespaceURI())) {
+				customization.markAsAcknowledged();
+				if (XEW_QNAME.equals(name)) {
+					String ccn;
+					ccn = element.getAttribute("collection");
+					if(ccn != null && !ccn.isEmpty()) {
+						try {
+							configuration.setCollectionImplClass(Class.forName(ccn));
+						} catch (ClassNotFoundException e) {
+							logger.error(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.");
+							throw new RuntimeException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.", e);
+						}
+					}
+					ccn = element.getAttribute("collectionInterface");
+					if(ccn != null && !ccn.isEmpty()) {
+						try {
+							configuration.setCollectionInterfaceClass(Class.forName(ccn));
+						} catch (ClassNotFoundException e) {
+							logger.error(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.");
+							throw new RuntimeException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.", e);
+						}
+					}
+					ccn = element.getAttribute("plural");
+					if(ccn != null && !ccn.isEmpty()) {
+						configuration.setApplyPluralForm("true".equals(ccn.toLowerCase()));
+					}
+					ccn = element.getAttribute("instantiate");
+					if(ccn != null && !ccn.isEmpty()) {
+						globalConfiguration.setInstantiation(Configuration.Instantiation.valueOf(ccn.toString().toUpperCase()));
+					}
+				}
+			}
+		}
+	}
+
 	//
 	// Logging helpers
 	//
@@ -1204,27 +1254,6 @@ public class XmlElementWrapperPlugin extends Plugin {
 		if (summary != null) {
 			summary.close();
 		}
-	}
-
-	/**
-	 * Types of collection instantiation modes.
-	 */
-	private enum Instantiation {
-		/**
-		 * Collection is initialized as property initializer (created when class is constructed).
-		 */
-		EARLY,
-
-		/**
-		 * Collection is initialized in getter (created when property is accessed the first time).
-		 */
-		LAZY,
-
-		/**
-		 * Collection is never initialized. It's consumers responsibility to set the property to some collection
-		 * instance.
-		 */
-		NONE
 	}
 
 	/**
@@ -1446,5 +1475,10 @@ public class XmlElementWrapperPlugin extends Plugin {
 		public String toString() {
 			return "Candidate[" + getClassName() + "]";
 		}
+	}
+
+	@Override
+	public Collection<QName> getCustomizationElementNames() {
+		return Arrays.asList(XEW_QNAME);
 	}
 }
