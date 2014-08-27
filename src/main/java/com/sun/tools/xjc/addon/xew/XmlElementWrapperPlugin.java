@@ -542,25 +542,33 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 					JAnnotationUse xmlElementAnnotation = originalImplField.annotate(xmlElementModelClass);
 					xmlElementOriginalAnnotation = getAnnotation(candidate.getField(), xmlElementModelClass);
 
-					JExpression xmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
-					if (xmlName != null) {
-						xmlElementAnnotation.param("name", xmlName);
+					if (xmlElementOriginalAnnotation != null) {
+						JExpression xmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
+						if (xmlName != null) {
+							xmlElementAnnotation.param("name", xmlName);
+						}
+						else {
+							xmlElementAnnotation.param("name", candidate.getFieldName());
+						}
+
+						JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "namespace");
+						if (xmlNamespace != null) {
+							xmlElementAnnotation.param("namespace", xmlNamespace);
+						}
+						else if (candidate.getFieldTargetNamespace() != null) {
+							xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
+						}
+
+						JExpression type = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "type");
+						if (type != null) {
+							xmlElementAnnotation.param("type", type);
+						}
 					}
 					else {
 						xmlElementAnnotation.param("name", candidate.getFieldName());
-					}
-
-					JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "namespace");
-					if (xmlNamespace != null) {
-						xmlElementAnnotation.param("namespace", xmlNamespace);
-					}
-					else if (candidate.getFieldTargetNamespace() != null) {
-						xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
-					}
-
-					JExpression type = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "type");
-					if (type != null) {
-						xmlElementAnnotation.param("type", type);
+						if (candidate.getFieldTargetNamespace() != null) {
+							xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
+						}
 					}
 				}
 
