@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="encoding" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+        <xs:element name="foo" type="bar" />
+
+        <xs:simpleType name="bar">
+                <xs:restriction base="xs:string">
+                        <xs:enumeration value="ä" />
+                        <xs:enumeration value="ü" />
+                        <xs:enumeration value="ö" />
+                </xs:restriction>
+       </xs:simpleType>
+</xs:schema>

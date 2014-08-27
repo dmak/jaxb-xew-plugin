@@ -20,6 +20,7 @@
  */
 package com.sun.tools.xjc.addon.xew;
 
+
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,6 +36,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.xml.XMLConstants;
@@ -46,6 +48,7 @@ import javax.xml.validation.SchemaFactory;
 
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Driver;
+import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.reader.Const;
 import com.sun.tools.xjc.reader.internalizer.DOMForest;
 import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
@@ -209,6 +212,11 @@ public class XmlElementWrapperPluginTest {
 		assertXsd("element-reserved-word", new String[] { "-Xxew:delete" }, false, "Class", "Method");
 	}
 
+	@Test
+	public void testEncoding() throws Exception {
+		assertXsd("encoding", new String[] { "-encoding", "UTF-8", "-debug", "-Xxew:delete" }, "UTF-8", false, "Bar");
+	}
+
 	/**
 	 * Standard test for XSD examples.
 	 * 
@@ -224,117 +232,146 @@ public class XmlElementWrapperPluginTest {
 	 */
 	private void assertXsd(String testName, String[] extraXewOptions, boolean generateEpisode, String... classesToCheck)
 	            throws Exception {
-		String resourceXsd = testName + ".xsd";
-		String packageName = testName.replace('-', '_');
+		assertXsd(testName, extraXewOptions, null, generateEpisode, classesToCheck);
+	}
 
-		// Force plugin to reinitialize the logger:
-		System.clearProperty(XmlElementWrapperPlugin.COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY);
+	/**
+	 * Standard test for XSD examples. With encoding
+	 * 
+	 * @param testName
+	 *            the prototype of XSD file name / package name
+	 * @param extraXewOptions
+	 *            to be passed to plugin
+	 * @param generateEpisode
+	 *            generate episode file and check the list of classes included into it
+	 * @param classesToCheck
+	 *            expected classes/files in target directory; these files content is checked if it is present in
+	 *            resources directory; {@code ObjectFactory.java} is automatically included
+	 */
+	private void assertXsd(String testName, String[] extraXewOptions, String encoding, boolean generateEpisode, String... classesToCheck)
+	            throws Exception {
+		Locale currentDefaultLocale = Locale.getDefault();
+		Locale.setDefault(Locale.ENGLISH);
+		
+		try {
+			String resourceXsd = testName + ".xsd";
+			String packageName = testName.replace('-', '_');
 
-		URL xsdUrl = getClass().getResource(resourceXsd);
+			// Force plugin to reinitialize the logger:
+			System.clearProperty(XmlElementWrapperPlugin.COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY);
 
-		File targetDir = new File(GENERATED_SOURCES_PREFIX);
+			URL xsdUrl = getClass().getResource(resourceXsd);
 
-		targetDir.mkdirs();
+			File targetDir = new File(GENERATED_SOURCES_PREFIX);
 
-		PrintStream loggingPrintStream = new PrintStream(new LoggingOutputStream(logger,
-		            LoggingOutputStream.LogLevel.INFO, "[XJC] "));
+			targetDir.mkdirs();
 
-		String[] opts = ArrayUtils.addAll(extraXewOptions, "-no-header", "-extension", "-Xxew", "-d",
-		            targetDir.getPath(), xsdUrl.getFile());
+			PrintStream loggingPrintStream = new PrintStream(new LoggingOutputStream(logger,
+				    LoggingOutputStream.LogLevel.INFO, "[XJC] "));
 
-		String episodeFile = new File(targetDir, "episode.xml").getPath();
+			String[] opts = ArrayUtils.addAll(extraXewOptions, "-no-header", "-extension", "-Xxew", "-d",
+				    targetDir.getPath(), xsdUrl.getFile());
 
-		// Episode plugin should be triggered after Xew, see https://github.com/dmak/jaxb-xew-plugin/issues/6
-		if (generateEpisode) {
-			opts = ArrayUtils.addAll(opts, "-episode", episodeFile);
-		}
+			String episodeFile = new File(targetDir, "episode.xml").getPath();
 
-		assertTrue("XJC compilation failed. Checked console for more info.",
-		            Driver.run(opts, loggingPrintStream, loggingPrintStream) == 0);
+			// Episode plugin should be triggered after Xew, see https://github.com/dmak/jaxb-xew-plugin/issues/6
+			if (generateEpisode) {
+				opts = ArrayUtils.addAll(opts, "-episode", episodeFile);
+			}
 
-		if (generateEpisode) {
-			// FIXME: Episode file actually contains only value objects
-			Set<String> classReferences = getClassReferencesFromEpisodeFile(episodeFile);
+			assertTrue("XJC compilation failed. Checked console for more info.",
+				    Driver.run(opts, loggingPrintStream, loggingPrintStream) == 0);
 
-			assertEquals("Wrong number of classes in episode file", classesToCheck.length, classReferences.size());
+			if (generateEpisode) {
+				// FIXME: Episode file actually contains only value objects
+				Set<String> classReferences = getClassReferencesFromEpisodeFile(episodeFile);
+
+				assertEquals("Wrong number of classes in episode file", classesToCheck.length, classReferences.size());
+
+				for (String className : classesToCheck) {
+					assertTrue(className + " class is missing in episode file;",
+						    classReferences.contains(packageName + "." + className));
+				}
+			}
+
+			targetDir = new File(targetDir, packageName);
+
+			Collection<String> generatedJavaSources = new HashSet<String>();
+
+			// *.properties files are ignored:
+			for (File targetFile : FileUtils.listFiles(targetDir, new String[] { "java" }, true)) {
+				// This is effectively the path of targetFile relative to targetDir:
+				generatedJavaSources.add(targetFile.getPath().substring(targetDir.getPath().length() + 1)
+					    .replace('\\', '/'));
+			}
+
+			// This class is added and checked by default:
+			classesToCheck = ArrayUtils.add(classesToCheck, "ObjectFactory");
+
+			assertEquals("Wrong number of generated classes;", classesToCheck.length, generatedJavaSources.size());
 
 			for (String className : classesToCheck) {
-				assertTrue(className + " class is missing in episode file;",
-				            classReferences.contains(packageName + "." + className));
+				className = className.replace('.', '/') + ".java";
+
+				assertTrue(className + " is missing in target directory", generatedJavaSources.contains(className));
 			}
-		}
 
-		targetDir = new File(targetDir, packageName);
+			// Check the contents for those files which exist in resources:
+			for (String className : classesToCheck) {
+				className = className.replace('.', '/') + ".java";
 
-		Collection<String> generatedJavaSources = new HashSet<String>();
+				File sourceFile = new File(PREGENERATED_SOURCES_PREFIX + packageName, className);
 
-		// *.properties files are ignored:
-		for (File targetFile : FileUtils.listFiles(targetDir, new String[] { "java" }, true)) {
-			// This is effectively the path of targetFile relative to targetDir:
-			generatedJavaSources.add(targetFile.getPath().substring(targetDir.getPath().length() + 1)
-			            .replace('\\', '/'));
-		}
-
-		// This class is added and checked by default:
-		classesToCheck = ArrayUtils.add(classesToCheck, "ObjectFactory");
-
-		assertEquals("Wrong number of generated classes;", classesToCheck.length, generatedJavaSources.size());
-
-		for (String className : classesToCheck) {
-			className = className.replace('.', '/') + ".java";
-
-			assertTrue(className + " is missing in target directory", generatedJavaSources.contains(className));
-		}
-
-		// Check the contents for those files which exist in resources:
-		for (String className : classesToCheck) {
-			className = className.replace('.', '/') + ".java";
-
-			File sourceFile = new File(PREGENERATED_SOURCES_PREFIX + packageName, className);
-
-			if (sourceFile.exists()) {
-				// To avoid CR/LF conflicts:
-				assertEquals("For " + className, FileUtils.readFileToString(sourceFile).replace("\r", ""), FileUtils
-				            .readFileToString(new File(targetDir, className)).replace("\r", ""));
+				if (sourceFile.exists()) {
+					// To avoid CR/LF conflicts:
+					assertEquals("For " + className, FileUtils.readFileToString(sourceFile).replace("\r", ""), FileUtils
+						    .readFileToString(new File(targetDir, className)).replace("\r", ""));
+				}
 			}
-		}
 
-		JAXBContext jaxbContext = compileAndLoad(packageName, targetDir, generatedJavaSources);
+			JAXBContext jaxbContext = compileAndLoad(packageName, targetDir, generatedJavaSources, encoding);
 
-		URL xmlTestFile = getClass().getResource(testName + ".xml");
+			URL xmlTestFile = getClass().getResource(testName + ".xml");
 
-		if (xmlTestFile != null) {
-			StringWriter writer = new StringWriter();
+			if (xmlTestFile != null) {
+				StringWriter writer = new StringWriter();
 
-			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+				SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-			unmarshaller.setSchema(schemaFactory.newSchema(xsdUrl));
+				Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+				unmarshaller.setSchema(schemaFactory.newSchema(xsdUrl));
 
-			Marshaller marshaller = jaxbContext.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(unmarshaller.unmarshal(xmlTestFile), writer);
+				Marshaller marshaller = jaxbContext.createMarshaller();
+				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+				marshaller.marshal(unmarshaller.unmarshal(xmlTestFile), writer);
 
-			Diff xmlDiff = new Diff(IOUtils.toString(xmlTestFile), writer.toString());
+				Diff xmlDiff = new Diff(IOUtils.toString(xmlTestFile), writer.toString());
 
-			// This listener ignores text nodes that differ only by leading/trailing whitespace:
-			xmlDiff.overrideDifferenceListener(new DifferenceListener() {
+				// This listener ignores text nodes that differ only by leading/trailing whitespace:
+				xmlDiff.overrideDifferenceListener(new DifferenceListener() {
 
-				public int differenceFound(Difference difference) {
-					if (difference.getId() == DifferenceConstants.TEXT_VALUE_ID
-					            && difference.getControlNodeDetail().getValue().trim()
-					                        .equals(difference.getTestNodeDetail().getValue().trim())) {
-						return RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR;
+					public int differenceFound(Difference difference) {
+						if (difference.getId() == DifferenceConstants.TEXT_VALUE_ID
+							    && difference.getControlNodeDetail().getValue().trim()
+									.equals(difference.getTestNodeDetail().getValue().trim())) {
+							return RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR;
+						}
+
+						return RETURN_ACCEPT_DIFFERENCE;
 					}
 
-					return RETURN_ACCEPT_DIFFERENCE;
-				}
+					public void skippedComparison(Node control, Node test) {
+					}
+				});
 
-				public void skippedComparison(Node control, Node test) {
-				}
-			});
-
-			assertXMLEqual("Generated XML is wrong: " + writer.toString(), xmlDiff, true);
+				assertXMLEqual("Generated XML is wrong: " + writer.toString(), xmlDiff, true);
+			}
+		}
+		catch (Exception e) {
+			throw e;
+		}
+		finally {
+			Locale.setDefault(currentDefaultLocale);
 		}
 	}
 
@@ -353,18 +390,24 @@ public class XmlElementWrapperPluginTest {
 	 * @param generatedJavaSources
 	 *            list of Java source files which should become a part of JAXB context
 	 */
-	private JAXBContext compileAndLoad(String packageName, File targetDir, Collection<String> generatedJavaSources)
+	private JAXBContext compileAndLoad(String packageName, File targetDir, Collection<String> generatedJavaSources, String encoding)
 	            throws MalformedURLException, JAXBException {
-		String[] javaSources = new String[generatedJavaSources.size()];
+		String[] args = new String[generatedJavaSources.size() + (encoding != null ? 2 : 0)];
 
 		int i = 0;
-		for (String javaSource : generatedJavaSources) {
-			javaSources[i++] = (new File(targetDir, javaSource)).toString();
+
+		if (encoding != null) {
+			args[i++] = "-encoding";
+			args[i++] = encoding;
 		}
 
+		for (String javaSource : generatedJavaSources) {
+			args[i++] = (new File(targetDir, javaSource)).toString();
+		}
+		
 		StringWriter writer = new StringWriter();
 
-		if (com.sun.tools.javac.Main.compile(javaSources, new PrintWriter(writer)) != 0) {
+		if (com.sun.tools.javac.Main.compile(args, new PrintWriter(writer)) != 0) {
 			fail("javac failed with message: " + writer.toString());
 		}
 
@@ -380,7 +423,7 @@ public class XmlElementWrapperPluginTest {
 	 * Return values of all {@code <jaxb:class ref="..." />} attributes.
 	 */
 	private Set<String> getClassReferencesFromEpisodeFile(String episodeFile) throws SAXException {
-		DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic());
+		DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic(), new Options());
 
 		Document episodeDocument = forest.parse(new InputSource(episodeFile), true);
 
