@@ -89,11 +89,6 @@ public class XmlElementWrapperPluginTest {
 		assertXsd("different-namespaces", new String[] { "-Xxew:unknown" }, false);
 	}
 
-	@Test(expected = BadCommandLineException.class)
-	public void testInvalidCollectionClass() throws Exception {
-		assertXsd("different-namespaces", new String[] { "-Xxew:collection nonexistent.LinkedList" }, false);
-	}
-
 	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
 		// Plural form in this case will have no impact as all properties are already in plural:
@@ -152,7 +147,7 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementWithParent() throws Exception {
-		assertXsd("element-with-parent", new String[] { "-debug", "-Xxew:delete false" }, false, "Alliance", "Group",
+		assertXsd("element-with-parent", new String[] { "-debug", "-Xxew:delete" }, false, "Alliance", "Group",
 		            "Organization");
 	}
 
@@ -174,21 +169,22 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
-	public void testElementListExtended() throws Exception {
-		// TODO add all the others expected but this test demonstrates the NPE as is
-		assertXsd("element-list-extended", new String[] { "-debug", "-Xxew:delete" }, false, "CouponBookType", "CouponType",
-		            "package-info");
+	public void testElementListExtended1() throws Exception {
+		// This run is configured from XSD (<xew:xew ... >):
+		assertXsd("element-list-extended-1", null, false, "Foo");
 	}
-	
+
+	@Test(expected = NullPointerException.class)
+	public void testElementListExtended2() throws Exception {
+		// This run is configured from XSD (<xew:xew ... >):
+		assertXsd("element-list-extended-2", null, false, "CouponBookType", "CouponType", "CurrencyAmountType",
+		            "MetaObjectType", "package-info");
+	}
+
 	@Test
 	public void testElementScoped() throws Exception {
 		// Most classes cannot be tested for content
 		assertXsd("element-scoped", new String[] { "-debug", "-Xxew:delete" }, false, "Return", "package-info");
-	}
-
-	@Test
-	public void testElementListExtended1() throws Exception {
-		assertXsd("element-list-extended_1", new String[] { "-debug", "-Xxew:delete", "-Xxew:plural" }, false, "Foo");
 	}
 
 	@Test

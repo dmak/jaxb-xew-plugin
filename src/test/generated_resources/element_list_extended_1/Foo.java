@@ -1,8 +1,8 @@
 
 package element_list_extended_1;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -58,13 +58,13 @@ public class Foo {
 
     @XmlElementWrapper(name = "bar", required = true)
     @XmlElement(name = "e")
-    protected List<Foo.E> bars = new ArrayList<Foo.E>();
+    protected Set<Foo.E> bars = new HashSet<Foo.E>();
 
-    public List<Foo.E> getBars() {
+    public Set<Foo.E> getBars() {
         return bars;
     }
 
-    public void setBars(List<Foo.E> bars) {
+    public void setBars(Set<Foo.E> bars) {
         this.bars = bars;
     }
 

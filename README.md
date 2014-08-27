@@ -120,7 +120,11 @@ The following options are applicable for plugin:
 </tr>
 <tr>
 	<td>-Xxew:collection FQCN</td>
-	<td>Specify the class name of the collection type to use.</td>
+	<td>Specify the class name of the collection instance to use.</td>
+</tr>
+<tr>
+	<td>-Xxew:collectionInterface FQCN</td>
+	<td>Specify the class name of the collection interface to use.</td>
 </tr>
 <tr>
 	<td>-Xxew:instantiate [early|lazy|none]</td>
@@ -360,13 +364,19 @@ If you provide the code in any way you automatically agree with a [project licen
         			<username>...sonatype_user...</username>
         			<password>...sonatype_password...</password>
         		</server>
+        		<server>
+        			<id>github.com</id>
+        			<username>...github_user...</username>
+        			<password>...github_password...</password>
+        		</server>
         	</servers>
         
         	<profiles>
         		<profile>
-        			<id>gpg</id>
+        			<id>secure</id>
         			<properties>
         				<gpg.passphrase>...passphrase...</gpg.passphrase>
+        				<gpg.homedir>/private/...github_user.../gpg</gpg.homedir>
         			</properties>
         		</profile>
         	</profiles>
@@ -377,9 +387,7 @@ If you provide the code in any way you automatically agree with a [project licen
 * For Hudson freestyle job specify:
   * Pre-release step `git checkout master; git reset --hard origin/master` (see [Can't get automated release working with Hudson + Git + Maven Release Plugin](http://stackoverflow.com/questions/1877027) for more details about the problem).
   * Next step (release):  
-    `release:prepare release:perform -Pstage-release,gpg -Dresume=false -Dusername=<github_user> -Dpassword=<github_password>`  
-    In chain with [Mask Passwords Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Mask+Passwords+Plugin) and [Build Secret Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Build+Secret+Plugin) that can look like  
-    `release:prepare release:perform -B -Dresume=false -Pstage-release -Dusername=smith -Dpassword=${SCM_PASSWORD} -Darguments="-Dgpg.homedir=${KEYS_DIR} -Dgpg.passphrase=${PGP_PASSWORD}"`
+    `release:prepare release:perform -Pstage-release,secure -Dresume=false`
 
 ### Algorithm description
 
@@ -416,6 +424,7 @@ Original code by [Bjarne Hansen](http://www.conspicio.dk/blog/bjarne/jaxb-xmlele
 * [Sebastian Steiner](https://github.com/sebisteiner/)
 * [Colin Fairless](https://github.com/colin-yell/)
 * [Patrick Crocker](https://github.com/patrickcrocker/)
+* [Kermit The Frog](https://github.com/kermit-the-frog/)
 * and others...
 
 ## License

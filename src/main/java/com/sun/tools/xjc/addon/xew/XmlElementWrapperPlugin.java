@@ -33,7 +33,6 @@ import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.setPrivateField;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -82,7 +81,6 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.model.CCustomizations;
 import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.model.CPropertyInfo;
-import com.sun.tools.xjc.model.Model;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
@@ -95,8 +93,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
-import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
 
 /**
  * The XML Element Wrapper plugin is a JAXB plugin for the XJC compiler enabling generation of "natural" Java classes
@@ -111,35 +110,33 @@ import org.xml.sax.ErrorHandler;
  */
 public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
-    private static final String NAMESPACE_URI = "http://github.com/jaxb-xew-plugin";
-    private static final QName XEW_QNAME = new QName(NAMESPACE_URI, "xew");
+	private static final QName  XEW_QNAME                              = new QName("http://github.com/jaxb-xew-plugin",
+	                                                                               "xew");
 
 	private static final String PLUGIN_NAME                            = "Xxew";
-	private static final String OPTION_NAME_DELETE                     = "-" + PLUGIN_NAME + ":delete";
-	private static final String OPTION_NAME_INCLUDE                    = "-" + PLUGIN_NAME + ":include";
-	private static final String OPTION_NAME_EXCLUDE                    = "-" + PLUGIN_NAME + ":exclude";
-	private static final String OPTION_NAME_SUMMARY                    = "-" + PLUGIN_NAME + ":summary";
-	private static final String OPTION_NAME_COLLECTION                 = "-" + PLUGIN_NAME + ":collection";
-	private static final String OPTION_NAME_INSTANTIATE                = "-" + PLUGIN_NAME + ":instantiate";
-	private static final String OPTION_NAME_APPLY_PLURAL_FORM          = "-" + PLUGIN_NAME + ":plural";
 
-	private File                includeFile                            = null;
+	private static final String OPTION_NAME_DELETE                     = "delete";
+	private static final String OPTION_NAME_INCLUDE                    = "include";
+	private static final String OPTION_NAME_EXCLUDE                    = "exclude";
+	private static final String OPTION_NAME_SUMMARY                    = "summary";
+	private static final String OPTION_NAME_COLLECTION                 = "collection";
+	private static final String OPTION_NAME_COLLECTION_INTERFACE       = "collectionInterface";
+	private static final String OPTION_NAME_INSTANTIATE                = "instantiate";
+	private static final String OPTION_NAME_APPLY_PLURAL_FORM          = "plural";
+
 	/**
 	 * List of classes for inclusion
 	 */
 	private Set<String>         include                                = null;
-
-	private File                excludeFile                            = null;
 
 	/**
 	 * List of classes for exclusion
 	 */
 	private Set<String>         exclude                                = null;
 
-	private File                summaryFile                            = null;
 	private PrintWriter         summary                                = null;
 
-	private Configuration       globalConfiguration                    = new Configuration();
+	private Map<String, String> globalOptions                          = new HashMap<String, String>();
 
 	private JClass              xmlElementDeclModelClass;
 
@@ -156,9 +153,9 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 	@Override
 	public String getUsage() {
-		return "  -"
-		            + PLUGIN_NAME
-		            + ": Replace collection types with fields having the @XmlElementWrapper and @XmlElement annotations.";
+		return "  "
+		            + getArgumentName("")
+		            + " Replace collection types with fields having the @XmlElementWrapper and @XmlElement annotations.";
 	}
 
 	void initLoggerIfNecessary(Options opts) {
@@ -206,6 +203,13 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	}
 
 	/**
+	 * Generate argument name from option name.
+	 */
+	private static String getArgumentName(String optionName) {
+		return "-" + PLUGIN_NAME + ":" + optionName;
+	}
+
+	/**
 	 * Parse argument at a given index. Option value may go within the same argument, or as following argument.
 	 * 
 	 * @param args
@@ -213,23 +217,22 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	 * @param index
 	 *            current index
 	 * @param optionName
-	 *            the option to parse
-	 * @param value
-	 *            parser option value
+	 *            the option to match
 	 * @return number of arguments processed
 	 */
-	private int parseArgument(String[] args, int index, String optionName, StringBuilder value) {
+	private int parseArgument(String[] args, int index, String optionName) {
 		int recognized = 0;
 		String arg = args[index];
+		String argumentName = getArgumentName(optionName);
 
-		if (arg.startsWith(optionName)) {
+		if (arg.startsWith(argumentName)) {
 			recognized++;
 
-			if (arg.length() > optionName.length()) {
-				value.append(arg.substring(optionName.length()).trim());
+			if (arg.length() > argumentName.length()) {
+				globalOptions.put(optionName, arg.substring(argumentName.length()).trim());
 			}
 			else {
-				value.append(args[index + 1]);
+				globalOptions.put(optionName, args[index + 1].trim());
 				recognized++;
 			}
 		}
@@ -237,428 +240,490 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		return recognized;
 	}
 
+	private void applyConfigurationFromOptions(Configuration configuration, Map<String, String> options)
+	            throws IOException, ClassNotFoundException {
+		for (Map.Entry<String, String> option : options.entrySet()) {
+			if (OPTION_NAME_DELETE.equals(option.getKey())) {
+				configuration.setDeleteCandidates(Boolean.parseBoolean(option.getValue()));
+			}
+			else if (OPTION_NAME_APPLY_PLURAL_FORM.equals(option.getKey())) {
+				configuration.setApplyPluralForm(Boolean.parseBoolean(option.getValue()));
+			}
+			else if (OPTION_NAME_INCLUDE.equals(option.getKey())) {
+				include = readCandidates(option.getValue());
+			}
+			else if (OPTION_NAME_EXCLUDE.equals(option.getKey())) {
+				exclude = readCandidates(option.getValue());
+			}
+			else if (OPTION_NAME_SUMMARY.equals(option.getKey())) {
+				summary = new PrintWriter(new FileOutputStream(option.getValue()));
+			}
+			else if (OPTION_NAME_COLLECTION.equals(option.getKey())) {
+				configuration.setCollectionImplClass(Class.forName(option.getValue()));
+			}
+			else if (OPTION_NAME_COLLECTION_INTERFACE.equals(option.getKey())) {
+				configuration.setCollectionInterfaceClass(Class.forName(option.getValue()));
+			}
+			else if (OPTION_NAME_INSTANTIATE.equals(option.getKey())) {
+				configuration.setInstantiation(Configuration.Instantiation.valueOf(option.getValue().toUpperCase()));
+			}
+			else {
+				logger.warn("Unknown option " + option.getKey());
+			}
+		}
+	}
+
+	/**
+	 * Clone given configuration and apply settings from global/class/field JAXB customization.
+	 */
+	private Configuration applyConfigurationFromCustomizations(Configuration configuration,
+	            CCustomizations customizations) throws IOException, ClassNotFoundException {
+		CPluginCustomization customization = customizations.find(XEW_QNAME.getNamespaceURI(), XEW_QNAME.getLocalPart());
+
+		if (customization != null) {
+			configuration = configuration.clone();
+
+			customization.markAsAcknowledged();
+
+			NamedNodeMap attributes = customization.element.getAttributes();
+			Map<String, String> options = new HashMap<String, String>();
+
+			for (int i = 0; i < attributes.getLength(); i++) {
+				options.put(attributes.item(i).getNodeName(), attributes.item(i).getNodeValue());
+			}
+
+			applyConfigurationFromOptions(configuration, options);
+		}
+
+		return configuration;
+	}
+
 	@Override
-	public int parseArgument(Options opts, String[] args, int i) throws BadCommandLineException, IOException {
+	public int parseArgument(Options opts, String[] args, int i) throws BadCommandLineException {
 		initLoggerIfNecessary(opts);
 
 		int recognized = 0;
 
 		String arg = args[i];
 		logger.debug("Argument[" + i + "] = " + arg);
-		StringBuilder value = new StringBuilder();
 
-		if (arg.startsWith(OPTION_NAME_DELETE)) {
-			recognized++;
-			globalConfiguration.setDeleteCandidates(true);
+		if (arg.equals(getArgumentName(OPTION_NAME_DELETE))) {
+			globalOptions.put(OPTION_NAME_DELETE, "true");
+			return 1;
 		}
-		else if ((recognized = parseArgument(args, i, OPTION_NAME_INCLUDE, value)) > 0) {
-			include = new HashSet<String>();
-			includeFile = new File(value.toString());
-
-			readCandidates(includeFile, include);
+		else if (arg.equals(getArgumentName(OPTION_NAME_APPLY_PLURAL_FORM))) {
+			globalOptions.put(OPTION_NAME_APPLY_PLURAL_FORM, "true");
+			return 1;
 		}
-		else if ((recognized = parseArgument(args, i, OPTION_NAME_EXCLUDE, value)) > 0) {
-			exclude = new HashSet<String>();
-			excludeFile = new File(value.toString());
-
-			readCandidates(excludeFile, exclude);
-		}
-		else if ((recognized = parseArgument(args, i, OPTION_NAME_SUMMARY, value)) > 0) {
-			summaryFile = new File(value.toString());
-			summary = new PrintWriter(new FileOutputStream(summaryFile));
-		}
-		else if ((recognized = parseArgument(args, i, OPTION_NAME_COLLECTION, value)) > 0) {
-			String ccn = value.toString();
-
-			try {
-				globalConfiguration.setCollectionImplClass(Class.forName(ccn));
+		else if ((recognized = parseArgument(args, i, OPTION_NAME_INCLUDE)) == 0
+		            && (recognized = parseArgument(args, i, OPTION_NAME_EXCLUDE)) == 0
+		            && (recognized = parseArgument(args, i, OPTION_NAME_SUMMARY)) == 0
+		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION)) == 0
+		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION_INTERFACE)) == 0
+		            && (recognized = parseArgument(args, i, OPTION_NAME_INSTANTIATE)) == 0) {
+			if (arg.startsWith(getArgumentName(""))) {
+				throw new BadCommandLineException("Invalid argument " + arg);
 			}
-			catch (ClassNotFoundException e) {
-				throw new BadCommandLineException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.", e);
-			}
-		}
-		else if ((recognized = parseArgument(args, i, OPTION_NAME_INSTANTIATE, value)) > 0) {
-			globalConfiguration.setInstantiation(Configuration.Instantiation.valueOf(value.toString().toUpperCase()));
-		}
-		else if (arg.equals(OPTION_NAME_APPLY_PLURAL_FORM)) {
-			recognized++;
-			globalConfiguration.setApplyPluralForm(true);
-		}
-		else if (arg.startsWith("-" + PLUGIN_NAME + ":")) {
-			throw new BadCommandLineException("Invalid argument " + arg);
 		}
 
 		return recognized;
 	}
 
 	@Override
-	public boolean run(Outline outline, Options opt, ErrorHandler errorHandler) {
-		JCodeModel codeModel = outline.getCodeModel();
-		JClass xmlElementWrapperModelClass = codeModel.ref(XmlElementWrapper.class);
-		JClass xmlElementModelClass = codeModel.ref(XmlElement.class);
-		JClass xmlAnyElementModelClass = codeModel.ref(XmlAnyElement.class);
-		JClass xmlMixedModelClass = codeModel.ref(XmlMixed.class);
-		JClass xmlElementRefsModelClass = codeModel.ref(XmlElementRefs.class);
-		JClass xmlElementsModelClass = codeModel.ref(XmlElements.class);
-		JClass xmlJavaTypeAdapterModelClass = codeModel.ref(XmlJavaTypeAdapter.class);
-		JClass xmlTypeModelClass = codeModel.ref(XmlType.class);
-		xmlElementDeclModelClass = codeModel.ref(XmlElementDecl.class);
+	public boolean run(Outline outline, Options opt, ErrorHandler errorHandler) throws SAXException {
+		try {
+			JCodeModel codeModel = outline.getCodeModel();
+			JClass xmlElementWrapperModelClass = codeModel.ref(XmlElementWrapper.class);
+			JClass xmlElementModelClass = codeModel.ref(XmlElement.class);
+			JClass xmlAnyElementModelClass = codeModel.ref(XmlAnyElement.class);
+			JClass xmlMixedModelClass = codeModel.ref(XmlMixed.class);
+			JClass xmlElementRefsModelClass = codeModel.ref(XmlElementRefs.class);
+			JClass xmlElementsModelClass = codeModel.ref(XmlElements.class);
+			JClass xmlJavaTypeAdapterModelClass = codeModel.ref(XmlJavaTypeAdapter.class);
+			JClass xmlTypeModelClass = codeModel.ref(XmlType.class);
+			xmlElementDeclModelClass = codeModel.ref(XmlElementDecl.class);
 
-		logger.debug("JAXB Process Model (run)...");
+			logger.debug("JAXB Process Model (run)...");
 
-		// Write summary information on the option for this compilation.
-		writeSummary("Compilation:");
-		writeSummary("  JAXB version         : " + Options.getBuildID());
-		writeSummary("  Include file         : " + (includeFile == null ? "<none>" : includeFile));
-		writeSummary("  Exclude file         : " + (excludeFile == null ? "<none>" : excludeFile));
-		writeSummary("  Summary file         : " + (summaryFile == null ? "<none>" : summaryFile));
-		writeSummary("  Instantiation mode   : " + globalConfiguration.getInstantiation());
-		writeSummary("  Collection impl      : " + globalConfiguration.getCollectionImplClass());
-		writeSummary("  Collection interface : " + globalConfiguration.getCollectionInterfaceClass());
-		writeSummary("  Delete candidates    : " + globalConfiguration.isDeleteCandidates());
-		writeSummary("  Plural form          : " + globalConfiguration.isApplyPluralForm());
-		writeSummary("");
+			Configuration globalConfiguration = new Configuration();
 
-		// Visit all classes generated by JAXB and find candidate classes for transformation.
-		Map<String, Candidate> candidatesMap = new HashMap<String, Candidate>();
+			applyConfigurationFromOptions(globalConfiguration, globalOptions);
 
-		// Write information on candidate classes to summary file.
-		writeSummary("Candidates:");
+			Configuration modelConfiguration = applyConfigurationFromCustomizations(globalConfiguration,
+			            CustomizationUtils.getCustomizations(outline.getModel()));
 
-		for (Iterator<Candidate> iter = findCandidateClasses(outline).iterator(); iter.hasNext();) {
-			Candidate candidate = iter.next();
+			// Write summary information on the option for this compilation.
+			writeSummary("Compilation:");
+			writeSummary("  JAXB version         : " + Options.getBuildID());
+			writeSummary("  Include file         : "
+			            + (!globalOptions.containsKey(OPTION_NAME_INCLUDE) ? "<none>" : globalOptions
+			                        .get(OPTION_NAME_INCLUDE)));
+			writeSummary("  Exclude file         : "
+			            + (!globalOptions.containsKey(OPTION_NAME_EXCLUDE) ? "<none>" : globalOptions
+			                        .get(OPTION_NAME_EXCLUDE)));
+			writeSummary("  Summary file         : "
+			            + (!globalOptions.containsKey(OPTION_NAME_SUMMARY) ? "<none>" : globalOptions
+			                        .get(OPTION_NAME_SUMMARY)));
+			writeSummary("  Instantiation mode   : " + globalConfiguration.getInstantiation());
+			writeSummary("  Collection impl      : " + globalConfiguration.getCollectionImplClass());
+			writeSummary("  Collection interface : " + globalConfiguration.getCollectionInterfaceClass());
+			writeSummary("  Delete candidates    : " + globalConfiguration.isDeleteCandidates());
+			writeSummary("  Plural form          : " + globalConfiguration.isApplyPluralForm());
+			writeSummary("");
 
-			if (isIncluded(candidate)) {
-				writeSummary("\t[+]: " + getIncludeOrExcludeReason() + ":\t" + candidate.getClassName());
-				candidatesMap.put(candidate.getClassName(), candidate);
-			}
-			else {
-				writeSummary("\t[-]: " + getIncludeOrExcludeReason() + ":\t" + candidate.getClassName());
-				iter.remove();
-			}
-		}
+			// Visit all classes generated by JAXB and find candidate classes for transformation.
+			Map<String, Candidate> candidatesMap = new HashMap<String, Candidate>();
 
-		writeSummary("\t" + candidatesMap.size() + " candidate(s) being considered.");
-		writeSummary("");
+			// Write information on candidate classes to summary file.
+			writeSummary("Candidates:");
 
-		writeSummary("Modifications:");
+			for (Iterator<Candidate> iter = findCandidateClasses(outline).iterator(); iter.hasNext();) {
+				Candidate candidate = iter.next();
 
-		int modificationCount = 0;
-
-		Configuration modelConfiguration = globalConfiguration.clone();
-		applyConfiguration(modelConfiguration, CustomizationUtils.getCustomizations(outline.getModel()));
-
-		// Visit all classes again to check if the candidate is not eligible for removal:
-		// * If there are classes that extend the candidate
-		// * If there are class fields, that refer the candidate by e.g. @XmlElementRef annotation
-		for (ClassOutline outlineClass : outline.getClasses()) {
-			// Get the implementation class for the current class.
-			JDefinedClass targetClass = outlineClass.implClass;
-
-			Configuration classConfiguration = modelConfiguration.clone();
-			applyConfiguration(classConfiguration, CustomizationUtils.getCustomizations(outlineClass));
-
-			// We cannot remove candidates that have parent classes, but we can still substitute them:
-			Candidate parentCandidate = candidatesMap.get(targetClass._extends().fullName());
-
-			if (parentCandidate != null) {
-				logger.debug("Candidate " + parentCandidate.getClassName() + " is a parent of " + targetClass.name()
-				            + " and hence won't be removed.");
-				parentCandidate.unmarkForRemoval();
+				if (isIncluded(candidate)) {
+					writeSummary("\t[+]: " + getIncludeOrExcludeReason() + ":\t" + candidate.getClassName());
+					candidatesMap.put(candidate.getClassName(), candidate);
+				}
+				else {
+					writeSummary("\t[-]: " + getIncludeOrExcludeReason() + ":\t" + candidate.getClassName());
+					iter.remove();
+				}
 			}
 
-			// Visit all fields in this class.
-			for (FieldOutline field : outlineClass.getDeclaredFields()) {
-				// Only non-primitive fields are interesting.
-				if (!(field.getRawType() instanceof JClass)) {
-					continue;
+			writeSummary("\t" + candidatesMap.size() + " candidate(s) being considered.");
+			writeSummary("");
+
+			writeSummary("Modifications:");
+
+			int modificationCount = 0;
+
+			// Visit all classes again to check if the candidate is not eligible for removal:
+			// * If there are classes that extend the candidate
+			// * If there are class fields, that refer the candidate by e.g. @XmlElementRef annotation
+			for (ClassOutline outlineClass : outline.getClasses()) {
+				// Get the implementation class for the current class.
+				JDefinedClass targetClass = outlineClass.implClass;
+
+				Configuration classConfiguration = applyConfigurationFromCustomizations(modelConfiguration,
+				            CustomizationUtils.getCustomizations(outlineClass));
+
+				// We cannot remove candidates that have parent classes, but we can still substitute them:
+				Candidate parentCandidate = candidatesMap.get(targetClass._extends().fullName());
+
+				if (parentCandidate != null) {
+					logger.debug("Candidate " + parentCandidate.getClassName() + " is a parent of "
+					            + targetClass.name() + " and hence won't be removed.");
+					parentCandidate.unmarkForRemoval();
 				}
 
-				JClass fieldType = (JClass) field.getRawType();
-				CPropertyInfo fieldPropertyInfo = field.getPropertyInfo();
-				Configuration fieldConfiguration = classConfiguration.clone();
-				applyConfiguration(fieldConfiguration, CustomizationUtils.getCustomizations(field));
-
-				// For example, XSD attributes (PropertyKind.ATTRIBUTE) are always simple types:
-				if (!(fieldPropertyInfo.kind() == PropertyKind.ELEMENT || fieldPropertyInfo.kind() == PropertyKind.REFERENCE)) {
-					continue;
-				}
-
-				String fieldName = fieldPropertyInfo.getName(false);
-
-				Candidate candidate = null;
-
-				for (Candidate c : candidatesMap.values()) {
-					// Skip fields with basic types as for example any class can be casted to Object.
-					if (fieldType.isAssignableFrom(c.getCandidateClass()) && !isHiddenClass(fieldType)) {
-						// If the given field has type T, it cannot be also in the list of parametrisations (e.g. T<T>).
-						candidate = c;
-						break;
+				// Visit all fields in this class.
+				for (FieldOutline field : outlineClass.getDeclaredFields()) {
+					// Only non-primitive fields are interesting.
+					if (!(field.getRawType() instanceof JClass)) {
+						continue;
 					}
-					// If the candidate T is referred from list of parametrisations (e.g. List<T>), it cannot be removed.
-					// However field substitutions will take place.
-					else if (isListedAsParametrisation(c.getCandidateClass(), fieldType)) {
-						logger.debug("Candidate " + c.getClassName() + " is listed as parametrisation of "
-						            + targetClass.fullName() + "#" + fieldName + " and hence won't be removed.");
-						c.unmarkForRemoval();
+
+					JClass fieldType = (JClass) field.getRawType();
+					CPropertyInfo fieldPropertyInfo = field.getPropertyInfo();
+					Configuration fieldConfiguration = applyConfigurationFromCustomizations(classConfiguration,
+					            CustomizationUtils.getCustomizations(field));
+
+					// For example, XSD attributes (PropertyKind.ATTRIBUTE) are always simple types:
+					if (!(fieldPropertyInfo.kind() == PropertyKind.ELEMENT || fieldPropertyInfo.kind() == PropertyKind.REFERENCE)) {
+						continue;
 					}
-				}
 
-				JFieldVar originalImplField = targetClass.fields().get(fieldName);
+					String fieldName = fieldPropertyInfo.getName(false);
 
-				if (candidate == null) {
-					checkAnnotationReference(candidatesMap, originalImplField);
+					Candidate candidate = null;
 
-					continue;
-				}
+					for (Candidate c : candidatesMap.values()) {
+						// Skip fields with basic types as for example any class can be casted to Object.
+						if (fieldType.isAssignableFrom(c.getCandidateClass()) && !isHiddenClass(fieldType)) {
+							// If the given field has type T, it cannot be also in the list of parametrisations (e.g. T<T>).
+							candidate = c;
+							break;
+						}
+						// If the candidate T is referred from list of parametrisations (e.g. List<T>), it cannot be removed.
+						// However field substitutions will take place.
+						else if (isListedAsParametrisation(c.getCandidateClass(), fieldType)) {
+							logger.debug("Candidate " + c.getClassName() + " is listed as parametrisation of "
+							            + targetClass.fullName() + "#" + fieldName + " and hence won't be removed.");
+							c.unmarkForRemoval();
+						}
+					}
 
-				// We have a candidate field to be replaced with a wrapped version. Report finding to summary file.
-				writeSummary("\tReplacing field [" + fieldType.name() + " " + targetClass.fullName() + "#" + fieldName
-				            + "]");
-				candidate.incrementSubstitutions();
-				modificationCount++;
+					JFieldVar originalImplField = targetClass.fields().get(fieldName);
 
-				// The container class has to be deleted. Check that inner class has to be moved to it's parent.
-				if (moveInnerClassToParent(outline, candidate)) {
+					if (candidate == null) {
+						checkAnnotationReference(candidatesMap, originalImplField);
+
+						continue;
+					}
+
+					// We have a candidate field to be replaced with a wrapped version. Report finding to summary file.
+					writeSummary("\tReplacing field [" + fieldType.name() + " " + targetClass.fullName() + "#"
+					            + fieldName + "]");
+					candidate.incrementSubstitutions();
 					modificationCount++;
-				}
 
-				List<JClass> fieldTypeParametrisations = candidate.getFieldClass().getTypeParameters();
-
-				// Create the new interface and collection classes using the specified interface and
-				// collection classes (configuration) with an element type corresponding to
-				// the element type from the collection present in the candidate class (narrowing).
-				JClass collectionInterfaceClass = codeModel.ref(fieldConfiguration.getCollectionInterfaceClass()).narrow(fieldTypeParametrisations);
-				JClass collectionImplClass = codeModel.ref(fieldConfiguration.getCollectionImplClass()).narrow(fieldTypeParametrisations);
-
-				String schemaElementName = getXsdDeclaration(fieldPropertyInfo).getName();
-
-				boolean pluralFormWasApplied = false;
-
-				// Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
-				// plural form in more correct way, e.g. "field[s]OfScience" instead of "fieldOfScience[s]".
-				if (fieldConfiguration.isApplyPluralForm() && hasNoPropertyNameCustomization(fieldName, schemaElementName)) {
-					String oldFieldName = fieldName;
-
-					// Taken from com.sun.tools.xjc.reader.xmlschema.ParticleBinder#makeJavaName():
-					fieldName = JJavaName.getPluralForm(fieldName);
-
-					// The field e.g. "return" was escaped as "_return", but after conversion to plural
-					// it became valid Java identifier, so we remove the leading "_":
-					if (fieldName.startsWith("_") && JJavaName.isJavaIdentifier(fieldName.substring(1))) {
-						fieldName = fieldName.substring(1);
+					// The container class has to be deleted. Check that inner class has to be moved to it's parent.
+					if (moveInnerClassToParent(outline, candidate)) {
+						modificationCount++;
 					}
 
-					if (!fieldName.equals(oldFieldName)) {
-						pluralFormWasApplied = true;
+					List<JClass> fieldTypeParametrisations = candidate.getFieldClass().getTypeParameters();
 
-						originalImplField.name(fieldName);
-						fieldPropertyInfo.setName(false, fieldName);
+					// Create the new interface and collection classes using the specified interface and
+					// collection classes (configuration) with an element type corresponding to
+					// the element type from the collection present in the candidate class (narrowing).
+					JClass collectionInterfaceClass = codeModel.ref(fieldConfiguration.getCollectionInterfaceClass())
+					            .narrow(fieldTypeParametrisations);
+					JClass collectionImplClass = codeModel.ref(fieldConfiguration.getCollectionImplClass()).narrow(
+					            fieldTypeParametrisations);
 
-						// Correct the @XmlType class-level annotation:
-						JAnnotationValue propOrderValue = getAnnotation(targetClass, xmlTypeModelClass)
-						            .getAnnotationMembers().get("propOrder");
+					String schemaElementName = getXsdDeclaration(fieldPropertyInfo).getName();
 
-						if (propOrderValue != null) {
-							for (JAnnotationValue annotationValue : (List<JAnnotationValue>) getPrivateField(
-							            propOrderValue, "values")) {
-								if (oldFieldName.equals(generableToString(annotationValue))) {
-									setPrivateField(annotationValue, "value", JExpr.lit(fieldName));
-									break;
+					boolean pluralFormWasApplied = false;
+
+					// Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
+					// plural form in more correct way, e.g. "field[s]OfScience" instead of "fieldOfScience[s]".
+					if (fieldConfiguration.isApplyPluralForm()
+					            && hasNoPropertyNameCustomization(fieldName, schemaElementName)) {
+						String oldFieldName = fieldName;
+
+						// Taken from com.sun.tools.xjc.reader.xmlschema.ParticleBinder#makeJavaName():
+						fieldName = JJavaName.getPluralForm(fieldName);
+
+						// The field e.g. "return" was escaped as "_return", but after conversion to plural
+						// it became valid Java identifier, so we remove the leading "_":
+						if (fieldName.startsWith("_") && JJavaName.isJavaIdentifier(fieldName.substring(1))) {
+							fieldName = fieldName.substring(1);
+						}
+
+						if (!fieldName.equals(oldFieldName)) {
+							pluralFormWasApplied = true;
+
+							originalImplField.name(fieldName);
+							fieldPropertyInfo.setName(false, fieldName);
+
+							// Correct the @XmlType class-level annotation:
+							JAnnotationValue propOrderValue = getAnnotation(targetClass, xmlTypeModelClass)
+							            .getAnnotationMembers().get("propOrder");
+
+							if (propOrderValue != null) {
+								for (JAnnotationValue annotationValue : (List<JAnnotationValue>) getPrivateField(
+								            propOrderValue, "values")) {
+									if (oldFieldName.equals(generableToString(annotationValue))) {
+										setPrivateField(annotationValue, "value", JExpr.lit(fieldName));
+										break;
+									}
 								}
 							}
 						}
 					}
-				}
 
-				// Transform the field accordingly.
-				originalImplField.type(collectionInterfaceClass);
+					// Transform the field accordingly.
+					originalImplField.type(collectionInterfaceClass);
 
-				// If instantiation is specified to be "early", add code for creating new instance of the collection class.
-				if (fieldConfiguration.getInstantiation() == Configuration.Instantiation.EARLY) {
-					logger.debug("Applying EARLY instantiation...");
-					// GENERATED CODE: ... fieldName = new C<T>();
-					originalImplField.init(JExpr._new(collectionImplClass));
-				}
-
-				// Annotate the field with the @XmlElementWrapper annotation using the original field name.
-				JAnnotationUse xmlElementWrapperAnnotation = originalImplField.annotate(xmlElementWrapperModelClass);
-				JAnnotationUse xmlElementOriginalAnnotation = getAnnotation(originalImplField, xmlElementModelClass);
-				JExpression wrapperXmlNamespace = null;
-
-				if (xmlElementOriginalAnnotation != null) {
-					JExpression wrapperXmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
-					if (wrapperXmlName != null) {
-						xmlElementWrapperAnnotation.param("name", wrapperXmlName);
-					}
-					else if (fieldConfiguration.isApplyPluralForm()) {
-						xmlElementWrapperAnnotation.param("name", schemaElementName);
+					// If instantiation is specified to be "early", add code for creating new instance of the collection class.
+					if (fieldConfiguration.getInstantiation() == Configuration.Instantiation.EARLY) {
+						logger.debug("Applying EARLY instantiation...");
+						// GENERATED CODE: ... fieldName = new C<T>();
+						originalImplField.init(JExpr._new(collectionImplClass));
 					}
 
-					JExpression wrapperXmlRequired = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
-					            "required");
-					if (wrapperXmlRequired != null) {
-						xmlElementWrapperAnnotation.param("required", wrapperXmlRequired);
-					}
-
-					JExpression wrapperXmlNillable = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
-					            "nillable");
-					if (wrapperXmlNillable != null) {
-						xmlElementWrapperAnnotation.param("nillable", wrapperXmlNillable);
-					}
-
-					// Namespace of the wrapper element
-					wrapperXmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "namespace");
-					if (wrapperXmlNamespace != null) {
-						xmlElementWrapperAnnotation.param("namespace", wrapperXmlNamespace);
-					}
-
-					removeAnnotation(originalImplField, xmlElementOriginalAnnotation);
-				}
-				else {
-					if (fieldConfiguration.isApplyPluralForm()) {
-						xmlElementWrapperAnnotation.param("name", schemaElementName);
-					}
-				}
-
-				boolean xmlElementInfoWasTransferred = false;
-
-				// Transfer @XmlAnyElement, @XmlElementRefs, @XmlElements:
-				for (JClass annotationModelClass : new JClass[] { xmlAnyElementModelClass, xmlMixedModelClass,
-				        xmlElementRefsModelClass, xmlElementsModelClass }) {
-					JAnnotationUse annotation = getAnnotation(candidate.getField(), annotationModelClass);
-
-					if (annotation != null) {
-						xmlElementInfoWasTransferred = true;
-
-						addAnnotation(originalImplField, annotation);
-					}
-				}
-
-				if (!xmlElementInfoWasTransferred) {
-					// Annotate the field with the @XmlElement annotation using the field name from the wrapped type as name.
-					// We cannot just re-use the same annotation object instance, as for example, we need to set XML name and this
-					// will impact the candidate field annotation in case candidate is unmarked from removal.
-					JAnnotationUse xmlElementAnnotation = originalImplField.annotate(xmlElementModelClass);
-					xmlElementOriginalAnnotation = getAnnotation(candidate.getField(), xmlElementModelClass);
+					// Annotate the field with the @XmlElementWrapper annotation using the original field name.
+					JAnnotationUse xmlElementWrapperAnnotation = originalImplField
+					            .annotate(xmlElementWrapperModelClass);
+					JAnnotationUse xmlElementOriginalAnnotation = getAnnotation(originalImplField, xmlElementModelClass);
+					JExpression wrapperXmlNamespace = null;
 
 					if (xmlElementOriginalAnnotation != null) {
-						JExpression xmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
-						if (xmlName != null) {
-							xmlElementAnnotation.param("name", xmlName);
+						JExpression wrapperXmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
+						if (wrapperXmlName != null) {
+							xmlElementWrapperAnnotation.param("name", wrapperXmlName);
+						}
+						else if (fieldConfiguration.isApplyPluralForm()) {
+							xmlElementWrapperAnnotation.param("name", schemaElementName);
+						}
+
+						JExpression wrapperXmlRequired = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
+						            "required");
+						if (wrapperXmlRequired != null) {
+							xmlElementWrapperAnnotation.param("required", wrapperXmlRequired);
+						}
+
+						JExpression wrapperXmlNillable = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
+						            "nillable");
+						if (wrapperXmlNillable != null) {
+							xmlElementWrapperAnnotation.param("nillable", wrapperXmlNillable);
+						}
+
+						// Namespace of the wrapper element
+						wrapperXmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "namespace");
+						if (wrapperXmlNamespace != null) {
+							xmlElementWrapperAnnotation.param("namespace", wrapperXmlNamespace);
+						}
+
+						removeAnnotation(originalImplField, xmlElementOriginalAnnotation);
+					}
+					else {
+						if (fieldConfiguration.isApplyPluralForm()) {
+							xmlElementWrapperAnnotation.param("name", schemaElementName);
+						}
+					}
+
+					boolean xmlElementInfoWasTransferred = false;
+
+					// Transfer @XmlAnyElement, @XmlElementRefs, @XmlElements:
+					for (JClass annotationModelClass : new JClass[] { xmlAnyElementModelClass, xmlMixedModelClass,
+					        xmlElementRefsModelClass, xmlElementsModelClass }) {
+						JAnnotationUse annotation = getAnnotation(candidate.getField(), annotationModelClass);
+
+						if (annotation != null) {
+							xmlElementInfoWasTransferred = true;
+
+							addAnnotation(originalImplField, annotation);
+						}
+					}
+
+					if (!xmlElementInfoWasTransferred) {
+						// Annotate the field with the @XmlElement annotation using the field name from the wrapped type as name.
+						// We cannot just re-use the same annotation object instance, as for example, we need to set XML name and this
+						// will impact the candidate field annotation in case candidate is unmarked from removal.
+						JAnnotationUse xmlElementAnnotation = originalImplField.annotate(xmlElementModelClass);
+						xmlElementOriginalAnnotation = getAnnotation(candidate.getField(), xmlElementModelClass);
+
+						if (xmlElementOriginalAnnotation != null) {
+							JExpression xmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
+							if (xmlName != null) {
+								xmlElementAnnotation.param("name", xmlName);
+							}
+							else {
+								xmlElementAnnotation.param("name", candidate.getFieldName());
+							}
+
+							JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
+							            "namespace");
+							if (xmlNamespace != null) {
+								xmlElementAnnotation.param("namespace", xmlNamespace);
+							}
+							else if (candidate.getFieldTargetNamespace() != null) {
+								xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
+							}
+
+							JExpression type = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "type");
+							if (type != null) {
+								xmlElementAnnotation.param("type", type);
+							}
 						}
 						else {
 							xmlElementAnnotation.param("name", candidate.getFieldName());
-						}
-
-						JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "namespace");
-						if (xmlNamespace != null) {
-							xmlElementAnnotation.param("namespace", xmlNamespace);
-						}
-						else if (candidate.getFieldTargetNamespace() != null) {
-							xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
-						}
-
-						JExpression type = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "type");
-						if (type != null) {
-							xmlElementAnnotation.param("type", type);
+							if (candidate.getFieldTargetNamespace() != null) {
+								xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
+							}
 						}
 					}
-					else {
-						xmlElementAnnotation.param("name", candidate.getFieldName());
-						if (candidate.getFieldTargetNamespace() != null) {
-							xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
+
+					JAnnotationUse adapterAnnotation = getAnnotation(candidate.getField(), xmlJavaTypeAdapterModelClass);
+
+					if (adapterAnnotation != null) {
+						addAnnotation(originalImplField, adapterAnnotation);
+					}
+
+					// Same as fieldName, but used as getter/setter method name:
+					String propertyName = fieldPropertyInfo.getName(true);
+
+					JDefinedClass implementationInterface = null;
+
+					for (Iterator<JClass> iter = targetClass._implements(); iter.hasNext();) {
+						JClass interfaceClass = iter.next();
+
+						// If value class implements some JVM interface it is not considered as such interface cannot be modified:
+						if (interfaceClass instanceof JDefinedClass
+						            && deleteSettersGetters((JDefinedClass) interfaceClass, propertyName)) {
+							implementationInterface = (JDefinedClass) interfaceClass;
+							break;
 						}
 					}
-				}
 
-				JAnnotationUse adapterAnnotation = getAnnotation(candidate.getField(), xmlJavaTypeAdapterModelClass);
+					// Find original getter and setter methods to remove.
+					deleteSettersGetters(targetClass, propertyName);
 
-				if (adapterAnnotation != null) {
-					addAnnotation(originalImplField, adapterAnnotation);
-				}
-
-				// Same as fieldName, but used as getter/setter method name:
-				String propertyName = fieldPropertyInfo.getName(true);
-
-				JDefinedClass implementationInterface = null;
-
-				for (Iterator<JClass> iter = targetClass._implements(); iter.hasNext();) {
-					JClass interfaceClass = iter.next();
-
-					// If value class implements some JVM interface it is not considered as such interface cannot be modified:
-					if (interfaceClass instanceof JDefinedClass
-					            && deleteSettersGetters((JDefinedClass) interfaceClass, propertyName)) {
-						implementationInterface = (JDefinedClass) interfaceClass;
-						break;
+					if (pluralFormWasApplied) {
+						propertyName = JJavaName.getPluralForm(propertyName);
+						fieldPropertyInfo.setName(true, propertyName);
 					}
-				}
 
-				// Find original getter and setter methods to remove.
-				deleteSettersGetters(targetClass, propertyName);
+					// Add a new getter method returning the (wrapped) field added.
+					// GENERATED CODE: public I<T> getFieldName() { ... return fieldName; }
+					JMethod getterMethod = targetClass.method(JMod.PUBLIC, collectionInterfaceClass, "get"
+					            + propertyName);
 
-				if (pluralFormWasApplied) {
-					propertyName = JJavaName.getPluralForm(propertyName);
-					fieldPropertyInfo.setName(true, propertyName);
-				}
+					if (fieldConfiguration.getInstantiation() == Configuration.Instantiation.LAZY) {
+						logger.debug("Applying LAZY instantiation...");
+						// GENERATED CODE: if (fieldName == null) fieldName = new C<T>();
+						getterMethod.body()._if(JExpr.ref(fieldName).eq(JExpr._null()))._then()
+						            .assign(JExpr.ref(fieldName), JExpr._new(collectionImplClass));
+					}
 
-				// Add a new getter method returning the (wrapped) field added.
-				// GENERATED CODE: public I<T> getFieldName() { ... return fieldName; }
-				JMethod getterMethod = targetClass.method(JMod.PUBLIC, collectionInterfaceClass, "get" + propertyName);
+					// GENERATED CODE: return "fieldName";
+					getterMethod.body()._return(JExpr.ref(fieldName));
 
-				if (fieldConfiguration.getInstantiation() == Configuration.Instantiation.LAZY) {
-					logger.debug("Applying LAZY instantiation...");
-					// GENERATED CODE: if (fieldName == null) fieldName = new C<T>();
-					getterMethod.body()._if(JExpr.ref(fieldName).eq(JExpr._null()))._then()
-					            .assign(JExpr.ref(fieldName), JExpr._new(collectionImplClass));
-				}
+					// Add a new setter method:
+					// GENERATED CODE: public void setFieldName(I<T> fieldName) { this.fieldName = fieldName; }
+					JMethod setterMethod = targetClass.method(JMod.PUBLIC, codeModel.VOID, "set" + propertyName);
 
-				// GENERATED CODE: return "fieldName";
-				getterMethod.body()._return(JExpr.ref(fieldName));
+					setterMethod.body().assign(JExpr._this().ref(fieldName),
+					            setterMethod.param(collectionInterfaceClass, fieldName));
 
-				// Add a new setter method:
-				// GENERATED CODE: public void setFieldName(I<T> fieldName) { this.fieldName = fieldName; }
-				JMethod setterMethod = targetClass.method(JMod.PUBLIC, codeModel.VOID, "set" + propertyName);
+					// Modify interface as well:
+					if (implementationInterface != null) {
+						writeSummary("\tCorrecting interface " + implementationInterface.fullName());
 
-				setterMethod.body().assign(JExpr._this().ref(fieldName),
-				            setterMethod.param(collectionInterfaceClass, fieldName));
+						implementationInterface.method(JMod.PUBLIC, collectionInterfaceClass, "get" + propertyName);
+						setterMethod = implementationInterface
+						            .method(JMod.PUBLIC, codeModel.VOID, "set" + propertyName);
+						setterMethod.param(collectionInterfaceClass, fieldName);
+					}
 
-				// Modify interface as well:
-				if (implementationInterface != null) {
-					writeSummary("\tCorrecting interface " + implementationInterface.fullName());
-
-					implementationInterface.method(JMod.PUBLIC, collectionInterfaceClass, "get" + propertyName);
-					setterMethod = implementationInterface.method(JMod.PUBLIC, codeModel.VOID, "set" + propertyName);
-					setterMethod.param(collectionInterfaceClass, fieldName);
-				}
-
-				modificationCount += createScopedFactoryMethods(codeModel, candidate.getValueObjectFactoryClass(),
-				            candidate.getScopedElementInfos().values(), targetClass);
-
-				if (candidate.isValueObjectDisabled()) {
-					modificationCount += createScopedFactoryMethods(codeModel, candidate.getObjectFactoryClass(),
+					modificationCount += createScopedFactoryMethods(codeModel, candidate.getValueObjectFactoryClass(),
 					            candidate.getScopedElementInfos().values(), targetClass);
+
+					if (candidate.isValueObjectDisabled()) {
+						modificationCount += createScopedFactoryMethods(codeModel, candidate.getObjectFactoryClass(),
+						            candidate.getScopedElementInfos().values(), targetClass);
+					}
 				}
 			}
+
+			writeSummary("\t" + modificationCount + " modification(s) to original code.");
+			writeSummary("");
+
+			int deletionCount = 0;
+
+			if (modelConfiguration.isDeleteCandidates()) {
+				deletionCount = deleteCandidates(outline, candidatesMap.values());
+			}
+
+			writeSummary("\t" + deletionCount + " deletion(s) from original code.");
+			writeSummary("");
+
+			closeSummary();
+
+			logger.debug("Done");
+
+			return true;
 		}
-
-		writeSummary("\t" + modificationCount + " modification(s) to original code.");
-		writeSummary("");
-
-		int deletionCount = 0;
-
-		if (modelConfiguration.isDeleteCandidates()) {
-			deletionCount = deleteCandidates(outline, candidatesMap.values());
+		catch (IOException e) {
+			logger.error("Failed to read the file", e);
+			throw new SAXException(e);
 		}
-
-		writeSummary("\t" + deletionCount + " deletion(s) from original code.");
-		writeSummary("");
-
-		closeSummary();
-
-		logger.debug("Done");
-
-		return true;
+		catch (ClassNotFoundException e) {
+			logger.error("Invalid class", e);
+			throw new SAXException(e);
+		}
 	}
 
 	/**
@@ -1190,8 +1255,9 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	/**
 	 * Read all candidates from a given file into the given set.
 	 */
-	private static void readCandidates(File file, Set<String> candidates) throws IOException {
-		BufferedReader input = new BufferedReader(new FileReader(file));
+	private static Set<String> readCandidates(String fileName) throws IOException {
+		Set<String> candidates = new HashSet<String>();
+		BufferedReader input = new BufferedReader(new FileReader(fileName));
 		String line;
 
 		while ((line = input.readLine()) != null) {
@@ -1204,46 +1270,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		}
 
 		input.close();
-	}
 
-	private void applyConfiguration(Configuration configuration, CCustomizations customizations) {
-		for (final CPluginCustomization customization : customizations) {
-			final Element element = customization.element;
-			final QName name = new QName(element.getNamespaceURI(),
-					element.getLocalName());
-			if (NAMESPACE_URI.equals(name.getNamespaceURI())) {
-				customization.markAsAcknowledged();
-				if (XEW_QNAME.equals(name)) {
-					String ccn;
-					ccn = element.getAttribute("collection");
-					if(ccn != null && !ccn.isEmpty()) {
-						try {
-							configuration.setCollectionImplClass(Class.forName(ccn));
-						} catch (ClassNotFoundException e) {
-							logger.error(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.");
-							throw new RuntimeException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.", e);
-						}
-					}
-					ccn = element.getAttribute("collectionInterface");
-					if(ccn != null && !ccn.isEmpty()) {
-						try {
-							configuration.setCollectionInterfaceClass(Class.forName(ccn));
-						} catch (ClassNotFoundException e) {
-							logger.error(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.");
-							throw new RuntimeException(OPTION_NAME_COLLECTION + " " + ccn + ": Class not found.", e);
-						}
-					}
-					ccn = element.getAttribute("plural");
-					if(ccn != null && !ccn.isEmpty()) {
-						configuration.setApplyPluralForm("true".equals(ccn.toLowerCase()));
-					}
-					ccn = element.getAttribute("instantiate");
-					if(ccn != null && !ccn.isEmpty()) {
-						globalConfiguration.setInstantiation(Configuration.Instantiation.valueOf(ccn.toString().toUpperCase()));
-					}
-				}
-			}
-		}
+		return candidates;
 	}
 
 	//
