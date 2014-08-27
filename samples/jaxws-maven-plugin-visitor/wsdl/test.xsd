@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://jax-ws-commons.jvnet.org/test" targetNamespace="http://jax-ws-commons.jvnet.org/test"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified" attributeFormDefault="unqualified"
+            jaxb:version="2.1"
+            version="1.0">
+	<xsd:element name="listRequest" type="listRequest"/>
+	<xsd:element name="listResponse" type="listResponse"/>
+
+	<xsd:complexType name="listRequest">
+		<xsd:sequence />
+	</xsd:complexType>
+
+	<xsd:complexType name="listResponse">
+		<xsd:sequence>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<jaxb:property name="items"/>
+				</xsd:appinfo>
+			</xsd:annotation>
+
+			<xsd:element name="item" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

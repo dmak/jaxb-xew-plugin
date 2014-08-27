@@ -4,9 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.jaxb-xew-plugin.sample</groupId>
-	<artifactId>jaxws-maven-plugin</artifactId>
+	<artifactId>jaxws-maven-plugin-visitor</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
+
+	<name>Sample project for jaxb-xew-plugin with visitor plugin.</name>
 
 	<build>
 		<plugins>
@@ -27,7 +29,14 @@
 								<xjcArg>-Xxew</xjcArg>
 								<xjcArg>-Xxew:instantiate lazy</xjcArg>
 								<xjcArg>-Xxew:delete</xjcArg>
+								<xjcArg>-Xvisitor</xjcArg>
 							</xjcArgs>
+
+							<sourceDestDir>${project.build.directory}/generated-sources/jaxws</sourceDestDir>
+							<wsdlDirectory>wsdl</wsdlDirectory>
+
+							<extension>true</extension>
+							<keep>true</keep>
 						</configuration>
 					</execution>
 				</executions>
@@ -35,7 +44,12 @@
 					<dependency>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.2</version>
+						<version>1.3-SNAPSHOT</version>
+					</dependency>
+					<dependency>
+						<groupId>com.massfords</groupId>
+						<artifactId>jaxb-visitor</artifactId>
+						<version>1.13</version>
 					</dependency>
 				</dependencies>
 			</plugin>
