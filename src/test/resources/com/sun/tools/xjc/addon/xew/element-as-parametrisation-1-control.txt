@@ -1,1 +1,6 @@
 element_as_parametrisation_1.ArticlesCollections=exclude
+
+the rest are invalid lines (ignored)
+element_as_parametrisation_1.Dummy=faulty
+//=strange
+/=dummy

@@ -76,14 +76,6 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Returns the value of the given annotation member of given annotation for the given field.
-	 */
-	public static JExpression getAnnotationMemberExpression(JAnnotatable annotatable, JClass annotationClass,
-	            String annotationMember) {
-		return getAnnotationMemberExpression(getAnnotation(annotatable, annotationClass), annotationMember);
-	}
-
-	/**
 	 * Returns the string value of annotation element. For example, for annotation
 	 * <code>@XmlElementRef(name = "last-name", namespace = "http://mycompany.org/exchange", type = JAXBElement.class)</code>
 	 * for member <code>name</code> the value <code>last-name</code> will be returned.

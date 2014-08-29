@@ -89,6 +89,26 @@ public class XmlElementWrapperPluginTest {
 		assertXsd("different-namespaces", new String[] { "-Xxew:unknown" }, false);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testInvalidInstantiationMode() throws Exception {
+		assertXsd("element-list-extended", new String[] { "-Xxew:instantiate invalid" }, false);
+	}
+
+	@Test(expected = AssertionError.class)
+	public void testInvalidControlFile() throws Exception {
+		assertXsd("element-list-extended", new String[] { "-Xxew:control invalid" }, false);
+	}
+
+	@Test(expected = AssertionError.class)
+	public void testInvalidCollectionClass() throws Exception {
+		assertXsd("element-list-extended", new String[] { "-Xxew:collection badvalue" }, false);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testInvalidCustomization() throws Exception {
+		assertXsd("element-with-invalid-customization", null, false);
+	}
+
 	@Test
 	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
 		// Plural form in this case will have no impact as all properties are already in plural:
@@ -105,10 +125,10 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
-		assertXsd("inner-element-value-objects", new String[] { "-debug", "-Xxew:instantiate badvalue" }, false,
-		            "Article", "Articles", "ArticlesCollections", "Filesystem", "Publisher", "Volume",
-		            "impl.ArticleImpl", "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl",
-		            "impl.PublisherImpl", "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory");
+		assertXsd("inner-element-value-objects", new String[] { "-debug" }, false, "Article", "Articles",
+		            "ArticlesCollections", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl",
+		            "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl", "impl.PublisherImpl",
+		            "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory");
 	}
 
 	@Test
@@ -180,7 +200,8 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementWithAdapter() throws Exception {
 		// Plural form in this case will have no impact as there is property customization:
-		assertXsd("element-with-adapter", new String[] { "-Xxew:plural" }, false, "Calendar", "Adapter1");
+		assertXsd("element-with-adapter", new String[] { "-Xxew:plural",
+		        "-Xxew:collectionInterface java.util.Collection" }, false, "Calendar", "Adapter1");
 	}
 
 	@Test

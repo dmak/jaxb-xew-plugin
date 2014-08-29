@@ -2,8 +2,8 @@
 package element_with_adapter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -56,7 +56,7 @@ public class Calendar {
     @XmlElementWrapper(name = "appointments")
     @XmlElement(name = "appointment", type = String.class)
     @XmlJavaTypeAdapter(Adapter1 .class)
-    protected List<Date> itemsAppointed = new ArrayList<Date>();
+    protected Collection<Date> itemsAppointed = new ArrayList<Date>();
 
     /**
      * Gets the value of the url property.
@@ -82,11 +82,11 @@ public class Calendar {
         this.url = value;
     }
 
-    public List<Date> getItemsAppointed() {
+    public Collection<Date> getItemsAppointed() {
         return itemsAppointed;
     }
 
-    public void setItemsAppointed(List<Date> itemsAppointed) {
+    public void setItemsAppointed(Collection<Date> itemsAppointed) {
         this.itemsAppointed = itemsAppointed;
     }
 

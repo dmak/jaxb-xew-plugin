@@ -180,20 +180,6 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	@Override
 	public void onActivated(Options opts) {
 		initLoggerIfNecessary(opts);
-
-		logger.debug("JAXB Compilation started (XmlElementWrapperPlugin.onActivated):");
-		logger.debug("  buildId         : " + Options.getBuildID());
-		logger.debug("  targetDir       : " + opts.targetDir);
-		logger.debug("  defaultPackage  : " + opts.defaultPackage);
-		logger.debug("  defaultPackage2 : " + opts.defaultPackage2);
-		logger.debug("  debug           : " + opts.debugMode);
-		logger.debug("  verbose         : " + opts.verbose);
-		logger.debug("  quiet           : " + opts.quiet);
-		logger.debug("  grammars        : " + opts.getGrammars().length);
-
-		for (int i = 0; i < opts.getGrammars().length; i++) {
-			logger.debug("\t  [" + i + "]: " + opts.getGrammars()[i].getSystemId());
-		}
 	}
 
 	/**
@@ -258,11 +244,11 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 					            .toUpperCase()));
 				}
 				catch (IllegalArgumentException e) {
-					logger.warn("Unknown instantiation mode \"" + option.getValue() + "\"");
+					throw new IllegalArgumentException("Unknown instantiation mode \"" + option.getValue() + "\"");
 				}
 			}
 			else {
-				logger.warn("Unknown option " + option.getKey());
+				throw new IllegalArgumentException("Unknown option " + option.getKey());
 			}
 		}
 	}
@@ -310,8 +296,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		}
 		else if ((recognized = parseArgument(args, i, OPTION_NAME_CONTROL)) == 0
 		            && (recognized = parseArgument(args, i, OPTION_NAME_SUMMARY)) == 0
+		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION_INTERFACE)) == 0 // longer option name comes first
 		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION)) == 0
-		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION_INTERFACE)) == 0
 		            && (recognized = parseArgument(args, i, OPTION_NAME_INSTANTIATE)) == 0) {
 			if (arg.startsWith(getArgumentName(""))) {
 				throw new BadCommandLineException("Invalid argument " + arg);
