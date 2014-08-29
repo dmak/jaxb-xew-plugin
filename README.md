@@ -107,12 +107,8 @@ The following options are applicable for plugin:
 	<td>Activate the XML Element Wrapper plugin</td>
 </tr>
 <tr>
-	<td>-Xxew:include filename</td>
-	<td>Specify a filename with candidate classes to include in the compilation.</td>
-</tr>
-<tr>
-	<td>-Xxew:exclude filename</td>
-	<td>Specify a filename with candidate classes to exclude from the compilation.</td>
+	<td>-Xxew:control filename</td>
+	<td>Specify a file with classes to exclude/include/keep in the compilation.</td>
 </tr>
 <tr>
 	<td>-Xxew:summary filename</td>
@@ -131,14 +127,41 @@ The following options are applicable for plugin:
 	<td>Specify when the collection class should be instantiated: when class is created / when property is accessed from getter / not instantiated at all.</td>
 </tr>
 <tr>
-	<td>-Xxew:delete</td>
-	<td>Delete candidate classes having been replaced during compilation.</td>
-</tr>
-<tr>
 	<td>-Xxew:plural</td>
 	<td>[experimental, [see problems](http://stackoverflow.com/a/9899174/267197)] Apply plural form to collection property (e.g. turn "item" into "items").</td>
 </tr>
 </table>
+
+### Control file
+
+Each control file line specifies a fully qualified class name or pattern plus mode associated with it.
+
+The following control modes are available:
+
+<table>
+<tr>
+	<td>exclude</td>
+	<td>Given class is excluded from becoming candidate for substitution.</td>
+</tr>
+<tr>
+	<td>include</td>
+	<td>Given class is not excluded from becoming candidate for substitution. Used usually in conjunction with exclude to include back a part of the exclusion space.</td>
+</tr>
+<tr>
+	<td>keep</td>
+	<td>Given candidate class is not removed (kept) from model. Substitutions are nevertheless made.</td>
+</tr>
+</table>
+
+Example of control file:
+
+    # RegEx to exclude given package:
+    /org\.company\..*/=exclude
+    
+    # Specific class marked for exclusion is now included back:
+    org.company.Processor=include
+
+Empty lines or lines started with '#' (comment) are ignored. See also [`inner-element-control.txt`](src/test/resources/com/sun/tools/xjc/addon/xew/inner-element-control.txt) and other control files in test suit.
 
 ### Episode file
 
@@ -272,6 +295,11 @@ Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which 
 You can find more examples of this plugin in [`samples`](samples/) directory (including how to call this plugin using `jaxws-maven-plugin` or `cxf-codegen-plugin`).
 
 ## What's new
+
+### v1.3
+
+* Improvements ([#23](https://github.com/dmak/jaxb-xew-plugin/issues/23)). Bugs fixed ([#22](https://github.com/dmak/jaxb-xew-plugin/issues/22), [#26](https://github.com/dmak/jaxb-xew-plugin/issues/26)).
+* The option `-Xxew:delete` is removed as in majorify of cases it is set to true. Now default plugin deletes all candidates. To prevent them from being deleted, create [control file](#control-file) with only line `/.*/=keep`.
 
 ### v1.2
 

@@ -32,20 +32,16 @@ import static com.sun.tools.xjc.addon.xew.CommonUtils.isListedAsParametrisation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.setPrivateField;
 
-import java.io.BufferedReader;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAnyElement;
@@ -116,24 +112,12 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 	private static final String PLUGIN_NAME                            = "Xxew";
 
-	private static final String OPTION_NAME_DELETE                     = "delete";
-	private static final String OPTION_NAME_INCLUDE                    = "include";
-	private static final String OPTION_NAME_EXCLUDE                    = "exclude";
+	private static final String OPTION_NAME_CONTROL                    = "control";
 	private static final String OPTION_NAME_SUMMARY                    = "summary";
 	private static final String OPTION_NAME_COLLECTION                 = "collection";
 	private static final String OPTION_NAME_COLLECTION_INTERFACE       = "collectionInterface";
 	private static final String OPTION_NAME_INSTANTIATE                = "instantiate";
 	private static final String OPTION_NAME_APPLY_PLURAL_FORM          = "plural";
-
-	/**
-	 * List of classes for inclusion
-	 */
-	private Set<String>         include                                = null;
-
-	/**
-	 * List of classes for exclusion
-	 */
-	private Set<String>         exclude                                = null;
 
 	private PrintWriter         summary                                = null;
 
@@ -249,17 +233,11 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	private void applyConfigurationFromOptions(Configuration configuration, Map<String, String> options)
 	            throws IOException, ClassNotFoundException {
 		for (Map.Entry<String, String> option : options.entrySet()) {
-			if (OPTION_NAME_DELETE.equals(option.getKey())) {
-				configuration.setDeleteCandidates(Boolean.parseBoolean(option.getValue()));
-			}
-			else if (OPTION_NAME_APPLY_PLURAL_FORM.equals(option.getKey())) {
+			if (OPTION_NAME_APPLY_PLURAL_FORM.equals(option.getKey())) {
 				configuration.setApplyPluralForm(Boolean.parseBoolean(option.getValue()));
 			}
-			else if (OPTION_NAME_INCLUDE.equals(option.getKey())) {
-				include = readCandidates(option.getValue());
-			}
-			else if (OPTION_NAME_EXCLUDE.equals(option.getKey())) {
-				exclude = readCandidates(option.getValue());
+			else if (OPTION_NAME_CONTROL.equals(option.getKey())) {
+				configuration.readControlFile(option.getValue());
 			}
 			else if (OPTION_NAME_SUMMARY.equals(option.getKey())) {
 				summary = new PrintWriter(new FileOutputStream(option.getValue()));
@@ -271,7 +249,13 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				configuration.setCollectionInterfaceClass(Class.forName(option.getValue()));
 			}
 			else if (OPTION_NAME_INSTANTIATE.equals(option.getKey())) {
-				configuration.setInstantiation(Configuration.Instantiation.valueOf(option.getValue().toUpperCase()));
+				try {
+					configuration.setInstantiationMode(Configuration.InstantiationMode.valueOf(option.getValue()
+					            .toUpperCase()));
+				}
+				catch (IllegalArgumentException e) {
+					logger.warn("Unknown instantiation mode \"" + option.getValue() + "\"");
+				}
 			}
 			else {
 				logger.warn("Unknown option " + option.getKey());
@@ -314,18 +298,13 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		int recognized = 0;
 
 		String arg = args[i];
-		logger.debug("Argument[" + i + "] = " + arg);
+		logger.trace("Argument[" + i + "] = " + arg);
 
-		if (arg.equals(getArgumentName(OPTION_NAME_DELETE))) {
-			globalOptions.put(OPTION_NAME_DELETE, "true");
-			return 1;
-		}
-		else if (arg.equals(getArgumentName(OPTION_NAME_APPLY_PLURAL_FORM))) {
+		if (arg.equals(getArgumentName(OPTION_NAME_APPLY_PLURAL_FORM))) {
 			globalOptions.put(OPTION_NAME_APPLY_PLURAL_FORM, "true");
 			return 1;
 		}
-		else if ((recognized = parseArgument(args, i, OPTION_NAME_INCLUDE)) == 0
-		            && (recognized = parseArgument(args, i, OPTION_NAME_EXCLUDE)) == 0
+		else if ((recognized = parseArgument(args, i, OPTION_NAME_CONTROL)) == 0
 		            && (recognized = parseArgument(args, i, OPTION_NAME_SUMMARY)) == 0
 		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION)) == 0
 		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION_INTERFACE)) == 0
@@ -369,7 +348,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 		logger.debug("JAXB Process Model (run)...");
 
-		Configuration globalConfiguration = new Configuration();
+		Configuration globalConfiguration = new Configuration(logger);
 
 		applyConfigurationFromOptions(globalConfiguration, globalOptions);
 
@@ -379,19 +358,15 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		// Write summary information on the option for this compilation.
 		writeSummary("Compilation:");
 		writeSummary("  JAXB version         : " + Options.getBuildID());
-		writeSummary("  Include file         : "
-		            + (!globalOptions.containsKey(OPTION_NAME_INCLUDE) ? "<none>" : globalOptions
-		                        .get(OPTION_NAME_INCLUDE)));
-		writeSummary("  Exclude file         : "
-		            + (!globalOptions.containsKey(OPTION_NAME_EXCLUDE) ? "<none>" : globalOptions
-		                        .get(OPTION_NAME_EXCLUDE)));
+		writeSummary("  Control file         : "
+		            + (!globalOptions.containsKey(OPTION_NAME_CONTROL) ? "<none>" : globalOptions
+		                        .get(OPTION_NAME_CONTROL)));
 		writeSummary("  Summary file         : "
 		            + (!globalOptions.containsKey(OPTION_NAME_SUMMARY) ? "<none>" : globalOptions
 		                        .get(OPTION_NAME_SUMMARY)));
-		writeSummary("  Instantiation mode   : " + globalConfiguration.getInstantiation());
-		writeSummary("  Collection impl      : " + globalConfiguration.getCollectionImplClass());
-		writeSummary("  Collection interface : " + globalConfiguration.getCollectionInterfaceClass());
-		writeSummary("  Delete candidates    : " + globalConfiguration.isDeleteCandidates());
+		writeSummary("  Instantiation mode   : " + globalConfiguration.getInstantiationMode());
+		writeSummary("  Collection impl      : " + globalConfiguration.getCollectionImplClass().getName());
+		writeSummary("  Collection interface : " + globalConfiguration.getCollectionInterfaceClass().getName());
 		writeSummary("  Plural form          : " + globalConfiguration.isApplyPluralForm());
 		writeSummary("");
 
@@ -404,13 +379,19 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		for (Iterator<Candidate> iter = findCandidateClasses(outline).iterator(); iter.hasNext();) {
 			Candidate candidate = iter.next();
 
-			if (isIncluded(candidate)) {
-				writeSummary("\t[+]: " + getIncludeOrExcludeReason() + ":\t" + candidate.getClassName());
+			if (globalConfiguration.isClassIncluded(candidate.getClassName())) {
+				if (globalConfiguration.isClassUnmarkedForRemoval(candidate.getClassName())) {
+					candidate.unmarkForRemoval();
+					writeSummary("\t[!]: " + candidate.getClassName());
+				}
+				else {
+					writeSummary("\t[+]: " + candidate.getClassName());
+				}
+
 				candidatesMap.put(candidate.getClassName(), candidate);
 			}
 			else {
-				writeSummary("\t[-]: " + getIncludeOrExcludeReason() + ":\t" + candidate.getClassName());
-				iter.remove();
+				writeSummary("\t[-]: " + candidate.getClassName());
 			}
 		}
 
@@ -552,7 +533,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				originalImplField.type(collectionInterfaceClass);
 
 				// If instantiation is specified to be "early", add code for creating new instance of the collection class.
-				if (fieldConfiguration.getInstantiation() == Configuration.Instantiation.EARLY) {
+				if (fieldConfiguration.getInstantiationMode() == Configuration.InstantiationMode.EARLY) {
 					logger.debug("Applying EARLY instantiation...");
 					// GENERATED CODE: ... fieldName = new C<T>();
 					originalImplField.init(JExpr._new(collectionImplClass));
@@ -670,7 +651,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				// GENERATED CODE: public I<T> getFieldName() { ... return fieldName; }
 				JMethod getterMethod = targetClass.method(JMod.PUBLIC, collectionInterfaceClass, "get" + propertyName);
 
-				if (fieldConfiguration.getInstantiation() == Configuration.Instantiation.LAZY) {
+				if (fieldConfiguration.getInstantiationMode() == Configuration.InstantiationMode.LAZY) {
 					logger.debug("Applying LAZY instantiation...");
 					// GENERATED CODE: if (fieldName == null) fieldName = new C<T>();
 					getterMethod.body()._if(JExpr.ref(fieldName).eq(JExpr._null()))._then()
@@ -709,11 +690,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		writeSummary("\t" + modificationCount + " modification(s) to original code.");
 		writeSummary("");
 
-		int deletionCount = 0;
-
-		if (globalConfiguration.isDeleteCandidates()) {
-			deletionCount = deleteCandidates(outline, candidatesMap.values());
-		}
+		int deletionCount = deleteCandidates(outline, candidatesMap.values());
 
 		writeSummary("\t" + deletionCount + " deletion(s) from original code.");
 		writeSummary("");
@@ -935,8 +912,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			            fieldParametrisationImpl, xmlElementDeclModelClass);
 			candidates.add(candidate);
 
-			logger.debug("Candidate found: " + candidate.getClassName() + " [private "
-			            + candidate.getFieldClass().name() + " " + candidate.getFieldName() + "]");
+			logger.debug("Found " + candidate);
 		}
 
 		return candidates;
@@ -955,8 +931,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 		// Visit all candidate classes.
 		for (Candidate candidate : candidates) {
-			// Only consider candidates that are actually included...
-			if (!isIncluded(candidate) || !candidate.canBeRemoved()) {
+			if (!candidate.canBeRemoved()) {
 				continue;
 			}
 
@@ -968,7 +943,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			deleteClass(outline, candidateClass);
 			deletionCount++;
 
-			// Redo the same for interface:
+			// Replay the same for interface:
 			if (candidate.isValueObjectDisabled()) {
 				deletionCount += deleteFactoryMethod(candidate.getObjectFactoryClass(), candidate);
 
@@ -1197,77 +1172,6 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	}
 
 	//
-	// Includes / excludes support.
-	//
-
-	private boolean hasIncludes() {
-		return include != null;
-	}
-
-	private boolean hasExcludes() {
-		return exclude != null;
-	}
-
-	private boolean isIncluded(Candidate candidate) {
-		//
-		// A candidate is included if, ...
-		// 1. No includes and no excludes have been specified
-		// 2. Includes have been specified and candidate is included, and no excludes have been specified.
-		// 3. No includes have been specified and excludes have been specified and candidate is not in excludes.
-		// 4. Both includes and excludes have been specified and candidate is in includes and not in excludes.
-		//
-		if (!hasIncludes() && !hasExcludes()) {
-			return true; // [+] (default)
-		}
-		else if (hasIncludes() && !hasExcludes()) {
-			return include.contains(candidate.getClassName()); // [+/-] (included)
-		}
-		else if (!hasIncludes()) {
-			return !exclude.contains(candidate.getClassName()); // [+/-] (excluded)
-		}
-		else {
-			return include.contains(candidate.getClassName()) && !exclude.contains(candidate.getClassName()); // [+/-] (override)
-		}
-	}
-
-	private String getIncludeOrExcludeReason() {
-		if (!hasIncludes() && !hasExcludes()) {
-			return "(default)"; // [+] (default)
-		}
-		else if (hasIncludes() && !hasExcludes()) {
-			return "(included)";
-		}
-		else if (!hasIncludes()) {
-			return "(excluded)";
-		}
-		else {
-			return "(override)";
-		}
-	}
-
-	/**
-	 * Read all candidates from a given file into the given set.
-	 */
-	private static Set<String> readCandidates(String fileName) throws IOException {
-		Set<String> candidates = new HashSet<String>();
-		BufferedReader input = new BufferedReader(new FileReader(fileName));
-		String line;
-
-		while ((line = input.readLine()) != null) {
-			line = line.trim();
-
-			// Lines starting with # are considered comments.
-			if (!line.startsWith("#")) {
-				candidates.add(line);
-			}
-		}
-
-		input.close();
-
-		return candidates;
-	}
-
-	//
 	// Logging helpers
 	//
 
@@ -1309,10 +1213,16 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			this.namespace = namespace;
 			this.type = type;
 		}
+
+		@Override
+		public String toString() {
+			return "[ScopedElementInfo name:" + name + " namespace:" + namespace + " type:" + type + "]";
+		}
 	}
 
 	/**
-	 * Describes the collection container class -- a candidate for removal.
+	 * Describes the collection container class - a candidate for removal. This class class has only one field -
+	 * collection of objects.
 	 */
 	private static class Candidate {
 		private final JDefinedClass                  candidateClass;
@@ -1497,7 +1407,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 		@Override
 		public String toString() {
-			return "Candidate[" + getClassName() + "]";
+			return "Candidate[" + getClassName() + " field " + getFieldClass().name() + " " + getFieldName() + "]";
 		}
 	}
 }

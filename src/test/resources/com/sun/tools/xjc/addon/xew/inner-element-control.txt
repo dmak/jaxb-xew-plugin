@@ -1,0 +1,8 @@
+# This class is explicitly kept from being substituted (and removed):
+inner_element.Volumes=exclude
+
+# RegEx to exclude given classes:
+/inner_element\.Filesystem\..*Listing/=exclude
+
+# This is marked for exclusion but now included back:
+inner_element.Filesystem.DirectoryListing=include

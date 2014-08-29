@@ -12,7 +12,7 @@
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_list_extended" />
 			</jaxb:schemaBindings>
-			<xew:xew collection="java.util.HashSet" collectionInterface="java.util.Set" plural="true" delete="true" />
+			<xew:xew collection="java.util.HashSet" collectionInterface="java.util.Set" plural="true" />
 		</xs:appinfo>
 	</xs:annotation>
 
