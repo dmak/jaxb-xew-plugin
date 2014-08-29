@@ -128,7 +128,7 @@ The following options are applicable for plugin:
 </tr>
 <tr>
 	<td>-Xxew:plural</td>
-	<td>[experimental, [see problems](http://stackoverflow.com/a/9899174/267197)] Apply plural form to collection property (e.g. turn "item" into "items").</td>
+	<td>Apply plural form to collection property (e.g. turn "item" into "items").</td>
 </tr>
 </table>
 
@@ -298,7 +298,10 @@ You can find more examples of this plugin in [`samples`](samples/) directory (in
 
 ### v1.3
 
-* Improvements ([#23](https://github.com/dmak/jaxb-xew-plugin/issues/23)). Bugs fixed ([#22](https://github.com/dmak/jaxb-xew-plugin/issues/22), [#26](https://github.com/dmak/jaxb-xew-plugin/issues/26)).
+* Improvements:
+** More flexible control file ([#23](https://github.com/dmak/jaxb-xew-plugin/issues/23))
+** In-schema plugin customization [#28](https://github.com/dmak/jaxb-xew-plugin/issues/28))
+* Bugs fixed ([#22](https://github.com/dmak/jaxb-xew-plugin/issues/22), [#26](https://github.com/dmak/jaxb-xew-plugin/issues/26)).
 * The option `-Xxew:delete` is removed as in majorify of cases it is set to true. Now default plugin deletes all candidates. To prevent them from being deleted, create [control file](#control-file) with only line `/.*/=keep`.
 
 ### v1.2

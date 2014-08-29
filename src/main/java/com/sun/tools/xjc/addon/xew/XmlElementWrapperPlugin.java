@@ -80,8 +80,12 @@ import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIDeclaration;
+import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty;
+import com.sun.tools.xjc.reader.xmlschema.bindinfo.BindInfo;
 import com.sun.xml.bind.api.impl.NameConverter;
 import com.sun.xml.bind.v2.model.core.PropertyKind;
+import com.sun.xml.xsom.XSAnnotation;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 
@@ -488,14 +492,11 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				JClass collectionImplClass = codeModel.ref(fieldConfiguration.getCollectionImplClass()).narrow(
 				            fieldTypeParametrisations);
 
-				String schemaElementName = getXsdDeclaration(fieldPropertyInfo).getName();
-
 				boolean pluralFormWasApplied = false;
 
 				// Apply the plural form if there are no customizations. Assuming that customization is correct as may define the
 				// plural form in more correct way, e.g. "field[s]OfScience" instead of "fieldOfScience[s]".
-				if (fieldConfiguration.isApplyPluralForm()
-				            && hasNoPropertyNameCustomization(fieldName, schemaElementName)) {
+				if (fieldConfiguration.isApplyPluralForm() && !hasPropertyNameCustomization(fieldPropertyInfo)) {
 					String oldFieldName = fieldName;
 
 					// Taken from com.sun.tools.xjc.reader.xmlschema.ParticleBinder#makeJavaName():
@@ -549,7 +550,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 					xmlElementWrapperAnnotation.param("name", wrapperXmlName);
 				}
 				else if (fieldConfiguration.isApplyPluralForm()) {
-					xmlElementWrapperAnnotation.param("name", schemaElementName);
+					xmlElementWrapperAnnotation.param("name", getXsdDeclaration(fieldPropertyInfo).getName());
 				}
 
 				JExpression wrapperXmlRequired = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "required");
@@ -1116,21 +1117,30 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	}
 
 	/**
-	 * Check that given field property has no name customizations.
+	 * Check that given field property has name customization ({@code <jaxb:property name="..." />}).
 	 * 
 	 * @see com.sun.xml.bind.api.impl.NameUtil
 	 * @see com.sun.codemodel.JJavaName
 	 * @see com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty#getCustomization(XSComponent)
 	 */
-	private boolean hasNoPropertyNameCustomization(String fieldName, String schemaElementName) {
-		// Customizations are not available after model is created as Ring is released. Correct code would look like this:
-		// return BIProperty.getCustomization(((XSParticle) field.getPropertyInfo().getSchemaComponent()).getTerm()).getName() != null;
-		String originalFieldName = NameConverter.standard.toVariableName(NameConverter.standard
-		            .toPropertyName(schemaElementName));
+	private boolean hasPropertyNameCustomization(CPropertyInfo fieldPropertyInfo) {
+		XSAnnotation annotation = fieldPropertyInfo.getSchemaComponent().getAnnotation();
 
-		// The names should match either exactly, or Java name may be prefixed with "_":
-		return fieldName.equals(originalFieldName)
-		            || (fieldName.length() - originalFieldName.length() == 1 && fieldName.endsWith(originalFieldName));
+		if (annotation == null) {
+			annotation = getXsdDeclaration(fieldPropertyInfo).getAnnotation();
+		}
+
+		if (annotation == null || !(annotation.getAnnotation() instanceof BindInfo)) {
+			return false;
+		}
+
+		for (BIDeclaration declaration : (BindInfo) annotation.getAnnotation()) {
+			if (declaration instanceof BIProperty) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

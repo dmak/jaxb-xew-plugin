@@ -21,33 +21,28 @@
 
 	<xs:element name="post-office">
 		<xs:complexType>
-			<!-- Example of class customization: all fields in this class will inherit given settings. -->
+			<!-- Example of class customization: all substituted fields in this class (if any) will inherit given settings -->
 			<xs:annotation>
 				<xs:appinfo>
 					<xew:xew collection="java.util.LinkedList" />
 				</xs:appinfo>
 			</xs:annotation>
 			<xs:sequence>
-				<xs:element ref="type-of-message">
-					<!-- Example of field customization: this very field uses different settings -->
-					<xs:annotation>
-						<xs:appinfo>
-							<xew:xew collection="java.util.Vector" />
-						</xs:appinfo>
-					</xs:annotation>
-				</xs:element>
+				<xs:element ref="type-of-message" />
 				<xs:element ref="class">
 					<xs:annotation>
 						<xs:appinfo>
-							<!-- Otherwise this property becomes "clazzs" -->
+							<!-- Force the property name to be "classes" (otherwise it becomes "clazzs") -->
 							<jaxb:property name="classes" />
+							<!-- Example of field customization: this very field uses settings different from global -->
+							<xew:xew collection="java.util.Vector" />
 						</xs:appinfo>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="misc" minOccurs="0">
 					<xs:annotation>
 						<xs:appinfo>
-							<!-- FIXME: Unfortunately, this property becomes "miscs": -->
+							<!-- Force the property name to be "misc" (otherwise it becomes "miscs") -->
 							<jaxb:property name="misc" />
 						</xs:appinfo>
 					</xs:annotation>

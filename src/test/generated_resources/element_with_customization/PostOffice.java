@@ -38,20 +38,20 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "typeOfMessages",
     "classes",
-    "miscs"
+    "misc"
 })
 @XmlRootElement(name = "post-office")
 public class PostOffice {
 
     @XmlElementWrapper(name = "class", required = true)
     @XmlElement(name = "name")
-    protected List<String> classes = new LinkedList<String>();
-    @XmlElementWrapper(name = "type-of-message", required = true)
-    @XmlElement(name = "type")
-    protected List<String> typeOfMessages = new Vector<String>();
+    protected List<String> classes = new Vector<String>();
     @XmlElementWrapper(name = "misc")
     @XmlAnyElement(lax = true)
-    protected List<Object> miscs = new LinkedList<Object>();
+    protected List<Object> misc = new LinkedList<Object>();
+    @XmlElementWrapper(name = "type-of-message", required = true)
+    @XmlElement(name = "type")
+    protected List<String> typeOfMessages = new LinkedList<String>();
 
     public List<String> getTypeOfMessages() {
         return typeOfMessages;
@@ -69,12 +69,12 @@ public class PostOffice {
         this.classes = classes;
     }
 
-    public List<Object> getMiscs() {
-        return miscs;
+    public List<Object> getMisc() {
+        return misc;
     }
 
-    public void setMiscs(List<Object> miscs) {
-        this.miscs = miscs;
+    public void setMisc(List<Object> misc) {
+        this.misc = misc;
     }
 
 }

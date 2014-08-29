@@ -26,9 +26,7 @@ public class Configuration implements Cloneable {
 	private List<ControlEntry> controlList              = new ArrayList<ControlEntry>();
 
 	// Waiting for this bug to be resolved: http://java.net/jira/browse/JAXB-883
-	//private boolean             applyPluralForm                        = Ring.get(BIGlobalBinding.class).isSimpleMode();
-	// This is currently an experimental and not properly working feature, so keep this field set to false.
-	private boolean            applyPluralForm          = false;
+	private boolean            applyPluralForm          = false;                        // = Ring.get(BIGlobalBinding.class).isSimpleMode();
 
 	private final Log          logger;
 
