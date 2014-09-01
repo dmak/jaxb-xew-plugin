@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "order")
 public class Order {
 
-    @XmlElementWrapper(name = "items", required = true)
+    @XmlElementWrapper(required = true)
     @XmlElement(name = "item")
     protected List<String> items;
 

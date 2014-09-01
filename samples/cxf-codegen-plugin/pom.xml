@@ -24,9 +24,8 @@
 									<wsdl>src/xsd/test.wsdl</wsdl>
 									<extraargs>
 										<extraarg>-xjc-Xxew</extraarg>
-										<extraarg>-xjc-Xxew:summary target/summary.txt</extraarg>
+										<extraarg>-xjc-Xxew:summary ${project.build.outputDirectory}/../summary.txt</extraarg>
 										<extraarg>-xjc-Xxew:instantiate lazy</extraarg>
-										<extraarg>-xjc-Xxew:delete</extraarg>
 									</extraargs>
 								</wsdlOption>
 							</wsdlOptions>
@@ -40,7 +39,7 @@
 					<dependency>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.2</version>
+						<version>1.3</version>
 					</dependency>
 					<dependency>
 						<groupId>com.sun.xml.bind</groupId>

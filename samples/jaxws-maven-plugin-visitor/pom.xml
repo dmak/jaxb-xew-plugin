@@ -28,7 +28,6 @@
 								<xjcArg>-no-header</xjcArg>
 								<xjcArg>-Xxew</xjcArg>
 								<xjcArg>-Xxew:instantiate lazy</xjcArg>
-								<xjcArg>-Xxew:delete</xjcArg>
 								<xjcArg>-Xvisitor</xjcArg>
 							</xjcArgs>
 
@@ -44,7 +43,7 @@
 					<dependency>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.3-SNAPSHOT</version>
+						<version>1.3</version>
 						<!--
 							Mind that this exclusion is needed to be added to plugin classpath
 							as jaxb-xew-plugin was compiled against jaxb-xjc v2.2.4-1 but

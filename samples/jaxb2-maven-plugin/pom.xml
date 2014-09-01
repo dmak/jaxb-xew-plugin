@@ -27,7 +27,7 @@
 							<clearOutputDir>false</clearOutputDir>
 
 							<extension>true</extension>
-							<arguments>-no-header -Xxew -Xxew:delete</arguments>
+							<arguments>-no-header -Xxew</arguments>
 						</configuration>
 					</execution>
 				</executions>
