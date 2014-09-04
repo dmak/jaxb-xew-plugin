@@ -46,6 +46,7 @@ import javax.xml.validation.SchemaFactory;
 
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Driver;
+import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.reader.Const;
 import com.sun.tools.xjc.reader.internalizer.DOMForest;
 import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
@@ -386,7 +387,7 @@ public class XmlElementWrapperPluginTest {
 	 * Return values of all {@code <jaxb:class ref="..." />} attributes.
 	 */
 	private Set<String> getClassReferencesFromEpisodeFile(String episodeFile) throws SAXException {
-		DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic());
+		DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic(), new Options());
 
 		Document episodeDocument = forest.parse(new InputSource(episodeFile), true);
 

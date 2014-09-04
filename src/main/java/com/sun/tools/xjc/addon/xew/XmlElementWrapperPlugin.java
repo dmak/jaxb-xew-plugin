@@ -27,6 +27,7 @@ import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getPrivateField;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getXsdDeclaration;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.hasPropertyNameCustomization;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isListedAsParametrisation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotation;
@@ -80,12 +81,8 @@ import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
-import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIDeclaration;
-import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty;
-import com.sun.tools.xjc.reader.xmlschema.bindinfo.BindInfo;
 import com.sun.xml.bind.api.impl.NameConverter;
 import com.sun.xml.bind.v2.model.core.PropertyKind;
-import com.sun.xml.xsom.XSAnnotation;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 
@@ -501,12 +498,11 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 						fieldPropertyInfo.setName(false, fieldName);
 
 						// Correct the @XmlType class-level annotation:
-						JAnnotationValue propOrderValue = getAnnotation(targetClass, xmlTypeModelClass)
-						            .getAnnotationMembers().get("propOrder");
+						JAnnotationArrayMember propOrderValue = (JAnnotationArrayMember) getAnnotation(targetClass,
+						            xmlTypeModelClass).getAnnotationMembers().get("propOrder");
 
 						if (propOrderValue != null) {
-							for (JAnnotationValue annotationValue : (List<JAnnotationValue>) getPrivateField(
-							            propOrderValue, "values")) {
+							for (JAnnotationValue annotationValue : propOrderValue.annotations()) {
 								if (oldFieldName.equals(generableToString(annotationValue))) {
 									setPrivateField(annotationValue, "value", JExpr.lit(fieldName));
 									break;
@@ -1100,33 +1096,6 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Check that given field property has name customization ({@code <jaxb:property name="..." />}).
-	 * 
-	 * @see com.sun.xml.bind.api.impl.NameUtil
-	 * @see com.sun.codemodel.JJavaName
-	 * @see com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty#getCustomization(XSComponent)
-	 */
-	private boolean hasPropertyNameCustomization(CPropertyInfo fieldPropertyInfo) {
-		XSAnnotation annotation = fieldPropertyInfo.getSchemaComponent().getAnnotation();
-
-		if (annotation == null) {
-			annotation = getXsdDeclaration(fieldPropertyInfo).getAnnotation();
-		}
-
-		if (annotation == null || !(annotation.getAnnotation() instanceof BindInfo)) {
-			return false;
-		}
-
-		for (BIDeclaration declaration : (BindInfo) annotation.getAnnotation()) {
-			if (declaration instanceof BIProperty) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**

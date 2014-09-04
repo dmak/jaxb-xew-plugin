@@ -17,6 +17,10 @@ import com.sun.codemodel.JGenerable;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.model.CPropertyInfo;
+import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIDeclaration;
+import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty;
+import com.sun.tools.xjc.reader.xmlschema.bindinfo.BindInfo;
+import com.sun.xml.xsom.XSAnnotation;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 import com.sun.xml.xsom.XSParticle;
@@ -93,6 +97,33 @@ public final class CommonUtils {
 
 		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
 		return (JExpression) getPrivateField(annotationValue, "value");
+	}
+
+	/**
+	 * Check that given field property has name customization ({@code <jaxb:property name="..." />}).
+	 * 
+	 * @see com.sun.xml.bind.api.impl.NameUtil
+	 * @see com.sun.codemodel.JJavaName
+	 * @see com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty#getCustomization(XSComponent)
+	 */
+	public static boolean hasPropertyNameCustomization(CPropertyInfo fieldPropertyInfo) {
+		XSAnnotation annotation = fieldPropertyInfo.getSchemaComponent().getAnnotation();
+
+		if (annotation == null) {
+			annotation = getXsdDeclaration(fieldPropertyInfo).getAnnotation();
+		}
+
+		if (annotation == null || !(annotation.getAnnotation() instanceof BindInfo)) {
+			return false;
+		}
+
+		for (BIDeclaration declaration : (BindInfo) annotation.getAnnotation()) {
+			if (declaration instanceof BIProperty) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

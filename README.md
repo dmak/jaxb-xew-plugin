@@ -342,7 +342,7 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 - Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (fixes #22)`). Check [here](https://github.com/blog/831-issues-2-0-the-next-generation) the commit message syntax sugar.
 - [Request for pull](http://help.github.com/send-pull-requests/).
 
-If you provide the code in any way you automatically agree with a [project license](#license).
+If you provide the code in any way (patch, pull request, post, comment, …) you automatically agree with a [project license](#license).
 
 #### Code style
 
@@ -360,6 +360,12 @@ If you provide the code in any way you automatically agree with a [project licen
 * TAB is used for alignment for XML/XSD/... files. 
 
 #### Build and release procedure
+
+<!-- width, height, align attributes are not supported.
+[<img width="148" height="50" src="http://www.cloudbees.com/sites/default/files/Button-Powered-by-CB.png" align="right" />](https://dmak.ci.cloudbees.com/job/jaxb-xew-plugin/)
+-->
+
+[![Build job](http://www.cloudbees.com/sites/default/files/Button-Powered-by-CB.png)](https://dmak.ci.cloudbees.com/job/jaxb-xew-plugin/)
 
 * Read [Sonatype OSS Maven Repository Usage Guide](https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide) from cover to cover.
 * Use the following `settings.xml` for your Maven (see [Sharing Files with Build Agents](http://wiki.cloudbees.com/bin/view/DEV/Sharing+Files+with+Build+Executors) about how to share `settings.xml` with build nodes on CloudBees):
