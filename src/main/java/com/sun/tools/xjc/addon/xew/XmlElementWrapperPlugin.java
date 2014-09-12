@@ -24,6 +24,7 @@ package com.sun.tools.xjc.addon.xew;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.addAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMember;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getPrivateField;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getXsdDeclaration;
@@ -52,6 +53,7 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlMixed;
+import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -564,6 +566,19 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 					JAnnotationUse annotation = getAnnotation(candidate.getField(), annotationModelClass);
 
 					if (annotation != null) {
+						if (candidate.getFieldTargetNamespace() != null) {
+							JAnnotationArrayMember annotationArrayMember = (JAnnotationArrayMember) getAnnotationMember(
+							            annotation, "value");
+
+							if (annotationArrayMember != null) {
+								for (JAnnotationUse subAnnotation : annotationArrayMember.annotations()) {
+									if (getAnnotationMemberExpression(subAnnotation, "namespace") == null) {
+										subAnnotation.param("namespace", candidate.getFieldTargetNamespace());
+									}
+								}
+							}
+						}
+
 						xmlElementInfoWasTransferred = true;
 
 						addAnnotation(originalImplField, annotation);
@@ -816,6 +831,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		Collection<Candidate> candidates = new ArrayList<Candidate>();
 
 		JClass collectionModelClass = outline.getCodeModel().ref(Collection.class);
+		JClass xmlSchemaModelClass = outline.getCodeModel().ref(XmlSchema.class);
 
 		// Visit all classes created by JAXB processing to collect all potential wrapper classes to be removed:
 		for (ClassOutline classOutline : outline.getClasses()) {
@@ -882,6 +898,25 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				}
 			}
 
+			JDefinedClass objectFactoryClass = null;
+
+			// If class has a non-hidden interface, then there is object factory in another package.
+			for (Iterator<JClass> iter = candidateClass._implements(); iter.hasNext();) {
+				JClass interfaceClass = iter.next();
+
+				if (!isHiddenClass(interfaceClass)) {
+					objectFactoryClass = interfaceClass._package()._getClass(FACTORY_CLASS_NAME);
+
+					if (objectFactoryClass != null) {
+						break;
+					}
+				}
+			}
+
+			JDefinedClass valueObjectFactoryClass = candidateClass._package()._getClass(FACTORY_CLASS_NAME);
+
+			assert objectFactoryClass != valueObjectFactoryClass;
+
 			String fieldTargetNamespace = null;
 
 			XSDeclaration xsdDeclaration = getXsdDeclaration(classOutline.target.getProperty(field.name()));
@@ -889,10 +924,23 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			if (xsdDeclaration != null && !xsdDeclaration.getTargetNamespace().isEmpty()) {
 				fieldTargetNamespace = xsdDeclaration.getTargetNamespace();
 			}
+			else {
+				// Default (mostly used) namespace is generated as annotation for the package,
+				// see com.sun.tools.xjc.generator.bean.PackageOutlineImpl#calcDefaultValues()
+				JExpression packageWideNamespace = getAnnotationMemberExpression(
+				            getAnnotation(
+				                        (objectFactoryClass != null ? objectFactoryClass : valueObjectFactoryClass)
+				                                    .getPackage(),
+				                        xmlSchemaModelClass), "namespace");
+
+				if (packageWideNamespace != null) {
+					fieldTargetNamespace = generableToString(packageWideNamespace);
+				}
+			}
 
 			// We have a candidate class:
 			Candidate candidate = new Candidate(candidateClass, field, fieldTargetNamespace, fieldParametrisationClass,
-			            fieldParametrisationImpl, xmlElementDeclModelClass);
+			            fieldParametrisationImpl, objectFactoryClass, valueObjectFactoryClass, xmlElementDeclModelClass);
 			candidates.add(candidate);
 
 			logger.debug("Found " + candidate);
@@ -1099,22 +1147,25 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	}
 
 	/**
+	 * Returns {@code true} if given annotation is the container of other annotations.
+	 */
+	private static boolean isAnnotationContainer(JAnnotationUse annotation) {
+		String annotationClassName = annotation.getAnnotationClass().name();
+
+		return (annotationClassName.equals("XmlElementRefs") || annotationClassName.equals("XmlElements"));
+	}
+
+	/**
 	 * For the given annotatable check that all annotations (and all annotations within annotations recursively) do not
 	 * refer any candidate for removal.
 	 */
 	private void checkAnnotationReference(Map<String, Candidate> candidatesMap, JAnnotatable annotatable) {
 		for (JAnnotationUse annotation : annotatable.annotations()) {
-			String annotationClassName = annotation.getAnnotationClass().name();
+			JAnnotationValue annotationMember = getAnnotationMember(annotation, "value");
 
-			if (annotationClassName.equals("XmlElementRefs") || annotationClassName.equals("XmlElements")) {
-				checkAnnotationReference(candidatesMap,
-				            (JAnnotationArrayMember) annotation.getAnnotationMembers().get("value"));
+			if (annotationMember instanceof JAnnotationArrayMember) {
+				checkAnnotationReference(candidatesMap, (JAnnotationArrayMember) annotationMember);
 
-				continue;
-			}
-
-			// FIXME: Dirty workaround for http://java.net/jira/browse/JAXB-784:
-			if (!(annotationClassName.equals("XmlElementRef") || annotationClassName.equals("XmlElement"))) {
 				continue;
 			}
 
@@ -1200,7 +1251,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 		private final JDefinedClass                  fieldParametrisationImpl;
 
-		private JDefinedClass                        objectFactoryClass;
+		private final JDefinedClass                  objectFactoryClass;
 
 		private final JDefinedClass                  valueObjectFactoryClass;
 
@@ -1218,29 +1269,15 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 		Candidate(JDefinedClass candidateClass, JFieldVar field, String fieldTargetNamespace,
 		            JDefinedClass fieldParametrizationClass, JDefinedClass fieldParametrisationImpl,
+		            JDefinedClass objectFactoryClass, JDefinedClass valueObjectFactoryClass,
 		            JClass xmlElementDeclModelClass) {
 			this.candidateClass = candidateClass;
 			this.field = field;
 			this.fieldTargetNamespace = fieldTargetNamespace;
 			this.fieldParametrisationClass = fieldParametrizationClass;
 			this.fieldParametrisationImpl = fieldParametrisationImpl;
-
-			// If class has a non-hidden interface, then there is object factory in another package.
-			for (Iterator<JClass> iter = candidateClass._implements(); iter.hasNext();) {
-				JClass interfaceClass = iter.next();
-
-				if (!isHiddenClass(interfaceClass)) {
-					objectFactoryClass = interfaceClass._package()._getClass(FACTORY_CLASS_NAME);
-
-					if (objectFactoryClass != null) {
-						break;
-					}
-				}
-			}
-
-			this.valueObjectFactoryClass = candidateClass._package()._getClass(FACTORY_CLASS_NAME);
-
-			assert objectFactoryClass != valueObjectFactoryClass;
+			this.objectFactoryClass = objectFactoryClass;
+			this.valueObjectFactoryClass = valueObjectFactoryClass;
 
 			String dotClazz = candidateClass.fullName() + ".class";
 

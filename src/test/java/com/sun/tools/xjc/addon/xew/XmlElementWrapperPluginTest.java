@@ -33,6 +33,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -121,7 +122,7 @@ public class XmlElementWrapperPluginTest {
 	public void testInnerElement() throws Exception {
 		assertXsd("inner-element", new String[] { "-verbose", "-Xxew:instantiate none",
 		        "-Xxew:control " + getClass().getResource("inner-element-control.txt").getFile() }, true, "Filesystem",
-		            "Volumes");
+		            "Volumes", "package-info");
 	}
 
 	@Test
@@ -129,7 +130,7 @@ public class XmlElementWrapperPluginTest {
 		assertXsd("inner-element-value-objects", new String[] { "-debug" }, false, "Article", "Articles",
 		            "ArticlesCollections", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl",
 		            "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl", "impl.PublisherImpl",
-		            "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory");
+		            "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory", "package-info");
 	}
 
 	@Test
@@ -138,7 +139,7 @@ public class XmlElementWrapperPluginTest {
 		// one compilation to other as order of @XmlElementRef/@XmlElement annotations is not pre-defined
 		// (set is used as their container).
 		assertXsd("annotation-reference", new String[] { "-verbose", "-debug" }, false, "ClassCommon", "ClassesEu",
-		            "ClassesUs", "ClassExt", "Markup", "Para", "SearchEu", "SearchMulti");
+		            "ClassesUs", "ClassExt", "Markup", "Para", "SearchEu", "SearchMulti", "package-info");
 	}
 
 	@Test
@@ -146,7 +147,7 @@ public class XmlElementWrapperPluginTest {
 		assertXsd("element-as-parametrisation-1",
 		            new String[] { "-Xxew:control "
 		                        + getClass().getResource("element-as-parametrisation-1-control.txt").getFile() },
-		            false, "Article", "Articles", "ArticlesCollections", "Publisher");
+		            false, "Article", "Articles", "ArticlesCollections", "Publisher", "package-info");
 	}
 
 	@Test
@@ -156,7 +157,7 @@ public class XmlElementWrapperPluginTest {
 		                    "-Xxew:control "
 		                                + getClass().getResource("element-as-parametrisation-2-control.txt").getFile(),
 		                    "-Xxew:summary " + GENERATED_SOURCES_PREFIX + "summary.txt" }, false, "Family",
-		            "FamilyMember");
+		            "FamilyMember", "package-info");
 
 		String summaryFile = FileUtils.readFileToString(new File(GENERATED_SOURCES_PREFIX + "summary.txt"));
 
@@ -167,17 +168,18 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementWithParent() throws Exception {
-		assertXsd("element-with-parent", new String[] { "-debug" }, false, "Alliance", "Group", "Organization");
+		assertXsd("element-with-parent", new String[] { "-debug" }, false, "Alliance", "Group", "Organization",
+		            "package-info");
 	}
 
 	@Test
 	public void testElementAny() throws Exception {
-		assertXsd("element-any", new String[] { "-quiet", "-Xxew:plural" }, false, "Message");
+		assertXsd("element-any", new String[] { "-quiet", "-Xxew:plural" }, false, "Message", "package-info");
 	}
 
 	@Test
 	public void testElementAnyType() throws Exception {
-		assertXsd("element-any-type", new String[] { "-Xxew:plural" }, false, "Conversion", "Entry");
+		assertXsd("element-any-type", new String[] { "-Xxew:plural" }, false, "Conversion", "Entry", "package-info");
 	}
 
 	@Test
@@ -189,7 +191,7 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementListExtended() throws Exception {
 		// This run is configured from XSD (<xew:xew ... >):
-		assertXsd("element-list-extended", null, false, "Foo");
+		assertXsd("element-list-extended", null, false, "Foo", "package-info");
 	}
 
 	@Test
@@ -202,18 +204,19 @@ public class XmlElementWrapperPluginTest {
 	public void testElementWithAdapter() throws Exception {
 		// Plural form in this case will have no impact as there is property customization:
 		assertXsd("element-with-adapter", new String[] { "-Xxew:plural",
-		        "-Xxew:collectionInterface java.util.Collection" }, false, "Calendar", "Adapter1");
+		        "-Xxew:collectionInterface java.util.Collection" }, false, "Calendar", "Adapter1", "package-info");
 	}
 
 	@Test
 	public void testElementWithCustomization() throws Exception {
 		// This run is additionally configured from XSD (<xew:xew ... >):
-		assertXsd("element-with-customization", new String[] { "-debug", "-Xxew:plural" }, false, "PostOffice");
+		assertXsd("element-with-customization", new String[] { "-debug", "-Xxew:plural" }, false, "PostOffice",
+		            "package-info");
 	}
 
 	@Test
 	public void testElementReservedWord() throws Exception {
-		assertXsd("element-reserved-word", null, false, "Class", "Method");
+		assertXsd("element-reserved-word", null, false, "Class", "Method", "package-info");
 	}
 
 	/**
@@ -263,6 +266,10 @@ public class XmlElementWrapperPluginTest {
 			// FIXME: Episode file actually contains only value objects
 			Set<String> classReferences = getClassReferencesFromEpisodeFile(episodeFile);
 
+			if (Arrays.asList(classesToCheck).contains("package-info")) {
+				classReferences.add(packageName + ".package-info");
+			}
+
 			assertEquals("Wrong number of classes in episode file", classesToCheck.length, classReferences.size());
 
 			for (String className : classesToCheck) {
@@ -285,7 +292,8 @@ public class XmlElementWrapperPluginTest {
 		// This class is added and checked by default:
 		classesToCheck = ArrayUtils.add(classesToCheck, "ObjectFactory");
 
-		assertEquals("Wrong number of generated classes;", classesToCheck.length, generatedJavaSources.size());
+		assertEquals("Wrong number of generated classes " + generatedJavaSources + ";", classesToCheck.length,
+		            generatedJavaSources.size());
 
 		for (String className : classesToCheck) {
 			className = className.replace('.', '/') + ".java";

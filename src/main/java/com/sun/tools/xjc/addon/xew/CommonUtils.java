@@ -4,6 +4,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
@@ -64,6 +65,41 @@ public final class CommonUtils {
 	}
 
 	/**
+	 * Returns the annotation element as {@href JAnnotationValue}.
+	 */
+	public static JAnnotationValue getAnnotationMember(JAnnotationUse annotation, String annotationMember) {
+		if (annotation == null) {
+			return null;
+		}
+
+		// FIXME: Workaround for https://java.net/jira/browse/JAXB-1040:
+		Map<String, JAnnotationValue> memberValues = (Map<String, JAnnotationValue>) getPrivateField(annotation,
+		            "memberValues");
+
+		if (memberValues == null) {
+			return null;
+		}
+
+		return memberValues.get(annotationMember);
+	}
+
+	/**
+	 * Returns the value of annotation element as {@href JExpression}. For example, for annotation
+	 * <code>@XmlElementRef(name = "last-name", namespace = "http://mycompany.org/exchange", type = JAXBElement.class)</code>
+	 * for member <code>name</code> the value <code>last-name</code> will be returned.
+	 */
+	public static JExpression getAnnotationMemberExpression(JAnnotationUse annotation, String annotationMember) {
+		JAnnotationValue annotationValue = getAnnotationMember(annotation, annotationMember);
+
+		if (annotationValue == null) {
+			return null;
+		}
+
+		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
+		return (JExpression) getPrivateField(annotationValue, "value");
+	}
+
+	/**
 	 * Append the given annotation to list of annotations.
 	 */
 	@SuppressWarnings("unchecked")
@@ -77,26 +113,6 @@ public final class CommonUtils {
 	@SuppressWarnings("unchecked")
 	public static void removeAnnotation(JVar field, JAnnotationUse annotation) {
 		((List<JAnnotationUse>) getPrivateField(field, JVar.class, "annotations")).remove(annotation);
-	}
-
-	/**
-	 * Returns the string value of annotation element. For example, for annotation
-	 * <code>@XmlElementRef(name = "last-name", namespace = "http://mycompany.org/exchange", type = JAXBElement.class)</code>
-	 * for member <code>name</code> the value <code>last-name</code> will be returned.
-	 */
-	public static final JExpression getAnnotationMemberExpression(JAnnotationUse annotation, String annotationMember) {
-		if (annotation == null) {
-			return null;
-		}
-
-		JAnnotationValue annotationValue = annotation.getAnnotationMembers().get(annotationMember);
-
-		if (annotationValue == null) {
-			return null;
-		}
-
-		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
-		return (JExpression) getPrivateField(annotationValue, "value");
 	}
 
 	/**

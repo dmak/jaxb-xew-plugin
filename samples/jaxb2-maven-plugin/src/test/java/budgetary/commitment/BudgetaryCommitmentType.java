@@ -1,0 +1,57 @@
+
+package budgetary.commitment;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlType;
+import budgetary.reference.ContractorReferenceType;
+import budgetary.reference.PrimaryContractorReferenceType;
+import budgetary.reference.SecondaryContractorReferenceType;
+
+
+/**
+ * <p>Java class for BudgetaryCommitmentType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="BudgetaryCommitmentType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="ContractorReferences" type="{budgetary/reference}ContractorReferencesType" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "BudgetaryCommitmentType", propOrder = {
+    "contractorReferences"
+})
+public class BudgetaryCommitmentType {
+
+    @XmlElementWrapper(name = "ContractorReferences")
+    @XmlElements({
+        @XmlElement(name = "PrimaryContractorReference", type = PrimaryContractorReferenceType.class, namespace = "budgetary/reference"),
+        @XmlElement(name = "SecondaryContractorReference", type = SecondaryContractorReferenceType.class, namespace = "budgetary/reference")
+    })
+    protected List<ContractorReferenceType> contractorReferences = new ArrayList<ContractorReferenceType>();
+
+    public List<ContractorReferenceType> getContractorReferences() {
+        return contractorReferences;
+    }
+
+    public void setContractorReferences(List<ContractorReferenceType> contractorReferences) {
+        this.contractorReferences = contractorReferences;
+    }
+
+}
