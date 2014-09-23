@@ -295,6 +295,10 @@ You can find more examples of this plugin in [`samples`](samples/) directory (in
 
 ## What's new
 
+### v1.4
+
+* Bugs fixed ([#21](https://github.com/dmak/jaxb-xew-plugin/issues/21), [#32](https://github.com/dmak/jaxb-xew-plugin/issues/32)).
+
 ### v1.3
 
 * Improvements:

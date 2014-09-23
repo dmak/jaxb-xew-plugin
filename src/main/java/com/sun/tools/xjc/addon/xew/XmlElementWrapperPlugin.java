@@ -88,7 +88,6 @@ import com.sun.xml.bind.v2.model.core.PropertyKind;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
@@ -132,7 +131,9 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 	static final String         COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY = "org.apache.commons.logging.simplelog.defaultlog";
 
-	private Log                 logger;
+	public XmlElementWrapperPlugin() {
+		logger = null;
+	}
 
 	@Override
 	public String getOptionName() {
@@ -172,6 +173,9 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 			System.setProperty(COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY, logLevel);
 		}
+
+		// The logger needs to be re-created and not taken from cache:
+		LogFactory.getFactory().release();
 
 		logger = LogFactory.getLog(getClass());
 	}
