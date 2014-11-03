@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	version="1.0"
+	jaxb:version="2.1"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+>
+
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="substitution_groups" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:element name="customer" type="customerType" />
+	<xs:element name="contact-info" type="contactInfoType" abstract="true" />
+	<xs:element name="address" type="addressType" substitutionGroup="contact-info" />
+	<xs:element name="phone-number" type="phoneNumberType" substitutionGroup="contact-info" />
+
+	<xs:complexType name="customerType">
+		<xs:annotation>
+			<xs:appinfo>
+				<jaxb:class name="Customer" />
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="contact-infos" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="contact-info" minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="contactInfoType" abstract="true">
+		<xs:annotation>
+			<xs:appinfo>
+				<jaxb:class name="ContactInfo" />
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:complexType>
+
+	<xs:complexType name="addressType">
+		<xs:annotation>
+			<xs:appinfo>
+				<jaxb:class name="Address" />
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="contactInfoType">
+				<xs:sequence>
+					<xs:element name="street" type="xs:string" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="phoneNumberType">
+		<xs:annotation>
+			<xs:appinfo>
+				<jaxb:class name="PhoneNumber" />
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="contactInfoType">
+				<xs:sequence>
+					<xs:element name="area-number" type="xs:string" />
+					<xs:element name="phone-number" type="xs:string" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

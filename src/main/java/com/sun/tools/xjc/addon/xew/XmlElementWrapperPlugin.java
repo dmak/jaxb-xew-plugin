@@ -49,6 +49,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
@@ -333,6 +334,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		JClass xmlElementModelClass = codeModel.ref(XmlElement.class);
 		JClass xmlAnyElementModelClass = codeModel.ref(XmlAnyElement.class);
 		JClass xmlMixedModelClass = codeModel.ref(XmlMixed.class);
+		JClass xmlElementRefModelClass = codeModel.ref(XmlElementRef.class);
 		JClass xmlElementRefsModelClass = codeModel.ref(XmlElementRefs.class);
 		JClass xmlElementsModelClass = codeModel.ref(XmlElements.class);
 		JClass xmlJavaTypeAdapterModelClass = codeModel.ref(XmlJavaTypeAdapter.class);
@@ -566,7 +568,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 				// Transfer @XmlAnyElement, @XmlElementRefs, @XmlElements:
 				for (JClass annotationModelClass : new JClass[] { xmlAnyElementModelClass, xmlMixedModelClass,
-				        xmlElementRefsModelClass, xmlElementsModelClass }) {
+				        xmlElementRefModelClass, xmlElementRefsModelClass, xmlElementsModelClass }) {
 					JAnnotationUse annotation = getAnnotation(candidate.getField(), annotationModelClass);
 
 					if (annotation != null) {

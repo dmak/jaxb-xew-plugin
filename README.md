@@ -297,7 +297,7 @@ You can find more examples of this plugin in [`samples`](samples/) directory (in
 
 ### v1.4
 
-* Bugs fixed ([#21](https://github.com/dmak/jaxb-xew-plugin/issues/21), [#32](https://github.com/dmak/jaxb-xew-plugin/issues/32)).
+* Bugs fixed ([#21](https://github.com/dmak/jaxb-xew-plugin/issues/21), [#32](https://github.com/dmak/jaxb-xew-plugin/issues/32)), [#33](https://github.com/dmak/jaxb-xew-plugin/issues/33)).
 
 ### v1.3
 

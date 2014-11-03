@@ -219,6 +219,12 @@ public class XmlElementWrapperPluginTest {
 		assertXsd("element-reserved-word", null, false, "Class", "Method", "package-info");
 	}
 
+	@Test
+	public void testSubstitutionGroups() throws Exception {
+		assertXsd("substitution-groups", null, false, "Address", "ContactInfo", "Customer", "PhoneNumber",
+		            "package-info");
+	}
+
 	/**
 	 * Standard test for XSD examples.
 	 * 

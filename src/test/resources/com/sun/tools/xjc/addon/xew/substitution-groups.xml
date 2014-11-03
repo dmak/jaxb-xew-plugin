@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<customer>
+	<contact-infos>
+		<address>
+			<street>5th Avenue</street>
+		</address>
+		<phone-number>
+			<area-number>010</area-number>
+			<phone-number>1234567890</phone-number>
+		</phone-number>
+	</contact-infos>
+</customer>
