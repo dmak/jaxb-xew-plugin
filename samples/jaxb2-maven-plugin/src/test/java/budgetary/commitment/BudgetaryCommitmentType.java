@@ -2,6 +2,7 @@
 package budgetary.commitment;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,6 +53,27 @@ public class BudgetaryCommitmentType {
 
     public void setContractorReferences(List<ContractorReferenceType> contractorReferences) {
         this.contractorReferences = contractorReferences;
+    }
+
+    public BudgetaryCommitmentType withContractorReferences(ContractorReferenceType... values) {
+        if (values!= null) {
+            for (ContractorReferenceType value: values) {
+                getContractorReferences().add(value);
+            }
+        }
+        return this;
+    }
+
+    public BudgetaryCommitmentType withContractorReferences(Collection<ContractorReferenceType> values) {
+        if (values!= null) {
+            getContractorReferences().addAll(values);
+        }
+        return this;
+    }
+
+    public BudgetaryCommitmentType withContractorReferences(List<ContractorReferenceType> contractorReferences) {
+        setContractorReferences(contractorReferences);
+        return this;
     }
 
 }

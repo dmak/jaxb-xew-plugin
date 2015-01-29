@@ -2,6 +2,7 @@
 package com.github.jaxb_xew_plugin.sample.container;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -48,6 +49,27 @@ public class Container {
 
     public void setEntries(List<Entry> entries) {
         this.entries = entries;
+    }
+
+    public Container withEntries(Entry... values) {
+        if (values!= null) {
+            for (Entry value: values) {
+                getEntries().add(value);
+            }
+        }
+        return this;
+    }
+
+    public Container withEntries(Collection<Entry> values) {
+        if (values!= null) {
+            getEntries().addAll(values);
+        }
+        return this;
+    }
+
+    public Container withEntries(List<Entry> entries) {
+        setEntries(entries);
+        return this;
     }
 
 }

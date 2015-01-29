@@ -59,4 +59,15 @@ public class PrimaryContractorReferenceType
         this.primaryId = value;
     }
 
+    public PrimaryContractorReferenceType withPrimaryId(String value) {
+        setPrimaryId(value);
+        return this;
+    }
+
+    @Override
+    public PrimaryContractorReferenceType withContractorId(String value) {
+        setContractorId(value);
+        return this;
+    }
+
 }

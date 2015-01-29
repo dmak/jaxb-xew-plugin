@@ -62,4 +62,9 @@ public class ContractorReferenceType {
         this.contractorId = value;
     }
 
+    public ContractorReferenceType withContractorId(String value) {
+        setContractorId(value);
+        return this;
+    }
+
 }

@@ -59,4 +59,9 @@ public class Entry {
         this.name = value;
     }
 
+    public Entry withName(String value) {
+        setName(value);
+        return this;
+    }
+
 }

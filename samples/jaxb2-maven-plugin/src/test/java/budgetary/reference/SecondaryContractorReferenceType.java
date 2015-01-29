@@ -59,4 +59,15 @@ public class SecondaryContractorReferenceType
         this.secondaryId = value;
     }
 
+    public SecondaryContractorReferenceType withSecondaryId(String value) {
+        setSecondaryId(value);
+        return this;
+    }
+
+    @Override
+    public SecondaryContractorReferenceType withContractorId(String value) {
+        setContractorId(value);
+        return this;
+    }
+
 }

@@ -187,24 +187,40 @@ These plugin should be activated _before_ Xew plugin due to problem described in
 
 ### Ant task
 
-First you need to download the plugin jar (for example, from [Maven repository](http://mirrors.ibiblio.org/pub/mirrors/maven2/com/github/jaxb-xew-plugin/jaxb-xew-plugin)) and put it to your project `lib` folder.
+First you need to download the plugin jar (for example, from [Maven repository](http://mirrors.ibiblio.org/pub/mirrors/maven2/com/github/jaxb-xew-plugin/jaxb-xew-plugin)) and put it to your project `libs` folder togather with other dependencies.
 
 To use the plugin from Ant you will need something like the following in your build file:
 
-    <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-    	<classpath>
-    		<fileset dir="${lib}/jaxb" includes="*.jar" />
-    		<fileset dir="lib" includes="jaxb-xew-plugin.jar" />
-    	</classpath>
-    </taskdef>
-    
-    <xjc destdir="${src-generated}" package="dk.conspicio.example.xml2code.v2">
-    	<arg value="-Xxew" />
-    	<arg value="-Xxew:summary ${build}/xew-summary.txt" />
-    	<arg value="-Xxew:instantiate lazy" />
-    	<schema dir="xsd" includes="*.xsd" />
-    	<binding dir="xsd" includes="*.xjb" />
-    </xjc>
+    <?xml version="1.0" encoding="UTF-8"?>
+    <project name="SunlightDataService" default="build" basedir=".">
+    	<path id="runtime.classpath">
+    		<fileset dir="libs">
+    			<include name="jaxb-xjc-2.2.7.jar" />
+    			<include name="jaxb-api-2.2.7.jar" />
+    			<include name="jaxb-core-2.2.7.jar" />
+    			<include name="commons-logging-1.1.1.jar" />
+    			<include name="commons-lang-2.2.jar" />
+    		</fileset>
+    	</path>
+    	<path id="xjc.classpath">
+    		<fileset dir="libs">
+    			<include name="jaxb2-basics-tools-0.6.5.jar" />
+    			<include name="jaxb-xew-plugin-1.4.jar" />
+    		</fileset>
+    	</path>
+    	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+    		<classpath>
+    			<path refid="runtime.classpath" />
+    		</classpath>
+    	</taskdef>
+    	<target name="build">
+    		<mkdir dir="target" />
+    		<xjc destdir="target" schema="xsd/test.xsd" package="org.mycompany" extension="true" removeOldOutput="true">
+    			<classpath refid="xjc.classpath" />
+    			<arg value="-Xxew" />
+    		</xjc>
+    	</target>
+    </project>
 
 ### Maven
 
@@ -239,7 +255,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
     					<plugin>
     						<groupId>com.github.jaxb-xew-plugin</groupId>
     						<artifactId>jaxb-xew-plugin</artifactId>
-    						<version>1.3</version>
+    						<version>1.4</version>
     					</plugin>
     				</plugins>
     			</configuration>
@@ -276,7 +292,7 @@ Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which 
     		<dependency>
     			<groupId>com.github.jaxb-xew-plugin</groupId>
     			<artifactId>jaxb-xew-plugin</artifactId>
-    			<version>1.3</version>
+    			<version>1.4</version>
     		</dependency>
     		<!-- 
     		 | We need to update the jaxb-xjc plugin version from 2.1.13 to the 2.2.4-1 version 
@@ -293,11 +309,51 @@ Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which 
 
 You can find more examples of this plugin in [`samples`](samples/) directory (including how to call this plugin using `jaxws-maven-plugin` or `cxf-codegen-plugin`).
 
+### Gradle
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+    
+    repositories {
+      maven { url "http://repo1.maven.org/maven2/" }
+    }
+    
+    configurations {
+      xjc
+    }
+    
+    dependencies {
+      compile 'com.sun.xml.bind:jaxb-xjc:2.2.7'
+      compile 'com.sun.xml.bind:jaxb-core:2.2.7'
+      compile 'javax.xml.bind:jaxb-api:2.2.7'
+    
+      xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.4"
+      xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
+    }
+    
+    task processXSDs() << {
+      ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.compile.asPath)
+    
+      ant.xjc(destdir: 'target', package: "com.mycompany", extension: true) {
+        classpath {
+          pathelement(path: configurations.xjc.asPath)
+        }
+        schema(dir: "xsd", includes: "test.xsd")
+        arg(value: "-Xxew")
+        arg(value: "-Xfluent-api")
+      }
+    }
+    
+    compileJava.dependsOn processXSDs
+
 ## What's new
 
 ### v1.4
 
-* Bugs fixed ([#21](https://github.com/dmak/jaxb-xew-plugin/issues/21), [#32](https://github.com/dmak/jaxb-xew-plugin/issues/32)), [#33](https://github.com/dmak/jaxb-xew-plugin/issues/33)).
+* Bugs fixed ([#21](https://github.com/dmak/jaxb-xew-plugin/issues/21), [#32](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#33](https://github.com/dmak/jaxb-xew-plugin/issues/33)).
 
 ### v1.3
 
@@ -371,7 +427,7 @@ If you provide the code in any way (patch, pull request, post, comment, …) you
 
 [![Build job](http://www.cloudbees.com/sites/default/files/Button-Powered-by-CB.png)](https://dmak.ci.cloudbees.com/job/jaxb-xew-plugin/)
 
-* Read [Sonatype OSS Maven Repository Usage Guide](https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide) from cover to cover.
+* Read [Sonatype OSS Maven Repository Usage Guide](http://central.sonatype.org/pages/ossrh-guide.html) from cover to cover.
 * Use the following `settings.xml` for your Maven (see [Sharing Files with Build Agents](http://wiki.cloudbees.com/bin/view/DEV/Sharing+Files+with+Build+Executors) about how to share `settings.xml` with build nodes on CloudBees):
 
         <settings>

@@ -8,6 +8,8 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
+	<name>jaxb2-maven-plugin with jaxb-xew-plugin + jaxb-fluent-api</name>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -27,8 +29,7 @@
 							<clearOutputDir>false</clearOutputDir>
 
 							<extension>true</extension>
-							<!--arguments>-no-header -Xxew -Xxew:control control.txt</arguments-->
-							<arguments>-no-header -Xxew</arguments>
+							<arguments>-no-header -Xxew -Xfluent-api</arguments>
 						</configuration>
 					</execution>
 				</executions>
@@ -36,7 +37,12 @@
 					<dependency>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.4-SNAPSHOT</version>
+						<version>1.4</version>
+					</dependency>
+					<dependency>
+						<groupId>net.java.dev.jaxb2-commons</groupId>
+						<artifactId>jaxb-fluent-api</artifactId>
+						<version>2.1.8</version>
 					</dependency>
 					<!--
 						Mind that this additional dependency is needed to be added to plugin classpath
