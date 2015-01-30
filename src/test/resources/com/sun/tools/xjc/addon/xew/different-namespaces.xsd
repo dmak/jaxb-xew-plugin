@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema
 	jaxb:version="2.0"
-	targetNamespace="http://example.com/container"
+	targetNamespace="http://example.com/namespaces"
+	xmlns:container="http://example.com/container"
 	xmlns:entries="http://example.com/entries"
 	xmlns:items="http://example.com/items"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
 >
 	<xs:annotation>
 		<xs:appinfo>
@@ -15,6 +17,7 @@
 		</xs:appinfo>
 	</xs:annotation>
 
+	<xs:import schemaLocation="different-namespaces-container.xsd" namespace="http://example.com/container" />
 	<xs:import schemaLocation="different-namespaces-entries.xsd" namespace="http://example.com/entries" />
 	<xs:import schemaLocation="different-namespaces-items.xsd" namespace="http://example.com/items" />
 
@@ -23,13 +26,24 @@
 	-->
 	<xs:element name="container">
 		<xs:complexType>
-			<xs:sequence>
-				<!--
-					Example of element which does not generate "required = true" in @XmlElementWrapper:
-				-->
-				<xs:element ref="entries:entries" minOccurs="0" />
-				<xs:element ref="items:items" />
-			</xs:sequence>
+			<xs:complexContent>
+				<xs:extension base="container:base_container">
+					<xs:sequence>
+						<!--
+							Example of element which does not generate "required = true" in @XmlElementWrapper:
+						-->
+						<xs:element ref="entries:entries" minOccurs="0" />
+						<xs:element ref="items:items" />
+						<xs:element name="tests" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="test" type="xs:string" minOccurs="0" maxOccurs="unbounded"></xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

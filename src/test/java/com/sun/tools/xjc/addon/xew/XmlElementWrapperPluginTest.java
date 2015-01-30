@@ -115,7 +115,8 @@ public class XmlElementWrapperPluginTest {
 	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
 		// Plural form in this case will have no impact as all properties are already in plural:
 		assertXsd("different-namespaces", new String[] { "-Xxew:collection", "java.util.LinkedList",
-		        "-Xxew:instantiate", "lazy", "-Xxew:plural" }, false, "Container", "Entry", "package-info");
+		        "-Xxew:instantiate", "lazy", "-Xxew:plural" }, false, "BaseContainer", "Container", "Entry",
+		            "package-info");
 	}
 
 	@Test
