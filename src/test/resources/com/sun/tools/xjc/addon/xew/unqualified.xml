@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<n:rootElement xmlns:n="testNamespace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="testNamespace unqualified.xsd">
+	<stringList>
+		<listItem>str1</listItem>
+		<listItem>str2</listItem>
+		<listItem>str3</listItem>
+		<listItem>str4</listItem>
+	</stringList>
+</n:rootElement>

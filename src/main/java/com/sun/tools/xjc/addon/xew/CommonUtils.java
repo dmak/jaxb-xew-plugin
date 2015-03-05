@@ -12,6 +12,7 @@ import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JGenerable;
@@ -96,7 +97,15 @@ public final class CommonUtils {
 		}
 
 		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
-		return (JExpression) getPrivateField(annotationValue, "value");
+		try {
+			// In most cases the value is some expression...
+			return (JExpression) getPrivateField(annotationValue, annotationValue.getClass(), "value");
+		}
+		catch (NoSuchFieldException e) {
+			// ... and in some cases (like enum) do the conversion from JGenerable to JExpression
+			// (a bit unoptimal, since this expression is going to be converted back to string)
+			return JExpr.lit(generableToString(annotationValue));
+		}
 	}
 
 	/**
@@ -104,7 +113,7 @@ public final class CommonUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void addAnnotation(JVar field, JAnnotationUse annotation) {
-		((List<JAnnotationUse>) getPrivateField(field, JVar.class, "annotations")).add(annotation);
+		((List<JAnnotationUse>) getPrivateField(field, "annotations")).add(annotation);
 	}
 
 	/**
@@ -112,7 +121,7 @@ public final class CommonUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void removeAnnotation(JVar field, JAnnotationUse annotation) {
-		((List<JAnnotationUse>) getPrivateField(field, JVar.class, "annotations")).remove(annotation);
+		((List<JAnnotationUse>) getPrivateField(field, "annotations")).remove(annotation);
 	}
 
 	/**
@@ -161,13 +170,22 @@ public final class CommonUtils {
 	//
 
 	public static void setPrivateField(Object obj, String fieldName, Object newValue) {
-		setPrivateField(obj, obj.getClass(), fieldName, newValue);
+		try {
+			setPrivateField(obj, obj.getClass(), fieldName, newValue);
+		}
+		catch (NoSuchFieldException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
 	 * Set the {@code newValue} to private field {@code fieldName} of given object {@code obj}.
+	 * 
+	 * @throws NoSuchFieldException
+	 *             if given field was not found
 	 */
-	private static void setPrivateField(Object obj, Class<?> clazz, String fieldName, Object newValue) {
+	private static void setPrivateField(Object obj, Class<?> clazz, String fieldName, Object newValue)
+	            throws NoSuchFieldException {
 		try {
 			Field field = clazz.getDeclaredField(fieldName);
 			field.setAccessible(true);
@@ -176,7 +194,7 @@ public final class CommonUtils {
 		catch (NoSuchFieldException e) {
 			if (clazz.getSuperclass() == Object.class) {
 				// Field is really not found:
-				throw new RuntimeException(e);
+				throw e;
 			}
 
 			// Try super class:
@@ -191,14 +209,22 @@ public final class CommonUtils {
 	 * Get the value of private field {@code fieldName} of given object {@code obj}.
 	 */
 	public static Object getPrivateField(Object obj, String fieldName) {
-		return getPrivateField(obj, obj.getClass(), fieldName);
+		try {
+			return getPrivateField(obj, obj.getClass(), fieldName);
+		}
+		catch (NoSuchFieldException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
 	 * Get the value of private field {@code fieldName} of given object {@code obj} which is treated as class
 	 * {@code clazz}.
+	 * 
+	 * @throws NoSuchFieldException
+	 *             if given field was not found
 	 */
-	private static Object getPrivateField(Object obj, Class<?> clazz, String fieldName) {
+	private static Object getPrivateField(Object obj, Class<?> clazz, String fieldName) throws NoSuchFieldException {
 		try {
 			Field field = clazz.getDeclaredField(fieldName);
 			field.setAccessible(true);
@@ -207,7 +233,7 @@ public final class CommonUtils {
 		catch (NoSuchFieldException e) {
 			if (clazz.getSuperclass() == Object.class) {
 				// Field is really not found:
-				throw new RuntimeException(e);
+				throw e;
 			}
 
 			// Try super class:

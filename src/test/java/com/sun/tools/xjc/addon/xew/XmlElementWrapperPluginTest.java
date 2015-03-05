@@ -226,6 +226,11 @@ public class XmlElementWrapperPluginTest {
 		            "package-info");
 	}
 
+	@Test
+	public void testUnqualifiedSchema() throws Exception {
+		assertXsd("unqualified", null, false, "RootElement", "package-info");
+	}
+
 	/**
 	 * Standard test for XSD examples.
 	 * 
@@ -335,7 +340,8 @@ public class XmlElementWrapperPluginTest {
 
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(unmarshaller.unmarshal(xmlTestFile), writer);
+			Object bean = unmarshaller.unmarshal(xmlTestFile);
+			marshaller.marshal(bean, writer);
 
 			Diff xmlDiff = new Diff(IOUtils.toString(xmlTestFile), writer.toString());
 

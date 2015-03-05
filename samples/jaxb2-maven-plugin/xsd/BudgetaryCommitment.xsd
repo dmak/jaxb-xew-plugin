@@ -1,4 +1,4 @@
-<xs:schema xmlns="budgetary/commitment" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:con="budgetary/reference" targetNamespace="budgetary/commitment" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema xmlns="budgetary/commitment" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:con="budgetary/reference" targetNamespace="budgetary/commitment" elementFormDefault="qualified">
 	<xs:import namespace="budgetary/reference" schemaLocation="ContractorReference.xsd" />
 	<xs:element name="BudgetaryCommitment" type="BudgetaryCommitmentType" />
 	<xs:complexType name="BudgetaryCommitmentType">

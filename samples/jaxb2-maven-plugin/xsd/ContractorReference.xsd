@@ -1,4 +1,4 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="budgetary/reference" targetNamespace="budgetary/reference" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="budgetary/reference" targetNamespace="budgetary/reference" elementFormDefault="qualified">
 	<xs:complexType name="ContractorReferencesType" abstract="false">
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="PrimaryContractorReference" type="PrimaryContractorReferenceType" />

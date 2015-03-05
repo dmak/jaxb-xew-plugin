@@ -933,14 +933,16 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			else {
 				// Default (mostly used) namespace is generated as annotation for the package,
 				// see com.sun.tools.xjc.generator.bean.PackageOutlineImpl#calcDefaultValues()
-				JExpression packageWideNamespace = getAnnotationMemberExpression(
-				            getAnnotation(
-				                        (objectFactoryClass != null ? objectFactoryClass : valueObjectFactoryClass)
-				                                    .getPackage(),
-				                        xmlSchemaModelClass), "namespace");
+				JAnnotationUse schemaAnnotation = getAnnotation((objectFactoryClass != null ? objectFactoryClass
+				            : valueObjectFactoryClass).getPackage(), xmlSchemaModelClass);
+				JExpression elementFormDefault = getAnnotationMemberExpression(schemaAnnotation, "elementFormDefault");
 
-				if (packageWideNamespace != null) {
-					fieldTargetNamespace = generableToString(packageWideNamespace);
+				if (elementFormDefault != null && generableToString(elementFormDefault).endsWith(".QUALIFIED")) {
+					JExpression packageWideNamespace = getAnnotationMemberExpression(schemaAnnotation, "namespace");
+
+					if (packageWideNamespace != null) {
+						fieldTargetNamespace = generableToString(packageWideNamespace);
+					}
 				}
 			}
 

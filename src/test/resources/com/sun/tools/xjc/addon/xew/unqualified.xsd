@@ -1,0 +1,32 @@
+<xs:schema
+	version="1.0"
+	jaxb:version="2.1"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns="testNamespace"
+	targetNamespace="testNamespace"
+	elementFormDefault="unqualified"
+>
+
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="unqualified" />
+			</jaxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:element name="rootElement">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="stringList" type="StringListType" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="StringListType">
+		<xs:sequence>
+			<xs:element name="listItem" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

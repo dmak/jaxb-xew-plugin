@@ -2,7 +2,7 @@
 <xsd:schema xmlns="http://jax-ws-commons.jvnet.org/test" targetNamespace="http://jax-ws-commons.jvnet.org/test"
             xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            elementFormDefault="qualified" attributeFormDefault="unqualified"
+            elementFormDefault="qualified"
             jaxb:version="2.1"
             version="1.0">
 	<xsd:element name="listRequest" type="listRequest"/>
