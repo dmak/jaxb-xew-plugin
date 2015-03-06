@@ -265,7 +265,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 
 #### jaxb2-maven-plugin
 
-Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which is not compatible with this plugin, thus additional dependency is needed to be added to **plugin classpath**.
+Note: `jaxb2-maven-plugin` v1.5 was compiled against JAXB XJC API v2.1.13 which is not compatible with this plugin, thus additional dependency is needed to be added to **plugin classpath**. The same apples to v1.6 of the plugin.
 
     <plugin>
     	<groupId>org.codehaus.mojo</groupId>
