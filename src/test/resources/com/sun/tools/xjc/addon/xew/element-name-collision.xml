@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root
+	xmlns="http://foo.org/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://foo.org/ element-same-name.xsd"
+>
+	<action>
+		<add>
+			<item>
+				<value>SpiderMan</value>
+				<key>Mutant</key>
+			</item>
+			<item>
+				<value>Luke Skywalker</value>
+				<key>Jedi</key>
+			</item>
+		</add>
+	</action>
+</root>

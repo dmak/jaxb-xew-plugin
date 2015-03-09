@@ -196,6 +196,13 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
+	public void testElementNameCollision() throws Exception {
+		// Most classes cannot be tested for content
+		assertXsd("element-name-collision", new String[] { "-debug", "-Xxew:instantiate", "lazy" }, false, "Root",
+		            "package-info");
+	}
+
+	@Test
 	public void testElementScoped() throws Exception {
 		// Most classes cannot be tested for content
 		assertXsd("element-scoped", new String[] { "-debug" }, false, "Return", "package-info");

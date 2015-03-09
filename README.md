@@ -351,6 +351,10 @@ You can find more examples of this plugin in [`samples`](samples/) directory (in
 
 ## What's new
 
+### v1.5 (future release)
+
+* Bugs fixed ([#39](https://github.com/dmak/jaxb-xew-plugin/issues/39), [#40](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#33](https://github.com/dmak/jaxb-xew-plugin/issues/40)).
+
 ### v1.4
 
 * Bugs fixed ([#21](https://github.com/dmak/jaxb-xew-plugin/issues/21), [#32](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#33](https://github.com/dmak/jaxb-xew-plugin/issues/33)).

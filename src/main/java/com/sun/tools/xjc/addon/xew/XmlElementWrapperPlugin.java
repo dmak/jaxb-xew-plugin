@@ -437,14 +437,14 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 				for (Candidate c : candidatesMap.values()) {
 					// Skip fields with basic types as for example any class can be casted to Object.
-					if (fieldType.isAssignableFrom(c.getCandidateClass()) && !isHiddenClass(fieldType)) {
+					if (fieldType.isAssignableFrom(c.getClazz()) && !isHiddenClass(fieldType)) {
 						// If the given field has type T, it cannot be also in the list of parametrisations (e.g. T<T>).
 						candidate = c;
 						break;
 					}
 					// If the candidate T is referred from list of parametrisations (e.g. List<T>), it cannot be removed.
 					// However field substitutions will take place.
-					else if (isListedAsParametrisation(c.getCandidateClass(), fieldType)) {
+					else if (isListedAsParametrisation(c.getClazz(), fieldType)) {
 						logger.debug("Candidate " + c.getClassName() + " is listed as parametrisation of "
 						            + targetClass.fullName() + "#" + fieldName + " and hence won't be removed.");
 						c.unmarkForRemoval();
@@ -705,11 +705,11 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	}
 
 	/**
-	 * If candidate class contains the inner class, which will be referred from collection, then this inner class has to
-	 * be moved to top class. For example from<br>
-	 * {@code TopClass -> ContainerClass (marked for removal) -> ElementClass}<br>
+	 * If candidate class contains the inner class which is collection parametrisation (type), then this inner class has
+	 * to be moved to top class. For example from<br>
+	 * {@code TypeClass (is a collection type) -> ContainerClass (marked for removal) -> ElementClass}<br>
 	 * we need to get<br>
-	 * {@code TopClass (will have a collection) -> ElementClass}.<br>
+	 * {@code TypeClass -> ElementClass}.<br>
 	 * Also this move should be reflected on factory method names.
 	 */
 	private boolean moveInnerClassToParent(Outline outline, Candidate candidate) {
@@ -720,7 +720,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 		JDefinedClass fieldParametrisationImpl = candidate.getFieldParametrisationImpl();
 
-		if (candidate.getCandidateClass() != fieldParametrisationImpl.parentContainer()) {
+		if (candidate.getClazz() != fieldParametrisationImpl.parentContainer()) {
+			// Field parametrisation class is not inner class of the candidate:
 			return false;
 		}
 
@@ -975,7 +976,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			}
 
 			// Get the defined class for candidate class.
-			JDefinedClass candidateClass = candidate.getCandidateClass();
+			JDefinedClass candidateClass = candidate.getClazz();
 
 			deletionCount += deleteFactoryMethod(candidate.getValueObjectFactoryClass(), candidate);
 
@@ -1038,8 +1039,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			// * @XmlElementDecl(..., scope = X.class)
 			//   public JAXBElement<T> createT...(T value) { return new JAXBElement<...>(QNAME, T.class, X.class, value); }
 			if ((method.type() instanceof JDefinedClass && ((JDefinedClass) method.type()).isAssignableFrom(candidate
-			            .getCandidateClass()))
-			            || isListedAsParametrisation(candidate.getCandidateClass(), method.type())
+			            .getClazz()))
+			            || isListedAsParametrisation(candidate.getClazz(), method.type())
 			            || candidate.getScopedElementInfos().containsKey(method.name())) {
 				writeSummary("\tRemoving factory method [" + method.type().fullName() + "#" + method.name()
 				            + "()] from " + factoryClass.fullName());
@@ -1075,30 +1076,32 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	}
 
 	/**
-	 * Move the given class to his grandparent (either class or package).
+	 * Move the given class to his grandparent (either class or package). The given {@code clazz} should be inner class.
 	 */
 	@SuppressWarnings("unchecked")
 	private void moveClassLevelUp(Outline outline, JDefinedClass clazz) {
 		// Modify the container so it now refers the class. Container can be a class or package.
-		JClassContainer container = clazz.parentContainer().parentContainer();
+		JDefinedClass parent = (JDefinedClass) clazz.parentContainer();
+		JClassContainer grandParent = parent.parentContainer();
+		Map<String, JDefinedClass> classes;
 
 		// FIXME: Pending https://java.net/jira/browse/JAXB-957
-		if (container.isClass()) {
+		if (grandParent.isClass()) {
 			// Element class should be added as its container child:
-			JDefinedClass parentClass = (JDefinedClass) container;
+			JDefinedClass grandParentClass = (JDefinedClass) grandParent;
 
-			writeSummary("\tMoving inner class " + clazz.fullName() + " to class " + parentClass.fullName());
+			writeSummary("\tMoving inner class " + clazz.fullName() + " to class " + grandParentClass.fullName());
 
-			((Map<String, JDefinedClass>) getPrivateField(parentClass, "classes")).put(clazz.name(), clazz);
+			classes = ((Map<String, JDefinedClass>) getPrivateField(grandParentClass, "classes"));
 		}
 		else {
-			JPackage parentPackage = (JPackage) container;
+			JPackage grandParentPackage = (JPackage) grandParent;
 
-			writeSummary("\tMoving inner class " + clazz.fullName() + " to package " + parentPackage.name());
+			writeSummary("\tMoving inner class " + clazz.fullName() + " to package " + grandParentPackage.name());
 
-			((Map<String, JDefinedClass>) getPrivateField(parentPackage, "classes")).put(clazz.name(), clazz);
+			classes = ((Map<String, JDefinedClass>) getPrivateField(grandParentPackage, "classes"));
 
-			// In this scenario class should have "static" modifier reset:
+			// In this scenario class should have "static" modifier reset otherwise it won't compile:
 			setPrivateField(clazz.mods(), "mods", Integer.valueOf(clazz.mods().getValue() & ~JMod.STATIC));
 
 			for (ClassOutline classOutline : outline.getClasses()) {
@@ -1109,12 +1112,21 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 					assert (sc instanceof XSDeclaration && ((XSDeclaration) sc).isLocal());
 
 					setPrivateField(sc, "anonymous", Boolean.FALSE);
+
+					break;
 				}
 			}
 		}
 
+		if (classes.containsKey(clazz.name())) {
+			writeSummary("\tRenaming class " + clazz.fullName() + " to class " + parent.name() + clazz.name());
+			setPrivateField(clazz, "name", parent.name() + clazz.name());
+		}
+
+		classes.put(clazz.name(), clazz);
+
 		// Finally modify the class so that it refers back the container:
-		setPrivateField(clazz, "outer", container);
+		setPrivateField(clazz, "outer", grandParent);
 	}
 
 	/**
@@ -1307,7 +1319,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		/**
 		 * Container class
 		 */
-		public JDefinedClass getCandidateClass() {
+		public JDefinedClass getClazz() {
 			return candidateClass;
 		}
 
@@ -1319,7 +1331,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		}
 
 		/**
-		 * The only field in container class.
+		 * The only field in container class (collection property).
 		 */
 		public JFieldVar getField() {
 			return field;
@@ -1333,7 +1345,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		}
 
 		/**
-		 * The class of the only field in container class.
+		 * The class of the only field in container class (collection interface or concrete implementation).
 		 */
 		public JClass getFieldClass() {
 			return (JClass) field.type();
@@ -1347,15 +1359,15 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		}
 
 		/**
-		 * The only parametrisation class of the field. In case of basic parametrisation like {@link List<String>} this
-		 * property is {@code null}.
+		 * The only parametrisation class of the field (collection type). In case of basic parametrisation like
+		 * {@link List<String>} this property is {@code null}.
 		 */
 		public JDefinedClass getFieldParametrisationClass() {
 			return fieldParametrisationClass;
 		}
 
 		/**
-		 * If {@link #getFieldParametrisationClass()} is an interface, then this holds that same value. Otherwise it
+		 * If {@link #getFieldParametrisationClass()} is an interface, then this holds the same value. Otherwise it
 		 * holds the implementation (value object) of {@link #getFieldParametrisationClass()}. In case of basic
 		 * parametrisation like {@code List<String>} this property is {@code null}.
 		 */
