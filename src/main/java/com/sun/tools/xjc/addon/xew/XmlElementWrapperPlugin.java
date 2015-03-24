@@ -1078,7 +1078,6 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	/**
 	 * Move the given class to his grandparent (either class or package). The given {@code clazz} should be inner class.
 	 */
-	@SuppressWarnings("unchecked")
 	private void moveClassLevelUp(Outline outline, JDefinedClass clazz) {
 		// Modify the container so it now refers the class. Container can be a class or package.
 		JDefinedClass parent = (JDefinedClass) clazz.parentContainer();
@@ -1092,14 +1091,14 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 			writeSummary("\tMoving inner class " + clazz.fullName() + " to class " + grandParentClass.fullName());
 
-			classes = ((Map<String, JDefinedClass>) getPrivateField(grandParentClass, "classes"));
+			classes = getPrivateField(grandParentClass, "classes");
 		}
 		else {
 			JPackage grandParentPackage = (JPackage) grandParent;
 
 			writeSummary("\tMoving inner class " + clazz.fullName() + " to package " + grandParentPackage.name());
 
-			classes = ((Map<String, JDefinedClass>) getPrivateField(grandParentPackage, "classes"));
+			classes = getPrivateField(grandParentPackage, "classes");
 
 			// In this scenario class should have "static" modifier reset otherwise it won't compile:
 			setPrivateField(clazz.mods(), "mods", Integer.valueOf(clazz.mods().getValue() & ~JMod.STATIC));
@@ -1164,15 +1163,6 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Returns {@code true} if given annotation is the container of other annotations.
-	 */
-	private static boolean isAnnotationContainer(JAnnotationUse annotation) {
-		String annotationClassName = annotation.getAnnotationClass().name();
-
-		return (annotationClassName.equals("XmlElementRefs") || annotationClassName.equals("XmlElements"));
 	}
 
 	/**

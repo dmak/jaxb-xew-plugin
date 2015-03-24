@@ -74,8 +74,7 @@ public final class CommonUtils {
 		}
 
 		// FIXME: Workaround for https://java.net/jira/browse/JAXB-1040:
-		Map<String, JAnnotationValue> memberValues = (Map<String, JAnnotationValue>) getPrivateField(annotation,
-		            "memberValues");
+		Map<String, JAnnotationValue> memberValues = getPrivateField(annotation, "memberValues");
 
 		if (memberValues == null) {
 			return null;
@@ -111,17 +110,17 @@ public final class CommonUtils {
 	/**
 	 * Append the given annotation to list of annotations.
 	 */
-	@SuppressWarnings("unchecked")
 	public static void addAnnotation(JVar field, JAnnotationUse annotation) {
-		((List<JAnnotationUse>) getPrivateField(field, "annotations")).add(annotation);
+		List<JAnnotationUse> annotations = getPrivateField(field, "annotations");
+		annotations.add(annotation);
 	}
 
 	/**
 	 * Remove the given annotation from the list of annotations.
 	 */
-	@SuppressWarnings("unchecked")
 	public static void removeAnnotation(JVar field, JAnnotationUse annotation) {
-		((List<JAnnotationUse>) getPrivateField(field, "annotations")).remove(annotation);
+		List<JAnnotationUse> annotations = getPrivateField(field, "annotations");
+		annotations.remove(annotation);
 	}
 
 	/**
@@ -208,7 +207,7 @@ public final class CommonUtils {
 	/**
 	 * Get the value of private field {@code fieldName} of given object {@code obj}.
 	 */
-	public static Object getPrivateField(Object obj, String fieldName) {
+	public static <T> T getPrivateField(Object obj, String fieldName) {
 		try {
 			return getPrivateField(obj, obj.getClass(), fieldName);
 		}
@@ -224,11 +223,12 @@ public final class CommonUtils {
 	 * @throws NoSuchFieldException
 	 *             if given field was not found
 	 */
-	private static Object getPrivateField(Object obj, Class<?> clazz, String fieldName) throws NoSuchFieldException {
+	@SuppressWarnings("unchecked")
+	private static <T> T getPrivateField(Object obj, Class<?> clazz, String fieldName) throws NoSuchFieldException {
 		try {
 			Field field = clazz.getDeclaredField(fieldName);
 			field.setAccessible(true);
-			return field.get(obj);
+			return (T) field.get(obj);
 		}
 		catch (NoSuchFieldException e) {
 			if (clazz.getSuperclass() == Object.class) {
