@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAnyElement;
@@ -1158,6 +1159,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				ClassOutline classOutline = iter.next();
 				if (classOutline.implClass == clazz) {
 					outline.getModel().beans().remove(classOutline.target);
+					Set<Object> packageClasses = getPrivateField(classOutline._package(), "classes");
+					packageClasses.remove(classOutline);
 					iter.remove();
 					break;
 				}

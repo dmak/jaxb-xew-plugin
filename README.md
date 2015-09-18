@@ -176,11 +176,11 @@ For correct generation of episode file the corresponding XJC options should foll
 
 This will trigger episode plugin _after_ Xew plugin and episode file will be correctly generated.
 
-### `fluent-api` and `value-constructor` plugins
+### `fluent-api`, `value-constructor` and `jaxbindex` plugins
 
 These plugins should be activated _after_ Xew plugin:
 
-`... -Xxew -Xfluent-api -Xvalue-constructor ...`
+`... -Xxew -Xfluent-api -Xvalue-constructor -Xjaxbindex ...`
 
 Otherwise (if they are activated before) Xew plugin cannot revert/complement the changes they made and compile-time error is guaranteed.
 
@@ -357,9 +357,15 @@ compileJava.dependsOn processXSDs
 
 ## What's new
 
+<!--
+### v1.6
+
+* Bugs fixed ([#41](https://github.com/dmak/jaxb-xew-plugin/issues/41)).
+-->
+
 ### v1.5
 
-* Bugs fixed ([#39](https://github.com/dmak/jaxb-xew-plugin/issues/39), [#40](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#33](https://github.com/dmak/jaxb-xew-plugin/issues/40)).
+* Bugs fixed ([#32](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#39](https://github.com/dmak/jaxb-xew-plugin/issues/39), [#40](https://github.com/dmak/jaxb-xew-plugin/issues/40)).
 
 ### v1.4
 
