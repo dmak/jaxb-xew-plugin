@@ -2,7 +2,6 @@ package com.sun.tools.xjc.addon.xew;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +26,8 @@ import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 import com.sun.xml.xsom.XSParticle;
 import com.sun.xml.xsom.XSTerm;
+
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 public final class CommonUtils {
 
@@ -98,9 +99,9 @@ public final class CommonUtils {
 		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
 		try {
 			// In most cases the value is some expression...
-			return (JExpression) getPrivateField(annotationValue, annotationValue.getClass(), "value");
+			return (JExpression) getPrivateField(annotationValue, "value");
 		}
-		catch (NoSuchFieldException e) {
+		catch (IllegalArgumentException e) {
 			// ... and in some cases (like enum) do the conversion from JGenerable to JExpression
 			// (a bit unoptimal, since this expression is going to be converted back to string)
 			return JExpr.lit(generableToString(annotationValue));
@@ -168,36 +169,15 @@ public final class CommonUtils {
 	// Reflection helpers.
 	//
 
-	public static void setPrivateField(Object obj, String fieldName, Object newValue) {
-		try {
-			setPrivateField(obj, obj.getClass(), fieldName, newValue);
-		}
-		catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	/**
 	 * Set the {@code newValue} to private field {@code fieldName} of given object {@code obj}.
 	 * 
 	 * @throws NoSuchFieldException
 	 *             if given field was not found
 	 */
-	private static void setPrivateField(Object obj, Class<?> clazz, String fieldName, Object newValue)
-	            throws NoSuchFieldException {
+	public static void setPrivateField(Object obj, String fieldName, Object newValue) {
 		try {
-			Field field = clazz.getDeclaredField(fieldName);
-			field.setAccessible(true);
-			field.set(obj, newValue);
-		}
-		catch (NoSuchFieldException e) {
-			if (clazz.getSuperclass() == Object.class) {
-				// Field is really not found:
-				throw e;
-			}
-
-			// Try super class:
-			setPrivateField(obj, clazz.getSuperclass(), fieldName, newValue);
+			FieldUtils.writeField(obj, fieldName, newValue, true);
 		}
 		catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -206,38 +186,14 @@ public final class CommonUtils {
 
 	/**
 	 * Get the value of private field {@code fieldName} of given object {@code obj}.
-	 */
-	public static <T> T getPrivateField(Object obj, String fieldName) {
-		try {
-			return getPrivateField(obj, obj.getClass(), fieldName);
-		}
-		catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * Get the value of private field {@code fieldName} of given object {@code obj} which is treated as class
-	 * {@code clazz}.
 	 * 
-	 * @throws NoSuchFieldException
+	 * @throws IllegalArgumentException
 	 *             if given field was not found
 	 */
 	@SuppressWarnings("unchecked")
-	private static <T> T getPrivateField(Object obj, Class<?> clazz, String fieldName) throws NoSuchFieldException {
+	public static <T> T getPrivateField(Object obj, String fieldName) {
 		try {
-			Field field = clazz.getDeclaredField(fieldName);
-			field.setAccessible(true);
-			return (T) field.get(obj);
-		}
-		catch (NoSuchFieldException e) {
-			if (clazz.getSuperclass() == Object.class) {
-				// Field is really not found:
-				throw e;
-			}
-
-			// Try super class:
-			return getPrivateField(obj, clazz.getSuperclass(), fieldName);
+			return (T) FieldUtils.readField(obj, fieldName, true);
 		}
 		catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
