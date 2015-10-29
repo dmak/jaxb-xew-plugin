@@ -210,7 +210,7 @@ To use the plugin from Ant you will need something like the following in your bu
 	<path id="xjc.classpath">
 		<fileset dir="libs">
 			<include name="jaxb2-basics-tools-0.6.5.jar" />
-			<include name="jaxb-xew-plugin-1.5.jar" />
+			<include name="jaxb-xew-plugin-1.6.jar" />
 		</fileset>
 	</path>
 	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
@@ -261,7 +261,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.5</version>
+						<version>1.6</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -298,7 +298,7 @@ Note: `jaxb2-maven-plugin` v1.5 (the same apples to v1.6) was compiled against J
 		<dependency>
 			<groupId>com.github.jaxb-xew-plugin</groupId>
 			<artifactId>jaxb-xew-plugin</artifactId>
-			<version>1.5</version>
+			<version>1.6</version>
 		</dependency>
 		<!--
 		 | We need to update the jaxb-xjc plugin version from 2.1.13 to the 2.2.4-1 version
@@ -336,7 +336,7 @@ dependencies {
   compile 'com.sun.xml.bind:jaxb-core:2.2.7'
   compile 'javax.xml.bind:jaxb-api:2.2.7'
 
-  xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.5"
+  xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.6"
   xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
 }
 
@@ -357,11 +357,9 @@ compileJava.dependsOn processXSDs
 
 ## What's new
 
-<!--
 ### v1.6
 
 * Bugs fixed ([#41](https://github.com/dmak/jaxb-xew-plugin/issues/41)).
--->
 
 ### v1.5
 
