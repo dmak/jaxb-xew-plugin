@@ -4,7 +4,7 @@
 
 This JAXB plugin utilises the power of `@XmlElementWrapper` annotation. Originally `xjc` trends to create wrapper classes which are the containers for collections. This plugin goes through all properties to find ones which can be represented in the model in more optimal way.
 
-If you like this plugin, please give in a star in GutHub!
+If you like this plugin, please give in a star in GutHub! Report the issues to [bugtracker](https://github.com/dmak/jaxb-xew-plugin/issues/) or use [`jaxb-xew-plugin`](http://stackoverflow.com/questions/tagged/jaxb-xew-plugin) tag on StackOverflow.
 
 ## The problem origin in details
 
@@ -176,11 +176,11 @@ For correct generation of episode file the corresponding XJC options should foll
 
 This will trigger episode plugin _after_ Xew plugin and episode file will be correctly generated.
 
-### `fluent-api`, `value-constructor` and `jaxbindex` plugins
+### `equals`, `hashCode`, `fluent-api`, `value-constructor` and `jaxbindex` plugins
 
 These plugins should be activated _after_ Xew plugin:
 
-`... -Xxew -Xfluent-api -Xvalue-constructor -Xjaxbindex ...`
+`... -Xxew -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xjaxbindex ...`
 
 Otherwise (if they are activated before) Xew plugin cannot revert/complement the changes they made and compile-time error is guaranteed.
 
@@ -301,9 +301,9 @@ Note: `jaxb2-maven-plugin` v1.5 (the same apples to v1.6) was compiled against J
 			<version>1.6</version>
 		</dependency>
 		<!--
-		 | We need to update the jaxb-xjc plugin version from 2.1.13 to the 2.2.4-1 version
-		 | used by the jaxb-xew-plugin (version 2.1.13 which does not have the required
-		 | method com.suun.codemodel.JAnnotatable.annotations()Ljava/util/Collection).
+		 | We need to update the jaxb-xjc plugin from v2.1.13 to v2.2.4-1
+		 | used by the jaxb-xew-plugin (v2.1.13 does not have the required
+		 | method com.sun.codemodel.JAnnotatable.annotations()Ljava/util/Collection).
 		 -->
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
@@ -356,6 +356,10 @@ compileJava.dependsOn processXSDs
 ```
 
 ## What's new
+
+### v1.7 (future release)
+
+* Bugs fixed ([#45](https://github.com/dmak/jaxb-xew-plugin/issues/45)).
 
 ### v1.6
 
