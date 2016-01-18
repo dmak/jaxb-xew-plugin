@@ -40,10 +40,10 @@ import javax.xml.bind.annotation.XmlType;
 public class Conversion {
 
     @XmlElementWrapper(name = "accept", required = true)
-    @XmlElement(name = "elements")
+    @XmlElement(name = "elements", nillable = true)
     protected List<Object> accepts = new ArrayList<Object>();
     @XmlElementWrapper(name = "return", required = true)
-    @XmlElement(name = "entry")
+    @XmlElement(name = "entry", nillable = true)
     protected List<Entry> returns = new ArrayList<Entry>();
 
     public List<Object> getAccepts() {

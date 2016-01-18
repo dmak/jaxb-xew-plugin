@@ -15,6 +15,7 @@
 				<value>Luke Skywalker</value>
 				<key>Jedi</key>
 			</item>
+			<item xsi:nil="true" />
 		</add>
 	</action>
 </root>

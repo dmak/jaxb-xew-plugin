@@ -58,13 +58,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
-import org.custommonkey.xmlunit.DifferenceConstants;
-import org.custommonkey.xmlunit.DifferenceListener;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -350,24 +347,9 @@ public class XmlElementWrapperPluginTest {
 			Object bean = unmarshaller.unmarshal(xmlTestFile);
 			marshaller.marshal(bean, writer);
 
+			XMLUnit.setIgnoreComments(true);
+			XMLUnit.setIgnoreWhitespace(true);
 			Diff xmlDiff = new Diff(IOUtils.toString(xmlTestFile), writer.toString());
-
-			// This listener ignores text nodes that differ only by leading/trailing whitespace:
-			xmlDiff.overrideDifferenceListener(new DifferenceListener() {
-
-				public int differenceFound(Difference difference) {
-					if (difference.getId() == DifferenceConstants.TEXT_VALUE_ID
-					            && difference.getControlNodeDetail().getValue().trim()
-					                        .equals(difference.getTestNodeDetail().getValue().trim())) {
-						return RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR;
-					}
-
-					return RETURN_ACCEPT_DIFFERENCE;
-				}
-
-				public void skippedComparison(Node control, Node test) {
-				}
-			});
 
 			assertXMLEqual("Generated XML is wrong: " + writer.toString(), xmlDiff, true);
 		}

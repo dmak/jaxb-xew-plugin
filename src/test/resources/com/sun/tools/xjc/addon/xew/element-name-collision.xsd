@@ -38,7 +38,7 @@
 							<xs:element name="add">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+										<xs:element name="item" minOccurs="0" maxOccurs="unbounded" nillable="true">
 											<xs:complexType>
 												<xs:all>
 													<xs:element name="key" type="xs:string" />

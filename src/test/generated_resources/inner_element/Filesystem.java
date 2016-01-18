@@ -84,7 +84,7 @@ public class Filesystem
     @XmlElement(name = "file-listing", required = true)
     protected Filesystem.FileListing fileListing;
     @XmlElementWrapper(name = "directory-listing", required = true)
-    @XmlElement(name = "directory-item")
+    @XmlElement(name = "directory-item", defaultValue = "SPAM")
     protected List<String> directoryListing;
     @XmlElement(required = true)
     protected Volumes volumes;

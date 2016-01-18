@@ -191,7 +191,7 @@ public class Root {
         @XmlElement(name = "item", namespace = "http://foo.org/")
         protected List<Root.Action.Item> update;
         @XmlElementWrapper
-        @XmlElement(name = "item", namespace = "http://foo.org/")
+        @XmlElement(name = "item", namespace = "http://foo.org/", nillable = true)
         protected List<Root.Action.AddItem> add;
 
         public List<Root.Action.Item> getUpdate() {

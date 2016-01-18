@@ -9,6 +9,7 @@
 				<imaginary>44.9</imaginary>
 			</number>
 			<number type="integer">-491</number>
+			<number xsi:nil="true" />
 			<number type="real">-1.22</number>
 		</elements>
 	</accept>

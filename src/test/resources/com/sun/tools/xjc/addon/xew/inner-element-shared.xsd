@@ -29,7 +29,7 @@
 							<!--
 								Example of collection with basic type (string).
 							-->
-							<xs:element name="directory-item" maxOccurs="unbounded">
+							<xs:element name="directory-item" maxOccurs="unbounded" default="SPAM">
 								<xs:simpleType>
 									<xs:restriction base="xs:string" />
 								</xs:simpleType>

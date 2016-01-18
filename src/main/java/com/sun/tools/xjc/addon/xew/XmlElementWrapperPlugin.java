@@ -103,7 +103,8 @@ import org.xml.sax.SAXException;
  * for handling collection types. The code generated will be annotated with {@link XmlElementWrapper} and
  * {@link XmlElement} annotations and will have no extra inner classes representing the immediate collection type.
  * 
- * @see <a href="http://www.conspicio.dk/blog/bjarne/jaxb-xmlelementwrapper-plugin">plugin site</a>
+ * @see <a href="https://github.com/dmak/jaxb-xew-plugin">plugin site</a>
+ * @see <a href="http://www.conspicio.dk/blog/bjarne/jaxb-xmlelementwrapper-plugin">original plugin site</a>
  * @see <a href="http://www.conspicio.dk/projects/overview">source code and binary packages</a>
  * 
  * @author Bjarne Hansen
@@ -597,10 +598,11 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 					// We cannot just re-use the same annotation object instance, as for example, we need to set XML name and this
 					// will impact the candidate field annotation in case candidate is unmarked from removal.
 					JAnnotationUse xmlElementAnnotation = originalImplField.annotate(xmlElementModelClass);
-					xmlElementOriginalAnnotation = getAnnotation(candidate.getField(), xmlElementModelClass);
+					JAnnotationUse xmlElementCandidateAnnotation = getAnnotation(candidate.getField(),
+					            xmlElementModelClass);
 
 					// xmlElementOriginalAnnotation can be null:
-					JExpression xmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
+					JExpression xmlName = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "name");
 					if (xmlName != null) {
 						xmlElementAnnotation.param("name", xmlName);
 					}
@@ -608,7 +610,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 						xmlElementAnnotation.param("name", candidate.getFieldName());
 					}
 
-					JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "namespace");
+					JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "namespace");
 					if (xmlNamespace != null) {
 						xmlElementAnnotation.param("namespace", xmlNamespace);
 					}
@@ -616,9 +618,19 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 						xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
 					}
 
-					JExpression type = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "type");
+					JExpression type = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "type");
 					if (type != null) {
 						xmlElementAnnotation.param("type", type);
+					}
+
+					JExpression required = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "defaultValue");
+					if (required != null) {
+						xmlElementAnnotation.param("defaultValue", required);
+					}
+
+					JExpression nillable = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "nillable");
+					if (nillable != null) {
+						xmlElementAnnotation.param("nillable", nillable);
 					}
 				}
 

@@ -18,6 +18,10 @@
 	<directory-listing>
 		<directory-item>INBOX</directory-item>
 		<directory-item>OUTBOX</directory-item>
+		<!--
+		Default value is difficult to test, since this empty value is turned to <directory-item>SPAM</directory-item>
+		<directory-item></directory-item>
+		-->
 		<directory-item>DRAFTS</directory-item>
 	</directory-listing>
 	<volumes>
