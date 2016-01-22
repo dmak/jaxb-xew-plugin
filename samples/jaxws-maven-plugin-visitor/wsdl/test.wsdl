@@ -12,10 +12,10 @@
 	</wsdl:types>
 
 	<wsdl:message name="listReqMsg">
-		<wsdl:part name="parameters" element="listRequest"/>
+		<wsdl:part name="body" element="listRequest"/>
 	</wsdl:message>
 	<wsdl:message name="listRespMsg">
-		<wsdl:part name="parameters" element="listResponse"/>
+		<wsdl:part name="body" element="listResponse"/>
 	</wsdl:message>
 
 	<wsdl:portType name="testPort">

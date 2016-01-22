@@ -12,13 +12,16 @@
 	</wsdl:types>
 
 	<wsdl:message name="listReqMsg">
-		<wsdl:part name="parameters" element="listRequest"/>
+		<wsdl:part name="parameter" element="list"/>
 	</wsdl:message>
 	<wsdl:message name="listRespMsg">
-		<wsdl:part name="parameters" element="listResponse"/>
+		<wsdl:part name="result" element="listResponse"/>
 	</wsdl:message>
 
 	<wsdl:portType name="testPort">
+		<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+			<jaxws:enableWrapperStyle>true</jaxws:enableWrapperStyle>
+		</jaxws:bindings>
 		<wsdl:operation name="list">
 			<wsdl:input message="listReqMsg"/>
 			<wsdl:output message="listRespMsg"/>

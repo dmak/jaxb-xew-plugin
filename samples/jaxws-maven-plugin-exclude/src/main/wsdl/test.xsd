@@ -5,22 +5,29 @@
             elementFormDefault="qualified"
             jaxb:version="2.1"
             version="1.0">
-	<xsd:element name="listRequest" type="listRequest"/>
-	<xsd:element name="listResponse" type="listResponse"/>
 
-	<xsd:complexType name="listRequest">
-		<xsd:sequence />
-	</xsd:complexType>
+	<xsd:element name="list">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="amount" type="xsd:integer"/>
+				<xsd:element name="good" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="urgent" type="xsd:boolean"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="listResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:annotation>
+					<xsd:appinfo>
+						<jaxb:property name="items"/>
+					</xsd:appinfo>
+				</xsd:annotation>
 
-	<xsd:complexType name="listResponse">
-		<xsd:sequence>
-			<xsd:annotation>
-				<xsd:appinfo>
-					<jaxb:property name="items"/>
-				</xsd:appinfo>
-			</xsd:annotation>
+				<xsd:element name="item" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 
-			<xsd:element name="item" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-		</xsd:sequence>
-	</xsd:complexType>
 </xsd:schema>
