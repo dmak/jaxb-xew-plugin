@@ -210,7 +210,7 @@ To use the plugin from Ant you will need something like the following in your bu
 	<path id="xjc.classpath">
 		<fileset dir="libs">
 			<include name="jaxb2-basics-tools-0.6.5.jar" />
-			<include name="jaxb-xew-plugin-1.6.jar" />
+			<include name="jaxb-xew-plugin-1.7.jar" />
 		</fileset>
 	</path>
 	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
@@ -232,7 +232,7 @@ To use the plugin from Ant you will need something like the following in your bu
 
 #### maven-jaxb2-plugin
 
-Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API which is not compatible with this plugin. Version 0.8.1 is guaranteed to work, versions 0.8.2 and 0.8.3 should also work fine.
+Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API which _is not compatible with this plugin_. Version 0.8.1 is guaranteed to work, versions 0.8.2 and later should also work fine.
 ```xml
 <plugin>
 	<groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -261,7 +261,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.6</version>
+						<version>1.7</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -271,7 +271,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 ```
 #### jaxb2-maven-plugin
 
-Note: `jaxb2-maven-plugin` v1.5 (the same apples to v1.6) was compiled against JAXB XJC API v2.1.13 which is not compatible with this plugin, thus additional dependency is needed to be added to **plugin classpath**.
+Note: `jaxb2-maven-plugin` v1.5 (the same apples to v1.6) was compiled against JAXB XJC API v2.1.13 which _is not compatible with this plugin_, thus additional dependency is needed to be added to **plugin classpath**.
 ```xml
 <plugin>
 	<groupId>org.codehaus.mojo</groupId>
@@ -298,7 +298,7 @@ Note: `jaxb2-maven-plugin` v1.5 (the same apples to v1.6) was compiled against J
 		<dependency>
 			<groupId>com.github.jaxb-xew-plugin</groupId>
 			<artifactId>jaxb-xew-plugin</artifactId>
-			<version>1.6</version>
+			<version>1.7</version>
 		</dependency>
 		<!--
 		 | We need to update the jaxb-xjc plugin from v2.1.13 to v2.2.4-1
@@ -336,7 +336,7 @@ dependencies {
   compile 'com.sun.xml.bind:jaxb-core:2.2.7'
   compile 'javax.xml.bind:jaxb-api:2.2.7'
 
-  xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.6"
+  xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.7"
   xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
 }
 
@@ -357,43 +357,43 @@ compileJava.dependsOn processXSDs
 
 ## What's new
 
-### v1.7 (future release)
+### [v1.7](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.7|jar)
 
 * Bugs fixed ([#45](https://github.com/dmak/jaxb-xew-plugin/issues/45)).
 
-### v1.6
+### [v1.6](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.6|jar)
 
 * Bugs fixed ([#41](https://github.com/dmak/jaxb-xew-plugin/issues/41)).
 
-### v1.5
+### [v1.5](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.5|jar)
 
 * Bugs fixed ([#32](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#39](https://github.com/dmak/jaxb-xew-plugin/issues/39), [#40](https://github.com/dmak/jaxb-xew-plugin/issues/40)).
 
-### v1.4
+### [v1.4](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.4|jar)
 
 * Bugs fixed ([#21](https://github.com/dmak/jaxb-xew-plugin/issues/21), [#32](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#33](https://github.com/dmak/jaxb-xew-plugin/issues/33)).
 
-### v1.3
+### [v1.3](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.3|jar)
 
 * Improvements:
   * More flexible control file ([#23](https://github.com/dmak/jaxb-xew-plugin/issues/23))
   * In-schema plugin customization [#28](https://github.com/dmak/jaxb-xew-plugin/issues/28))
 * Bugs fixed ([#22](https://github.com/dmak/jaxb-xew-plugin/issues/22), [#26](https://github.com/dmak/jaxb-xew-plugin/issues/26)).
-* The option `-Xxew:delete` is removed as in majorify of usecases it is set to true. Now by default plugin deletes all candidates. To prevent them from being deleted, create [control file](#control-file) with only line `/.*/=keep`.
+* The option `-Xxew:delete` is removed as in majority of usecases it is set to true. Now by default plugin deletes all candidates. To prevent them from being deleted, create [control file](#control-file) with only line `/.*/=keep`.
 
-### v1.2
+### [v1.2](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.2|jar)
 
 * Plugin is improved ([#14](https://github.com/dmak/jaxb-xew-plugin/issues/14)). Bugs fixed ([#12](https://github.com/dmak/jaxb-xew-plugin/issues/12), [#19](https://github.com/dmak/jaxb-xew-plugin/issues/19)).
 * Plugin can now automatically apply plural form to collection properties (see `-Xxew:plural`).
 * Unit tests now compile the model with `javac` and create JAXB context. Some test involve also XML marshalling/unmarshalling/comparing.
 
-### v1.1
+### [v1.1](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.1|jar)
 
 * Plugin is re-worked. Bugs fixed ([#1](https://github.com/dmak/jaxb-xew-plugin/issues/1), [#3](https://github.com/dmak/jaxb-xew-plugin/issues/3), [#6](https://github.com/dmak/jaxb-xew-plugin/issues/6), [#7](https://github.com/dmak/jaxb-xew-plugin/issues/7)). Some functionality is possible only by accessing private fields, so Xew plugin may not work in security-managed environment.
 * Testing framework introduced. XSDs in [`com/sun/tools/xjc/addon/xew/`](src/test/resources/com/sun/tools/xjc/addon/xew/) directory can be referred as collection of examples.
 * Logging is done via `commons-logging`. Log level is configurable like this `mvn -Dorg.apache.commons.logging.simplelog.defaultlog=DEBUG`.
 
-### v1.0
+### [v1.0](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.0|jar)
 
 The original code of Bjarne Hansen, with some fixes.
 

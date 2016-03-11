@@ -23,8 +23,7 @@
 		<url>https://github.com/dmak/jaxb-xew-plugin</url>
 		<connection>scm:git:https://github.com/dmak/jaxb-xew-plugin.git</connection>
 		<developerConnection>scm:git:https://dmak@github.com/dmak/jaxb-xew-plugin.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
@@ -49,6 +48,13 @@
 			<id>stage-release</id>
 
 			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+
 				<pluginManagement>
 					<plugins>
 						<plugin>
