@@ -8,6 +8,12 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
+	<parent>
+		<groupId>com.github.jaxb-xew-plugin.sample</groupId>
+		<artifactId>sample-parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -39,7 +45,7 @@
 					<dependency>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.7</version>
+						<version>${jaxb-xew-plugin.version}</version>
 					</dependency>
 					<dependency>
 						<groupId>com.sun.xml.bind</groupId>

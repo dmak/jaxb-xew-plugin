@@ -168,28 +168,6 @@ org.company.Processor=include
 ```
 Empty lines or lines started with `#` (comment) are ignored. See also [`inner-element-control.txt`](src/test/resources/com/sun/tools/xjc/addon/xew/inner-element-control.txt) and other control files in test suit.
 
-### Episode file
-
-For correct generation of episode file the corresponding XJC options should follow `-Xxew`, for example:
-
-`... -Xxew -episode <file> ...`
-
-This will trigger episode plugin _after_ Xew plugin and episode file will be correctly generated.
-
-### `equals`, `hashCode`, `fluent-api`, `value-constructor` and `jaxbindex` plugins
-
-These plugins should be activated _after_ Xew plugin:
-
-`... -Xxew -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xjaxbindex ...`
-
-Otherwise (if they are activated before) Xew plugin cannot revert/complement the changes they made and compile-time error is guaranteed.
-
-### `setters` plugin
-
-These plugin should be activated _before_ Xew plugin due to problem described in [issue#15](https://github.com/dmak/jaxb-xew-plugin/issues/15):
-
-`... -Xsetters -Xxew ...`
-
 ### Ant task
 
 First you need to download the plugin jar (for example, from [Maven repository](http://mirrors.ibiblio.org/pub/mirrors/maven2/com/github/jaxb-xew-plugin/jaxb-xew-plugin)) and put it to your project `libs` folder together with other dependencies.
@@ -354,6 +332,34 @@ task processXSDs() << {
 }
 compileJava.dependsOn processXSDs
 ```
+
+## Compatibility and side effects
+
+### Episode file
+
+For correct generation of episode file the corresponding XJC options should follow `-Xxew`, for example:
+
+`... -Xxew -episode <file> ...`
+
+This will trigger episode plugin _after_ Xew plugin and episode file will be correctly generated. Note that `maven-jaxb2-plugin` adds `-episode` to the end of argument list, hence works correctly.
+
+### `equals`, `hashCode`, `fluent-api`, `value-constructor` and `jaxbindex` plugins
+
+These plugins should be activated _after_ Xew plugin:
+
+`... -Xxew -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xjaxbindex ...`
+
+Otherwise (if they are activated before) Xew plugin cannot revert/complement the changes they made and compile-time error is guaranteed.
+
+### `setters` plugin
+
+This plugin should be activated _before_ Xew plugin due to problem described in [issue#15](https://github.com/dmak/jaxb-xew-plugin/issues/15):
+
+`... -Xsetters -Xxew ...`
+
+### `simpleEquals` and `simpleHashCode` plugins
+
+These plugins don't work with `xew` as last one is causing side effects (see [#48](https://github.com/dmak/jaxb-xew-plugin/issues/48)).
 
 ## What's new
 

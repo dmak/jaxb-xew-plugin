@@ -8,6 +8,28 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<properties>
+		<jaxb-xew-plugin.version>1.7</jaxb-xew-plugin.version>
+		<!-- Versions [0.9.2-0.9.5] of this plugin result the following problem:
+		Exception in thread "main" java.util.ServiceConfigurationError: com.sun.tools.xjc.Plugin: Provider org.jvnet.jaxb2_commons.plugin.fixjaxb1058.FixJAXB1058Plugin could not be instantiated
+			at java.util.ServiceLoader.fail(ServiceLoader.java:224)
+			at java.util.ServiceLoader.access$100(ServiceLoader.java:181)
+			at java.util.ServiceLoader$LazyIterator.next(ServiceLoader.java:377)
+			at java.util.ServiceLoader$1.next(ServiceLoader.java:445)
+			at com.sun.tools.xjc.Options.findServices(Options.java:957)
+			at com.sun.tools.xjc.Options.getAllPlugins(Options.java:374)
+			at com.sun.tools.xjc.Options.parseArgument(Options.java:688)
+			at com.sun.tools.xjc.Driver$OptionsEx.parseArgument(Driver.java:511)
+			at com.sun.tools.xjc.Options.parseArguments(Options.java:809)
+			at com.sun.tools.xjc.Driver.run(Driver.java:240)
+		Caused by: java.lang.NoClassDefFoundError: org/jvnet/jaxb2_commons/reflection/util/Accessor
+			at java.lang.Class.getDeclaredConstructors0(Native Method)
+			at java.lang.Class.privateGetDeclaredConstructors(Class.java:2493)
+			... 29 more
+		-->
+		<jaxb2-basics.version>0.9.1</jaxb2-basics.version>
+	</properties>
+
 	<modules>
 		<module>cxf-codegen-plugin</module>
 		<module>jaxb2-maven-plugin</module>

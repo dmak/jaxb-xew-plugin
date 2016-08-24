@@ -10,6 +10,12 @@
 
 	<name>jaxws-maven-plugin with jaxb-xew-plugin + jaxb-visitor and classpath voodoo</name>
 
+	<parent>
+		<groupId>com.github.jaxb-xew-plugin.sample</groupId>
+		<artifactId>sample-parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -43,7 +49,7 @@
 					<dependency>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.7</version>
+						<version>${jaxb-xew-plugin.version}</version>
 						<!--
 							Mind that this exclusion is needed to be added to plugin classpath
 							as jaxb-xew-plugin was compiled against jaxb-xjc v2.2.4-1 but
