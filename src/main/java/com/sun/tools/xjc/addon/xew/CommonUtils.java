@@ -2,6 +2,8 @@ package com.sun.tools.xjc.addon.xew;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 
@@ -198,6 +200,39 @@ public final class CommonUtils {
 		catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Perform the copying of all fields from {@code src} to {@code dest}. The code was copied from
+	 * {@link org.springframework.util.ReflectionUtils#shallowCopyFieldState(Object, Object)}.
+	 */
+	public static <S, D extends S> void copyFields(final S src, D dest) throws IllegalArgumentException {
+		Class<?> targetClass = src.getClass();
+
+		do {
+			Field[] fields = targetClass.getDeclaredFields();
+			for (Field field : fields) {
+				// Skip static fields:
+				if (Modifier.isStatic(field.getModifiers())) {
+					continue;
+				}
+				try {
+					if ((!Modifier.isPublic(field.getModifiers())
+					            || !Modifier.isPublic(field.getDeclaringClass().getModifiers())
+					            || Modifier.isFinal(field.getModifiers())) && !field.isAccessible()) {
+						field.setAccessible(true);
+					}
+					Object srcValue = field.get(src);
+					field.set(dest, srcValue);
+				}
+				catch (IllegalAccessException ex) {
+					throw new IllegalStateException(
+					            "Shouldn't be illegal to access field '" + field.getName() + "': " + ex);
+				}
+			}
+			targetClass = targetClass.getSuperclass();
+		}
+		while (targetClass != null && targetClass != Object.class);
 	}
 
 	/**

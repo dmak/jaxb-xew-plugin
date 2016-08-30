@@ -93,6 +93,7 @@ public class Order {
 	}
 }
 ```
+After this transformation of `Order` class, the class `Items` is not needed anymore and can be removed from the model. 
 
 ## Usage
 
@@ -522,8 +523,8 @@ The plugin flow consists of the following parts:
 * Visit all classes again to check if the candidate is not eligible for removal:
   1. If there are classes that extend the candidate
   2. If there are class fields that refer the candidate by e.g. `@XmlElementRef` annotation
-* Visit all classes again to replace the property having the candidate class type with collection plus `@XmlElementWrapper` annotation. On this step getters/setters are update and ObjectFactory methods are corrected. Also lazy initialization policy is applied.
-* Candidates which are still marked for removal are finally removed (and ObjectFactory is updated accordingly).
+* Visit all classes again to replace the property having the candidate class type with collection plus `@XmlElementWrapper` annotation. On this step getters/setters are update and `ObjectFactory` methods are corrected. Also lazy initialization policy is applied.
+* Candidates which are still marked for removal are finally removed (and `ObjectFactory` is updated accordingly).
 
 There are many pitfalls in JAXB Code Model API which are forcing the developer to use dirty tricks (like accessing private fields) in order to implement the manipulation of code model. Among others:
 

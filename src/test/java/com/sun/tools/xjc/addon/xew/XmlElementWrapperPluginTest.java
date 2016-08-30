@@ -73,10 +73,10 @@ import org.xml.sax.SAXException;
  */
 public class XmlElementWrapperPluginTest {
 
-	private static final String PREGENERATED_SOURCES_PREFIX = "src/test/generated_resources/";
-	private static final String GENERATED_SOURCES_PREFIX    = "target/test/generated_xsd_classes/";
+	private static final String	PREGENERATED_SOURCES_PREFIX	= "src/test/generated_resources/";
+	private static final String	GENERATED_SOURCES_PREFIX	= "target/test/generated_xsd_classes/";
 
-	private static final Log    logger                      = LogFactory.getLog(XmlElementWrapperPluginTest.class);
+	private static final Log	logger						= LogFactory.getLog(XmlElementWrapperPluginTest.class);
 
 	@Test
 	public void testUsage() throws Exception {
@@ -118,17 +118,18 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testInnerElement() throws Exception {
-		assertXsd("inner-element", new String[] { "-verbose", "-Xxew:instantiate none",
-		        "-Xxew:control " + getClass().getResource("inner-element-control.txt").getFile() }, true, "Filesystem",
-		            "Volumes", "package-info");
+		assertXsd("inner-element",
+		            new String[] { "-verbose", "-Xxew:instantiate none",
+		                    "-Xxew:control " + getClass().getResource("inner-element-control.txt").getFile() },
+		            true, "Filesystem", "Volumes", "package-info");
 	}
 
 	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
 		assertXsd("inner-element-value-objects", new String[] { "-debug" }, false, "Article", "Articles",
-		            "ArticlesCollections", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl",
-		            "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl", "impl.PublisherImpl",
-		            "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory", "package-info");
+		            "ArticlesCollections", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl", "impl.ArticlesImpl",
+		            "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl", "impl.PublisherImpl", "impl.VolumeImpl",
+		            "impl.ObjectFactory", "impl.JAXBContextFactory", "package-info");
 	}
 
 	@Test
@@ -154,8 +155,8 @@ public class XmlElementWrapperPluginTest {
 		            new String[] {
 		                    "-Xxew:control "
 		                                + getClass().getResource("element-as-parametrisation-2-control.txt").getFile(),
-		                    "-Xxew:summary " + GENERATED_SOURCES_PREFIX + "summary.txt" }, false, "Family",
-		            "FamilyMember", "package-info");
+		                    "-Xxew:summary " + GENERATED_SOURCES_PREFIX + "summary.txt" },
+		            false, "Family", "FamilyMember", "package-info");
 
 		String summaryFile = FileUtils.readFileToString(new File(GENERATED_SOURCES_PREFIX + "summary.txt"));
 
@@ -208,8 +209,9 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementWithAdapter() throws Exception {
 		// Plural form in this case will have no impact as there is property customization:
-		assertXsd("element-with-adapter", new String[] { "-Xxew:plural",
-		        "-Xxew:collectionInterface java.util.Collection" }, false, "Calendar", "Adapter1", "package-info");
+		assertXsd("element-with-adapter",
+		            new String[] { "-Xxew:plural", "-Xxew:collectionInterface java.util.Collection" }, false,
+		            "Calendar", "Adapter1", "package-info");
 	}
 
 	@Test
@@ -262,8 +264,8 @@ public class XmlElementWrapperPluginTest {
 
 		targetDir.mkdirs();
 
-		PrintStream loggingPrintStream = new PrintStream(new LoggingOutputStream(logger,
-		            LoggingOutputStream.LogLevel.INFO, "[XJC] "));
+		PrintStream loggingPrintStream = new PrintStream(
+		            new LoggingOutputStream(logger, LoggingOutputStream.LogLevel.INFO, "[XJC] "));
 
 		String[] opts = ArrayUtils.addAll(extraXewOptions, "-no-header", "-extension", "-Xxew", "-d",
 		            targetDir.getPath(), xsdUrl.getFile());
@@ -301,8 +303,8 @@ public class XmlElementWrapperPluginTest {
 		// *.properties files are ignored:
 		for (File targetFile : FileUtils.listFiles(targetDir, new String[] { "java" }, true)) {
 			// This is effectively the path of targetFile relative to targetDir:
-			generatedJavaSources.add(targetFile.getPath().substring(targetDir.getPath().length() + 1)
-			            .replace('\\', '/'));
+			generatedJavaSources
+			            .add(targetFile.getPath().substring(targetDir.getPath().length() + 1).replace('\\', '/'));
 		}
 
 		// This class is added and checked by default:
@@ -325,8 +327,8 @@ public class XmlElementWrapperPluginTest {
 
 			if (sourceFile.exists()) {
 				// To avoid CR/LF conflicts:
-				assertEquals("For " + className, FileUtils.readFileToString(sourceFile).replace("\r", ""), FileUtils
-				            .readFileToString(new File(targetDir, className)).replace("\r", ""));
+				assertEquals("For " + className, FileUtils.readFileToString(sourceFile).replace("\r", ""),
+				            FileUtils.readFileToString(new File(targetDir, className)).replace("\r", ""));
 			}
 		}
 
@@ -387,8 +389,8 @@ public class XmlElementWrapperPluginTest {
 
 		ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
 
-		URLClassLoader newClassLoader = new URLClassLoader(new URL[] { new File(GENERATED_SOURCES_PREFIX).toURI()
-		            .toURL() }, currentClassLoader);
+		URLClassLoader newClassLoader = new URLClassLoader(
+		            new URL[] { new File(GENERATED_SOURCES_PREFIX).toURI().toURL() }, currentClassLoader);
 
 		return JAXBContext.newInstance(packageName, newClassLoader);
 	}

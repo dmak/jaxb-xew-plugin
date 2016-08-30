@@ -9,7 +9,7 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<jaxb-xew-plugin.version>1.7</jaxb-xew-plugin.version>
+		<jaxb-xew-plugin.version>1.8-SNAPSHOT</jaxb-xew-plugin.version>
 		<!-- Versions [0.9.2-0.9.5] of this plugin result the following problem:
 		Exception in thread "main" java.util.ServiceConfigurationError: com.sun.tools.xjc.Plugin: Provider org.jvnet.jaxb2_commons.plugin.fixjaxb1058.FixJAXB1058Plugin could not be instantiated
 			at java.util.ServiceLoader.fail(ServiceLoader.java:224)
@@ -36,5 +36,6 @@
 		<module>jaxws-maven-plugin-exclude</module>
 		<module>jaxws-maven-plugin-visitor</module>
 		<module>maven-jaxb2-plugin</module>
+		<module>maven-jaxb2-plugin-basics</module>
 	</modules>
 </project>

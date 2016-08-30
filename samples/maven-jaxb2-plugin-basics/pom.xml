@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.jaxb-xew-plugin.sample</groupId>
+	<artifactId>maven-jaxb2-plugin-basics</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>maven-jaxb2-plugin with jaxb-xew-plugin + jaxb-simpleEquals + jaxb-simpleHashCode</name>
+
+	<parent>
+		<groupId>com.github.jaxb-xew-plugin.sample</groupId>
+		<artifactId>sample-parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<xsd.folder>xsd</xsd.folder>
+		<xjb.folder>xsd</xjb.folder>
+
+		<jaxb2-basics.version>0.11.1</jaxb2-basics.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.13.1</version>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<episode>true</episode>
+					<schemaDirectory>${xsd.folder}</schemaDirectory>
+					<bindingDirectory>${xjb.folder}</bindingDirectory>
+					<verbose>true</verbose>
+					<strict>false</strict>
+					<extension>true</extension>
+					<args>
+						<arg>-no-header</arg>
+			  			<arg>-Xxew</arg>
+			                    	<arg>-Xxew:instantiate lazy</arg>
+						<arg>-XsimpleEquals</arg>
+						<arg>-XsimpleHashCode</arg>
+						<arg>-Xannotate</arg> 
+						<arg>-Xnamespace-prefix</arg>
+					</args>
+					<plugins>
+						<plugin>
+							<groupId>com.github.jaxb-xew-plugin</groupId>
+							<artifactId>jaxb-xew-plugin</artifactId>
+							<version>${jaxb-xew-plugin.version}</version>
+						</plugin>
+						<plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics</artifactId>
+							<version>${jaxb2-basics.version}</version>
+						</plugin>
+						<plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics-tools</artifactId>
+							<version>${jaxb2-basics.version}</version>
+						</plugin>
+						<plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics-annotate</artifactId>
+							<version>1.0.2</version>
+						</plugin>
+						<plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-namespace-prefix</artifactId>
+							<version>1.1</version>
+						</plugin>
+					</plugins>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-simple</artifactId>
+						<version>1.7.7</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+</project>

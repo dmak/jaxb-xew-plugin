@@ -22,6 +22,7 @@
 package com.sun.tools.xjc.addon.xew;
 
 import static com.sun.tools.xjc.addon.xew.CommonUtils.addAnnotation;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.copyFields;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMember;
@@ -79,14 +80,18 @@ import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
+import com.sun.tools.xjc.model.CClassInfo;
 import com.sun.tools.xjc.model.CCustomizations;
+import com.sun.tools.xjc.model.CElementPropertyInfo;
+import com.sun.tools.xjc.model.CElementPropertyInfo.CollectionMode;
 import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.model.CPropertyInfo;
+import com.sun.tools.xjc.model.CReferencePropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+import com.sun.tools.xjc.reader.Ring;
 import com.sun.xml.bind.api.impl.NameConverter;
-import com.sun.xml.bind.v2.model.core.PropertyKind;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 
@@ -112,27 +117,27 @@ import org.xml.sax.SAXException;
  */
 public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
-	private static final QName  XEW_QNAME                              = new QName("http://github.com/jaxb-xew-plugin",
-	                                                                               "xew");
+	private static final QName	XEW_QNAME							   = new QName("http://github.com/jaxb-xew-plugin",
+	            "xew");
 
-	private static final String PLUGIN_NAME                            = "Xxew";
+	private static final String	PLUGIN_NAME							   = "Xxew";
 
-	private static final String OPTION_NAME_CONTROL                    = "control";
-	private static final String OPTION_NAME_SUMMARY                    = "summary";
-	private static final String OPTION_NAME_COLLECTION                 = "collection";
-	private static final String OPTION_NAME_COLLECTION_INTERFACE       = "collectionInterface";
-	private static final String OPTION_NAME_INSTANTIATE                = "instantiate";
-	private static final String OPTION_NAME_APPLY_PLURAL_FORM          = "plural";
+	private static final String	OPTION_NAME_CONTROL					   = "control";
+	private static final String	OPTION_NAME_SUMMARY					   = "summary";
+	private static final String	OPTION_NAME_COLLECTION				   = "collection";
+	private static final String	OPTION_NAME_COLLECTION_INTERFACE	   = "collectionInterface";
+	private static final String	OPTION_NAME_INSTANTIATE				   = "instantiate";
+	private static final String	OPTION_NAME_APPLY_PLURAL_FORM		   = "plural";
 
-	private PrintWriter         summary                                = null;
+	private PrintWriter			summary								   = null;
 
-	private Map<String, String> globalOptions                          = new HashMap<String, String>();
+	private Map<String, String>	globalOptions						   = new HashMap<String, String>();
 
-	private JClass              xmlElementDeclModelClass;
+	private JClass				xmlElementDeclModelClass;
 
-	private static final String FACTORY_CLASS_NAME                     = "ObjectFactory";
+	private static final String	FACTORY_CLASS_NAME					   = "ObjectFactory";
 
-	static final String         COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY = "org.apache.commons.logging.simplelog.defaultlog";
+	static final String			COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY = "org.apache.commons.logging.simplelog.defaultlog";
 
 	public XmlElementWrapperPlugin() {
 		logger = null;
@@ -145,8 +150,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 	@Override
 	public String getUsage() {
-		return "  "
-		            + getArgumentName("")
+		return "  " + getArgumentName("")
 		            + " Replace collection types with fields having the @XmlElementWrapper and @XmlElement annotations.";
 	}
 
@@ -246,8 +250,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			}
 			else if (OPTION_NAME_INSTANTIATE.equals(option.getKey())) {
 				try {
-					configuration.setInstantiationMode(Configuration.InstantiationMode.valueOf(option.getValue()
-					            .toUpperCase()));
+					configuration.setInstantiationMode(
+					            Configuration.InstantiationMode.valueOf(option.getValue().toUpperCase()));
 				}
 				catch (IllegalArgumentException e) {
 					throw new IllegalArgumentException("Unknown instantiation mode \"" + option.getValue() + "\"");
@@ -343,6 +347,9 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		JClass xmlTypeModelClass = codeModel.ref(XmlType.class);
 		xmlElementDeclModelClass = codeModel.ref(XmlElementDecl.class);
 
+		Ring.begin();
+		Ring.add(outline.getModel());
+
 		logger.debug("JAXB Process Model (run)...");
 
 		Configuration globalConfiguration = new Configuration(logger);
@@ -355,12 +362,10 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		// Write summary information on the option for this compilation.
 		writeSummary("Compilation:");
 		writeSummary("  JAXB version         : " + Options.getBuildID());
-		writeSummary("  Control file         : "
-		            + (!globalOptions.containsKey(OPTION_NAME_CONTROL) ? "<none>" : globalOptions
-		                        .get(OPTION_NAME_CONTROL)));
-		writeSummary("  Summary file         : "
-		            + (!globalOptions.containsKey(OPTION_NAME_SUMMARY) ? "<none>" : globalOptions
-		                        .get(OPTION_NAME_SUMMARY)));
+		writeSummary("  Control file         : " + (!globalOptions.containsKey(OPTION_NAME_CONTROL) ? "<none>"
+		            : globalOptions.get(OPTION_NAME_CONTROL)));
+		writeSummary("  Summary file         : " + (!globalOptions.containsKey(OPTION_NAME_SUMMARY) ? "<none>"
+		            : globalOptions.get(OPTION_NAME_SUMMARY)));
 		writeSummary("  Instantiation mode   : " + globalConfiguration.getInstantiationMode());
 		writeSummary("  Collection impl      : " + globalConfiguration.getCollectionImplClass().getName());
 		writeSummary("  Collection interface : " + globalConfiguration.getCollectionInterfaceClass().getName());
@@ -421,20 +426,15 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			// Visit all fields in this class.
 			for (FieldOutline field : outlineClass.getDeclaredFields()) {
 				// Only non-primitive fields are interesting.
-				if (!(field.getRawType() instanceof JClass)) {
+				// Consider only PropertyKind.ELEMENT as (for example) PropertyKind.ATTRIBUTE (stands for XSD attribute) is always simple type:
+				if (!(field.getRawType() instanceof JClass)
+				            || !(field.getPropertyInfo() instanceof CElementPropertyInfo)) {
 					continue;
 				}
 
-				JClass fieldType = (JClass) field.getRawType();
-				CPropertyInfo fieldPropertyInfo = field.getPropertyInfo();
-
-				// For example, XSD attributes (PropertyKind.ATTRIBUTE) are always simple types:
-				if (!(fieldPropertyInfo.kind() == PropertyKind.ELEMENT || fieldPropertyInfo.kind() == PropertyKind.REFERENCE)) {
-					continue;
-				}
-
+				final JClass fieldType = (JClass) field.getRawType();
+				final CPropertyInfo fieldPropertyInfo = field.getPropertyInfo();
 				String fieldName = fieldPropertyInfo.getName(false);
-
 				Candidate candidate = null;
 
 				for (Candidate c : candidatesMap.values()) {
@@ -453,7 +453,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 					}
 				}
 
-				JFieldVar originalImplField = targetClass.fields().get(fieldName);
+				final JFieldVar originalImplField = targetClass.fields().get(fieldName);
 
 				if (candidate == null) {
 					checkAnnotationReference(candidatesMap, originalImplField);
@@ -482,8 +482,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				// the element type from the collection present in the candidate class (narrowing).
 				JClass collectionInterfaceClass = codeModel.ref(fieldConfiguration.getCollectionInterfaceClass())
 				            .narrow(fieldTypeParametrisations);
-				JClass collectionImplClass = codeModel.ref(fieldConfiguration.getCollectionImplClass()).narrow(
-				            fieldTypeParametrisations);
+				JClass collectionImplClass = codeModel.ref(fieldConfiguration.getCollectionImplClass())
+				            .narrow(fieldTypeParametrisations);
 
 				boolean pluralFormWasApplied = false;
 
@@ -505,7 +505,6 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 						pluralFormWasApplied = true;
 
 						originalImplField.name(fieldName);
-						fieldPropertyInfo.setName(false, fieldName);
 
 						// Correct the @XmlType class-level annotation:
 						JAnnotationArrayMember propOrderValue = (JAnnotationArrayMember) getAnnotation(targetClass,
@@ -545,12 +544,14 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 					xmlElementWrapperAnnotation.param("name", getXsdDeclaration(fieldPropertyInfo).getName());
 				}
 
-				JExpression wrapperXmlRequired = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "required");
+				JExpression wrapperXmlRequired = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
+				            "required");
 				if (wrapperXmlRequired != null) {
 					xmlElementWrapperAnnotation.param("required", wrapperXmlRequired);
 				}
 
-				JExpression wrapperXmlNillable = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "nillable");
+				JExpression wrapperXmlNillable = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
+				            "nillable");
 				if (wrapperXmlNillable != null) {
 					xmlElementWrapperAnnotation.param("nillable", wrapperXmlNillable);
 				}
@@ -610,7 +611,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 						xmlElementAnnotation.param("name", candidate.getFieldName());
 					}
 
-					JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "namespace");
+					JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementCandidateAnnotation,
+					            "namespace");
 					if (xmlNamespace != null) {
 						xmlElementAnnotation.param("namespace", xmlNamespace);
 					}
@@ -659,10 +661,33 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				// Find original getter and setter methods to remove.
 				deleteSettersGetters(targetClass, propertyName);
 
+				// The type in property info should correspond to field type. For that we clone the candidate property info:
+				CPropertyInfo candidateFieldPropertyInfo = candidate.getFieldPropertyInfo();
+				CPropertyInfo propertyInfoClone = null;
+
+				if (candidateFieldPropertyInfo instanceof CElementPropertyInfo) {
+					propertyInfoClone = new CElementPropertyInfo("", CollectionMode.NOT_REPEATED, null, null, null,
+					            null, null, false);
+				}
+				else if (candidateFieldPropertyInfo instanceof CReferencePropertyInfo) {
+					propertyInfoClone = new CReferencePropertyInfo("", false, false, false, null, null, null, false,
+					            false, false);
+				}
+				else {
+					// There could be no other option as candidate field is a collection, hence not simple property.
+					assert false;
+				}
+
+				copyFields(candidateFieldPropertyInfo, propertyInfoClone);
+
 				if (pluralFormWasApplied) {
 					propertyName = JJavaName.getPluralForm(propertyName);
-					fieldPropertyInfo.setName(true, propertyName);
 				}
+
+				propertyInfoClone.setName(false, fieldName);
+				propertyInfoClone.setName(true, propertyName);
+
+				setPrivateField(field, "prop", propertyInfoClone);
 
 				// Add a new getter method returning the (wrapped) field added.
 				// GENERATED CODE: public I<T> getFieldName() { ... return fieldName; }
@@ -671,8 +696,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				if (fieldConfiguration.getInstantiationMode() == Configuration.InstantiationMode.LAZY) {
 					logger.debug("Applying LAZY instantiation...");
 					// GENERATED CODE: if (fieldName == null) fieldName = new C<T>();
-					getterMethod.body()._if(JExpr.ref(fieldName).eq(JExpr._null()))._then()
-					            .assign(JExpr.ref(fieldName), JExpr._new(collectionImplClass));
+					getterMethod.body()._if(JExpr.ref(fieldName).eq(JExpr._null()))._then().assign(JExpr.ref(fieldName),
+					            JExpr._new(collectionImplClass));
 				}
 
 				// GENERATED CODE: return "fieldName";
@@ -713,6 +738,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		writeSummary("");
 
 		closeSummary();
+
+		Ring.end(null);
 
 		logger.debug("Done");
 	}
@@ -817,9 +844,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			// FIXME: Make a try to load constants and (a) rename it appropriately (b) use it?
 			JInvocation qname = JExpr._new(codeModel.ref(QName.class)).arg(info.namespace).arg(info.name);
 
-			method.body()._return(
-			            JExpr._new(wrapperType).arg(qname).arg(info.type.boxify().dotclass())
-			                        .arg(targetClass.dotclass()).arg(method.param(info.type, "value")));
+			method.body()._return(JExpr._new(wrapperType).arg(qname).arg(info.type.boxify().dotclass())
+			            .arg(targetClass.dotclass()).arg(method.param(info.type, "value")));
 
 			createdMethods++;
 		}
@@ -905,8 +931,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			if (fieldParametrisations.get(0) instanceof JDefinedClass) {
 				fieldParametrisationClass = (JDefinedClass) fieldParametrisations.get(0);
 
-				ClassOutline fieldParametrisationClassOutline = interfaceImplementations.get(fieldParametrisationClass
-				            .fullName());
+				ClassOutline fieldParametrisationClassOutline = interfaceImplementations
+				            .get(fieldParametrisationClass.fullName());
 
 				if (fieldParametrisationClassOutline != null) {
 					assert fieldParametrisationClassOutline.ref == fieldParametrisationClass;
@@ -947,8 +973,9 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			else {
 				// Default (mostly used) namespace is generated as annotation for the package,
 				// see com.sun.tools.xjc.generator.bean.PackageOutlineImpl#calcDefaultValues()
-				JAnnotationUse schemaAnnotation = getAnnotation((objectFactoryClass != null ? objectFactoryClass
-				            : valueObjectFactoryClass).getPackage(), xmlSchemaModelClass);
+				JAnnotationUse schemaAnnotation = getAnnotation(
+				            (objectFactoryClass != null ? objectFactoryClass : valueObjectFactoryClass).getPackage(),
+				            xmlSchemaModelClass);
 				JExpression elementFormDefault = getAnnotationMemberExpression(schemaAnnotation, "elementFormDefault");
 
 				if (elementFormDefault != null && generableToString(elementFormDefault).endsWith(".QUALIFIED")) {
@@ -961,8 +988,9 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			}
 
 			// We have a candidate class:
-			Candidate candidate = new Candidate(candidateClass, field, fieldTargetNamespace, fieldParametrisationClass,
-			            fieldParametrisationImpl, objectFactoryClass, valueObjectFactoryClass, xmlElementDeclModelClass);
+			Candidate candidate = new Candidate(candidateClass, classOutline.target, field, fieldTargetNamespace,
+			            fieldParametrisationClass, fieldParametrisationImpl, objectFactoryClass,
+			            valueObjectFactoryClass, xmlElementDeclModelClass);
 			candidates.add(candidate);
 
 			logger.debug("Found " + candidate);
@@ -1051,8 +1079,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			// * public JAXBElement<T> createT(T value) { return new JAXBElement<T>(QNAME, T.class, null, value); }
 			// * @XmlElementDecl(..., scope = X.class)
 			//   public JAXBElement<T> createT...(T value) { return new JAXBElement<...>(QNAME, T.class, X.class, value); }
-			if ((method.type() instanceof JDefinedClass && ((JDefinedClass) method.type()).isAssignableFrom(candidate
-			            .getClazz()))
+			if ((method.type() instanceof JDefinedClass
+			            && ((JDefinedClass) method.type()).isAssignableFrom(candidate.getClazz()))
 			            || isListedAsParametrisation(candidate.getClazz(), method.type())
 			            || candidate.getScopedElementInfos().containsKey(method.name())) {
 				writeSummary("\tRemoving factory method [" + method.type().fullName() + "#" + method.name()
@@ -1247,7 +1275,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		/**
 		 * Element type ({@link String}).
 		 */
-		public JType       type;
+		public JType	   type;
 
 		public ScopedElementInfo(JExpression name, JExpression namespace, JType type) {
 			this.name = name;
@@ -1266,38 +1294,41 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	 * collection of objects.
 	 */
 	private static class Candidate {
-		private final JDefinedClass                  candidateClass;
+		private final JDefinedClass					 candidateClass;
 
-		private final JFieldVar                      field;
+		private final JFieldVar						 field;
 
-		private final String                         fieldTargetNamespace;
+		private final CPropertyInfo					 fieldPropertyInfo;
 
-		private final JDefinedClass                  fieldParametrisationClass;
+		private final String						 fieldTargetNamespace;
 
-		private final JDefinedClass                  fieldParametrisationImpl;
+		private final JDefinedClass					 fieldParametrisationClass;
 
-		private final JDefinedClass                  objectFactoryClass;
+		private final JDefinedClass					 fieldParametrisationImpl;
 
-		private final JDefinedClass                  valueObjectFactoryClass;
+		private final JDefinedClass					 objectFactoryClass;
 
-		private final Map<String, ScopedElementInfo> scopedElementInfos = new HashMap<String, ScopedElementInfo>();
+		private final JDefinedClass					 valueObjectFactoryClass;
+
+		private final Map<String, ScopedElementInfo> scopedElementInfos	= new HashMap<String, ScopedElementInfo>();
 
 		/**
 		 * By default the candidate is marked for removal unless something prevents it from being removed.
 		 */
-		private boolean                              markedForRemoval   = true;
+		private boolean								 markedForRemoval	= true;
 
 		/**
 		 * Number of times this candidate has been substituted in the model.
 		 */
-		private int                                  substitutionsCount;
+		private int									 substitutionsCount;
 
-		Candidate(JDefinedClass candidateClass, JFieldVar field, String fieldTargetNamespace,
-		            JDefinedClass fieldParametrizationClass, JDefinedClass fieldParametrisationImpl,
-		            JDefinedClass objectFactoryClass, JDefinedClass valueObjectFactoryClass,
-		            JClass xmlElementDeclModelClass) {
+		Candidate(JDefinedClass candidateClass, CClassInfo candidateClassInfo, JFieldVar field,
+		            String fieldTargetNamespace, JDefinedClass fieldParametrizationClass,
+		            JDefinedClass fieldParametrisationImpl, JDefinedClass objectFactoryClass,
+		            JDefinedClass valueObjectFactoryClass, JClass xmlElementDeclModelClass) {
 			this.candidateClass = candidateClass;
 			this.field = field;
+			this.fieldPropertyInfo = candidateClassInfo.getProperty(field.name());
 			this.fieldTargetNamespace = fieldTargetNamespace;
 			this.fieldParametrisationClass = fieldParametrizationClass;
 			this.fieldParametrisationImpl = fieldParametrisationImpl;
@@ -1316,8 +1347,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 				scopedElementInfos.put(method.name(),
 				            new ScopedElementInfo(getAnnotationMemberExpression(xmlElementDeclAnnotation, "name"),
-				                        getAnnotationMemberExpression(xmlElementDeclAnnotation, "namespace"), method
-				                                    .params().get(0).type()));
+				                        getAnnotationMemberExpression(xmlElementDeclAnnotation, "namespace"),
+				                        method.params().get(0).type()));
 			}
 		}
 
@@ -1354,6 +1385,13 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		 */
 		public JClass getFieldClass() {
 			return (JClass) field.type();
+		}
+
+		/**
+		 * The corresponding property info of the only field in container class.
+		 */
+		public CPropertyInfo getFieldPropertyInfo() {
+			return fieldPropertyInfo;
 		}
 
 		/**

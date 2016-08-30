@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:annox="http://annox.dev.java.net"
+    xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+    version="2.1">
+    
+    <jaxb:globalBindings collectionType="java.util.LinkedList" choiceContentProperty="true">
+        <!-- Force all classes implements Serializable -->
+        <xjc:serializable uid="1"/>
+    </jaxb:globalBindings>
+
+    <!-- Annotate the following classes with XmlRootElement -->
+    <jaxb:bindings schemaLocation="model.xsd" node="/xs:schema">
+     	<jaxb:bindings node="xs:complexType[@name='SampleData']">
+            <annox:annotate>
+                <annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="SampleData"/>
+            </annox:annotate>
+        </jaxb:bindings>
+        <jaxb:bindings node="xs:complexType[@name='SampleDataList']">
+            <annox:annotate>
+                <annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="SampleDataList"/>
+            </annox:annotate>
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xs:simpleType[@name='DataType']">
+            <jaxb:typesafeEnumClass>
+                <jaxb:typesafeEnumMember value="one" name="ONE"/>
+                <jaxb:typesafeEnumMember value="two" name="TWO"/>
+            </jaxb:typesafeEnumClass>
+        </jaxb:bindings>
+        <jaxb:bindings>
+            <namespace:prefix name="mo"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
+</jaxb:bindings>

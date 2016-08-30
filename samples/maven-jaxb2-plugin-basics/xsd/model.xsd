@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://mediadriver.com/model" version="2"
+    xmlns:mo="http://mediadriver.com/model">
+
+    <simpleType name="DataType">
+        <restriction base="string">
+		<enumeration value="One"/>
+		<enumeration value="Two"/>
+        </restriction>
+    </simpleType>
+    
+    <complexType name="StringList">
+    	<sequence>
+    		<element name="name" type="string" minOccurs="0" maxOccurs="unbounded" />
+     	</sequence>
+    </complexType>
+    
+    <complexType name="SampleData">
+        <sequence>
+            <element name="Foos" type="mo:StringList"/>
+            <element name="Bars" type="mo:StringList"/>
+        </sequence>
+        <attribute name="id" type="string" use="optional"/>
+        <attribute name="type" type="string" use="optional"/>
+    </complexType>
+
+    <complexType name="SampleDataList">
+	<sequence>
+		<element name="SampleData" type="mo:SampleData" minOccurs="0" maxOccurs="unbounded" />
+	</sequence>
+    </complexType>
+
+    <element name="SampleData" type="mo:SampleData" />
+    <element name="SampleDataList" type="mo:SampleDataList" />
+
+</schema>
