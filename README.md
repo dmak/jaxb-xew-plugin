@@ -211,7 +211,7 @@ To use the plugin from Ant you will need something like the following in your bu
 
 #### maven-jaxb2-plugin
 
-Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API which _is not compatible with this plugin_. Version 0.8.1 is guaranteed to work, versions 0.8.2 and later should also work fine.
+Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API which _is not compatible with this plugin_. Version 0.8.1 is guaranteed to work, versions [0.8.2…0.12.1] should also work.
 ```xml
 <plugin>
 	<groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -248,6 +248,42 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 	</executions>
 </plugin>
 ```
+Versions ≥ 0.12.2 work with the following correction (see [issue#50](https://github.com/dmak/jaxb-xew-plugin/issues/50)):
+<plugin>
+	<groupId>org.jvnet.jaxb2.maven2</groupId>
+	<artifactId>maven-jaxb2-plugin</artifactId>
+	<version>0.12.2</version>
+	<executions>
+		<execution>
+			<phase>generate-sources</phase>
+			<goals>
+				<goal>generate</goal>
+			</goals>
+			<configuration>
+				<generateDirectory>${project.build.sourceDirectory}</generateDirectory>
+				<extension>true</extension>
+				<args>
+					<arg>-Xxew</arg>
+				</args>
+				<plugins>
+					<plugin>
+						<groupId>com.github.jaxb-xew-plugin</groupId>
+						<artifactId>jaxb-xew-plugin</artifactId>
+						<version>1.7</version>
+						<exclusions>
+							<exclusion>
+								<groupId>com.sun.xml.bind</groupId>
+								<artifactId>jaxb-xjc</artifactId>
+							</exclusion>
+						</exclusions>
+					</plugin>
+				</plugins>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+```
+
 #### jaxb2-maven-plugin
 
 Note: `jaxb2-maven-plugin` v1.5 (the same apples to v1.6) was compiled against JAXB XJC API v2.1.13 which _is not compatible with this plugin_, thus additional dependency is needed to be added to **plugin classpath**.
@@ -363,6 +399,10 @@ This plugin should be activated _before_ Xew plugin due to problem described in 
 These plugins don't work with `xew` as last one is causing side effects (see [#48](https://github.com/dmak/jaxb-xew-plugin/issues/48)).
 
 ## What's new
+
+### [v1.8](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.8|jar)
+
+* Bugs fixed ([#48](https://github.com/dmak/jaxb-xew-plugin/issues/48)).
 
 ### [v1.7](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.7|jar)
 

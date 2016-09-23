@@ -24,8 +24,8 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Page_QNAME = new QName("", "page");
     private final static QName _Br_QNAME = new QName("", "br");
+    private final static QName _Page_QNAME = new QName("", "page");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: annotation_reference
@@ -51,11 +51,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ClassesEu }
+     * Create an instance of {@link SearchEu }
      * 
      */
-    public ClassesEu createClassesEu() {
-        return new ClassesEu();
+    public SearchEu createSearchEu() {
+        return new SearchEu();
     }
 
     /**
@@ -67,6 +67,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ClassCommon }
+     * 
+     */
+    public ClassCommon createClassCommon() {
+        return new ClassCommon();
+    }
+
+    /**
      * Create an instance of {@link ClassExt }
      * 
      */
@@ -75,19 +83,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SearchEu }
+     * Create an instance of {@link ClassesEu }
      * 
      */
-    public SearchEu createSearchEu() {
-        return new SearchEu();
-    }
-
-    /**
-     * Create an instance of {@link ClassCommon }
-     * 
-     */
-    public ClassCommon createClassCommon() {
-        return new ClassCommon();
+    public ClassesEu createClassesEu() {
+        return new ClassesEu();
     }
 
     /**
@@ -102,18 +102,18 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "page")
-    public JAXBElement<Object> createPage(Object value) {
-        return new JAXBElement<Object>(_Page_QNAME, Object.class, null, value);
+    @XmlElementDecl(namespace = "", name = "br")
+    public JAXBElement<Object> createBr(Object value) {
+        return new JAXBElement<Object>(_Br_QNAME, Object.class, null, value);
     }
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "br")
-    public JAXBElement<Object> createBr(Object value) {
-        return new JAXBElement<Object>(_Br_QNAME, Object.class, null, value);
+    @XmlElementDecl(namespace = "", name = "page")
+    public JAXBElement<Object> createPage(Object value) {
+        return new JAXBElement<Object>(_Page_QNAME, Object.class, null, value);
     }
 
 }

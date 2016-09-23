@@ -24,9 +24,9 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _Customer_QNAME = new QName("", "customer");
     private final static QName _ContactInfo_QNAME = new QName("", "contact-info");
     private final static QName _Address_QNAME = new QName("", "address");
-    private final static QName _Customer_QNAME = new QName("", "customer");
     private final static QName _PhoneNumber_QNAME = new QName("", "phone-number");
 
     /**
@@ -61,6 +61,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Customer }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "customer")
+    public JAXBElement<Customer> createCustomer(Customer value) {
+        return new JAXBElement<Customer>(_Customer_QNAME, Customer.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ContactInfo }{@code >}}
      * 
      */
@@ -76,15 +85,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "address", substitutionHeadNamespace = "", substitutionHeadName = "contact-info")
     public JAXBElement<Address> createAddress(Address value) {
         return new JAXBElement<Address>(_Address_QNAME, Address.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Customer }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "customer")
-    public JAXBElement<Customer> createCustomer(Customer value) {
-        return new JAXBElement<Customer>(_Customer_QNAME, Customer.class, null, value);
     }
 
     /**

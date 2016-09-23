@@ -24,8 +24,8 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _EntryValue_QNAME = new QName("", "value");
     private final static QName _EntryKey_QNAME = new QName("", "key");
+    private final static QName _EntryValue_QNAME = new QName("", "value");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: element_any_type
@@ -54,18 +54,18 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "value", scope = Entry.class)
-    public JAXBElement<Object> createEntryValue(Object value) {
-        return new JAXBElement<Object>(_EntryValue_QNAME, Object.class, Entry.class, value);
+    @XmlElementDecl(namespace = "", name = "key", scope = Entry.class)
+    public JAXBElement<Object> createEntryKey(Object value) {
+        return new JAXBElement<Object>(_EntryKey_QNAME, Object.class, Entry.class, value);
     }
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "key", scope = Entry.class)
-    public JAXBElement<Object> createEntryKey(Object value) {
-        return new JAXBElement<Object>(_EntryKey_QNAME, Object.class, Entry.class, value);
+    @XmlElementDecl(namespace = "", name = "value", scope = Entry.class)
+    public JAXBElement<Object> createEntryValue(Object value) {
+        return new JAXBElement<Object>(_EntryValue_QNAME, Object.class, Entry.class, value);
     }
 
 }

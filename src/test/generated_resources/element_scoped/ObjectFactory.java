@@ -25,8 +25,8 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _Age_QNAME = new QName("http://example.com/extra", "age");
-    private final static QName _ReturnUsersAge_QNAME = new QName("http://example.com/scope", "age");
     private final static QName _ReturnUsersName_QNAME = new QName("http://example.com/scope", "name");
+    private final static QName _ReturnUsersAge_QNAME = new QName("http://example.com/scope", "age");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: element_scoped

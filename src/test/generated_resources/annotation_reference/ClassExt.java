@@ -13,16 +13,16 @@ import javax.xml.bind.annotation.XmlType;
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="class-ext">
- *   &lt;complexContent>
- *     &lt;extension base="{}class-common">
- *       &lt;sequence>
- *         &lt;element name="country" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="code" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="class-ext"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{}class-common"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="country" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="code" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

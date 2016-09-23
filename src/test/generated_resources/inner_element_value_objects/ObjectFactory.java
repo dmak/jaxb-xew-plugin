@@ -45,14 +45,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Articles }
-     * 
-     */
-    public Articles createArticles() {
-        return new ArticlesImpl();
-    }
-
-    /**
      * Create an instance of {@link Article }
      * 
      */
@@ -61,11 +53,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Publisher }
+     * Create an instance of {@link Articles }
      * 
      */
-    public Publisher createPublisher() {
-        return new PublisherImpl();
+    public Articles createArticles() {
+        return new ArticlesImpl();
     }
 
     /**
@@ -74,6 +66,14 @@ public class ObjectFactory {
      */
     public ArticlesCollections createArticlesCollections() {
         return new ArticlesCollectionsImpl();
+    }
+
+    /**
+     * Create an instance of {@link Publisher }
+     * 
+     */
+    public Publisher createPublisher() {
+        return new PublisherImpl();
     }
 
     /**
