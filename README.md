@@ -332,42 +332,65 @@ You can find more examples of this plugin in [`samples`](samples/) directory (in
 
 ### Gradle
 ```
-apply plugin: 'java'
-apply plugin: 'maven'
+plugins {
+    id 'java'
+    id 'maven'
+}
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
 repositories {
-  maven { url "http://repo1.maven.org/maven2/" }
+    mavenCentral()
+}
+
+project.ext {
+    jaxbVersion = "2.2.7"
+    generatedSourcesDir = "target/generated-sources"
+}
+
+sourceSets {
+    generated {
+        output.classesDir = "target/classes"
+        java {
+            srcDir project.generatedSourcesDir
+        }
+    }
+    test {
+        compileClasspath += generated.output
+        runtimeClasspath += generated.output
+    }
 }
 
 configurations {
-  xjc
+    xjc
 }
 
 dependencies {
-  compile 'com.sun.xml.bind:jaxb-xjc:2.2.7'
-  compile 'com.sun.xml.bind:jaxb-core:2.2.7'
-  compile 'javax.xml.bind:jaxb-api:2.2.7'
+    compile "com.sun.xml.bind:jaxb-xjc:${jaxbVersion}"
+    compile "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
+    compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
+    compile "javax.xml.bind:jaxb-api:${jaxbVersion}"
 
-  xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.7"
-  xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
+    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.7"
+    xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
 }
 
-task processXSDs() << {
-  ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.compile.asPath)
+task processXSD {
+    ant.taskdef(name: "xjc", classname: "com.sun.tools.xjc.XJCTask", classpath: configurations.compile.asPath)
 
-  ant.xjc(destdir: 'target', package: "com.mycompany", extension: true) {
-    classpath {
-      pathelement(path: configurations.xjc.asPath)
+    mkdir project.generatedSourcesDir
+    ant.xjc(destdir: project.generatedSourcesDir, package: "com.mycompany", extension: true) {
+        classpath {
+            pathelement(path: configurations.xjc.asPath)
+        }
+        schema(dir: "xsd", includes: "test.xsd")
+        arg(value: "-Xxew")
+        arg(value: "-Xfluent-api")
     }
-    schema(dir: "xsd", includes: "test.xsd")
-    arg(value: "-Xxew")
-    arg(value: "-Xfluent-api")
-  }
 }
-compileJava.dependsOn processXSDs
+
+compileJava.dependsOn processXSD
 ```
 
 ## Compatibility and side effects
@@ -400,7 +423,9 @@ These plugins don't work with `xew` as last one is causing side effects (see [#4
 
 ## What's new
 
-### [v1.8](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.8|jar)
+### v1.8 (not yet released)
+
+<!--- (http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.8|jar) -->
 
 * Bugs fixed ([#48](https://github.com/dmak/jaxb-xew-plugin/issues/48)).
 
