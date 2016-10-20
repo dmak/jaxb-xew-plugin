@@ -1,8 +1,8 @@
 
 package element_with_customization;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Vector;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
  *         &lt;element ref="{}type-of-message"/&gt;
+ *         &lt;element ref="{}args"/&gt;
  *         &lt;element ref="{}class"/&gt;
  *         &lt;element ref="{}misc" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
@@ -37,43 +38,70 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "typeOfMessages",
+    "args",
     "classes",
     "misc"
 })
 @XmlRootElement(name = "post-office")
 public class PostOffice {
 
+    @XmlElement(required = true)
+    protected Args args;
     @XmlElementWrapper(name = "class", required = true)
     @XmlElement(name = "name")
-    protected List<String> classes = new Vector<String>();
+    protected Collection<String> classes = new Vector<String>();
     @XmlElementWrapper(name = "misc")
     @XmlAnyElement(lax = true)
-    protected List<Object> misc = new LinkedList<Object>();
+    protected Collection<Object> misc = new LinkedList<Object>();
     @XmlElementWrapper(name = "type-of-message", required = true)
     @XmlElement(name = "type")
-    protected List<String> typeOfMessages = new LinkedList<String>();
+    protected Collection<String> typeOfMessages = new LinkedList<String>();
 
-    public List<String> getTypeOfMessages() {
+    /**
+     * Gets the value of the args property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Args }
+     *     
+     */
+    public Args getArgs() {
+        return args;
+    }
+
+    /**
+     * Sets the value of the args property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Args }
+     *     
+     */
+    public void setArgs(Args value) {
+        this.args = value;
+    }
+
+    public Collection<String> getTypeOfMessages() {
         return typeOfMessages;
     }
 
-    public void setTypeOfMessages(List<String> typeOfMessages) {
+    public void setTypeOfMessages(Collection<String> typeOfMessages) {
         this.typeOfMessages = typeOfMessages;
     }
 
-    public List<String> getClasses() {
+    public Collection<String> getClasses() {
         return classes;
     }
 
-    public void setClasses(List<String> classes) {
+    public void setClasses(Collection<String> classes) {
         this.classes = classes;
     }
 
-    public List<Object> getMisc() {
+    public Collection<Object> getMisc() {
         return misc;
     }
 
-    public void setMisc(List<Object> misc) {
+    public void setMisc(Collection<Object> misc) {
         this.misc = misc;
     }
 

@@ -93,12 +93,12 @@ public class XmlElementWrapperPluginTest {
 		assertXsd("element-list-extended", new String[] { "-Xxew:instantiate invalid" }, false);
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test(expected = BadCommandLineException.class)
 	public void testInvalidControlFile() throws Exception {
 		assertXsd("element-list-extended", new String[] { "-Xxew:control invalid" }, false);
 	}
 
-	@Test(expected = AssertionError.class)
+	@Test(expected = BadCommandLineException.class)
 	public void testInvalidCollectionClass() throws Exception {
 		assertXsd("element-list-extended", new String[] { "-Xxew:collection badvalue" }, false);
 	}
@@ -217,7 +217,7 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementWithCustomization() throws Exception {
 		// This run is additionally configured from XSD (<xew:xew ... >):
-		assertXsd("element-with-customization", new String[] { "-debug", "-Xxew:plural" }, false, "PostOffice",
+		assertXsd("element-with-customization", new String[] { "-debug", "-Xxew:plural" }, false, "PostOffice", "Args",
 		            "package-info");
 	}
 

@@ -35,9 +35,7 @@ import static com.sun.tools.xjc.addon.xew.CommonUtils.isListedAsParametrisation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.setPrivateField;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,6 +78,7 @@ import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
+import com.sun.tools.xjc.addon.xew.CommonConfiguration.ConfigurationOption;
 import com.sun.tools.xjc.model.CClassInfo;
 import com.sun.tools.xjc.model.CCustomizations;
 import com.sun.tools.xjc.model.CElementPropertyInfo;
@@ -95,6 +94,9 @@ import com.sun.xml.bind.api.impl.NameConverter;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSDeclaration;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.logging.LogFactory;
 import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
 import org.jvnet.jaxb2_commons.util.CustomizationUtils;
@@ -122,16 +124,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 	private static final String	PLUGIN_NAME							   = "Xxew";
 
-	private static final String	OPTION_NAME_CONTROL					   = "control";
-	private static final String	OPTION_NAME_SUMMARY					   = "summary";
-	private static final String	OPTION_NAME_COLLECTION				   = "collection";
-	private static final String	OPTION_NAME_COLLECTION_INTERFACE	   = "collectionInterface";
-	private static final String	OPTION_NAME_INSTANTIATE				   = "instantiate";
-	private static final String	OPTION_NAME_APPLY_PLURAL_FORM		   = "plural";
-
-	private PrintWriter			summary								   = null;
-
-	private Map<String, String>	globalOptions						   = new HashMap<String, String>();
+	private GlobalConfiguration	globalConfiguration					   = new GlobalConfiguration();
 
 	private JClass				xmlElementDeclModelClass;
 
@@ -185,6 +178,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		LogFactory.getFactory().release();
 
 		logger = LogFactory.getLog(getClass());
+		globalConfiguration.setLogger(logger);
 	}
 
 	@Override
@@ -200,7 +194,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	}
 
 	/**
-	 * Parse argument at a given index. Option value may go within the same argument, or as following argument.
+	 * Parse argument at a given index. Option value may go within the same argument (separated with equals), or as
+	 * following argument.
 	 * 
 	 * @param args
 	 *            list of arguments
@@ -210,85 +205,32 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 	 *            the option to match
 	 * @return number of arguments processed
 	 */
-	private int parseArgument(String[] args, int index, String optionName) {
+	private int parseArgument(String[] args, int index, ConfigurationOption option) throws BadCommandLineException {
 		int recognized = 0;
 		String arg = args[index];
-		String argumentName = getArgumentName(optionName);
+		String argumentName = getArgumentName(option.optionName());
 
 		if (arg.startsWith(argumentName)) {
 			recognized++;
 
-			if (arg.length() > argumentName.length()) {
-				globalOptions.put(optionName, arg.substring(argumentName.length()).trim());
+			try {
+				if (arg.length() > argumentName.length()) {
+					applyConfigurationOption(globalConfiguration, option, arg.substring(argumentName.length()).trim());
+				}
+				else {
+					applyConfigurationOption(globalConfiguration, option, args[index + 1].trim());
+					recognized++;
+				}
 			}
-			else {
-				globalOptions.put(optionName, args[index + 1].trim());
-				recognized++;
+			catch (ClassNotFoundException e) {
+				throw new BadCommandLineException("Invalid class", e);
+			}
+			catch (IOException e) {
+				throw new BadCommandLineException("Failed to read from file", e);
 			}
 		}
 
 		return recognized;
-	}
-
-	private void applyConfigurationFromOptions(Configuration configuration, Map<String, String> options)
-	            throws IOException, ClassNotFoundException {
-		for (Map.Entry<String, String> option : options.entrySet()) {
-			if (OPTION_NAME_APPLY_PLURAL_FORM.equals(option.getKey())) {
-				configuration.setApplyPluralForm(Boolean.parseBoolean(option.getValue()));
-			}
-			else if (OPTION_NAME_CONTROL.equals(option.getKey())) {
-				configuration.readControlFile(option.getValue());
-			}
-			else if (OPTION_NAME_SUMMARY.equals(option.getKey())) {
-				summary = new PrintWriter(new FileOutputStream(option.getValue()));
-			}
-			else if (OPTION_NAME_COLLECTION.equals(option.getKey())) {
-				configuration.setCollectionImplClass(Class.forName(option.getValue()));
-			}
-			else if (OPTION_NAME_COLLECTION_INTERFACE.equals(option.getKey())) {
-				configuration.setCollectionInterfaceClass(Class.forName(option.getValue()));
-			}
-			else if (OPTION_NAME_INSTANTIATE.equals(option.getKey())) {
-				try {
-					configuration.setInstantiationMode(
-					            Configuration.InstantiationMode.valueOf(option.getValue().toUpperCase()));
-				}
-				catch (IllegalArgumentException e) {
-					throw new IllegalArgumentException("Unknown instantiation mode \"" + option.getValue() + "\"");
-				}
-			}
-			else {
-				throw new IllegalArgumentException("Unknown option " + option.getKey());
-			}
-		}
-	}
-
-	/**
-	 * Clone given configuration and apply settings from global/class/field JAXB customization.
-	 */
-	private Configuration applyConfigurationFromCustomizations(Configuration configuration,
-	            CCustomizations customizations) throws IOException, ClassNotFoundException {
-		CPluginCustomization customization = customizations.find(XEW_QNAME.getNamespaceURI(), XEW_QNAME.getLocalPart());
-
-		if (customization != null) {
-			configuration = configuration.clone();
-
-			customization.markAsAcknowledged();
-
-			NamedNodeMap attributes = customization.element.getAttributes();
-			Map<String, String> options = new HashMap<String, String>();
-
-			for (int i = 0; i < attributes.getLength(); i++) {
-				Node attribute = attributes.item(i);
-				if (attribute.getNamespaceURI() == null) {
-					options.put(attribute.getNodeName(), attribute.getNodeValue());
-				}
-			}
-
-			applyConfigurationFromOptions(configuration, options);
-		}
-
-		return configuration;
 	}
 
 	@Override
@@ -300,21 +242,97 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		String arg = args[i];
 		logger.trace("Argument[" + i + "] = " + arg);
 
-		if (arg.equals(getArgumentName(OPTION_NAME_APPLY_PLURAL_FORM))) {
-			globalOptions.put(OPTION_NAME_APPLY_PLURAL_FORM, "true");
+		if (arg.equals(getArgumentName(ConfigurationOption.APPLY_PLURAL_FORM.optionName()))) {
+			globalConfiguration.setApplyPluralForm(true);
 			return 1;
 		}
-		else if ((recognized = parseArgument(args, i, OPTION_NAME_CONTROL)) == 0
-		            && (recognized = parseArgument(args, i, OPTION_NAME_SUMMARY)) == 0
-		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION_INTERFACE)) == 0 // longer option name comes first
-		            && (recognized = parseArgument(args, i, OPTION_NAME_COLLECTION)) == 0
-		            && (recognized = parseArgument(args, i, OPTION_NAME_INSTANTIATE)) == 0) {
+		else if ((recognized = parseArgument(args, i, ConfigurationOption.CONTROL)) == 0
+		            && (recognized = parseArgument(args, i, ConfigurationOption.SUMMARY)) == 0
+		            && (recognized = parseArgument(args, i, ConfigurationOption.COLLECTION_INTERFACE)) == 0 // longer option name comes first
+		            && (recognized = parseArgument(args, i, ConfigurationOption.COLLECTION_IMPLEMENTATION)) == 0
+		            && (recognized = parseArgument(args, i, ConfigurationOption.INSTANTIATION_MODE)) == 0) {
 			if (arg.startsWith(getArgumentName(""))) {
 				throw new BadCommandLineException("Invalid argument " + arg);
 			}
 		}
 
 		return recognized;
+	}
+
+	private static void applyConfigurationOption(CommonConfiguration configuration, ConfigurationOption option,
+	            String value) throws IOException, ClassNotFoundException {
+		switch (option) {
+		case CONTROL:
+			if (!(configuration instanceof GlobalConfiguration)) {
+				throw new IllegalArgumentException("The option " + option + " is not applicable");
+			}
+			((GlobalConfiguration) configuration).readControlFile(value);
+			break;
+		case SUMMARY:
+			if (!(configuration instanceof GlobalConfiguration)) {
+				throw new IllegalArgumentException("The option " + option + " is not applicable");
+			}
+			((GlobalConfiguration) configuration).initSummaryWriter(value);
+			break;
+		case COLLECTION_IMPLEMENTATION:
+			configuration.setCollectionImplClass(Class.forName(value));
+			break;
+		case COLLECTION_INTERFACE:
+			configuration.setCollectionInterfaceClass(Class.forName(value));
+			break;
+		case INSTANTIATION_MODE:
+			try {
+				configuration.setInstantiationMode(CommonConfiguration.InstantiationMode.valueOf(value.toUpperCase()));
+			}
+			catch (IllegalArgumentException e) {
+				throw new IllegalArgumentException("Unknown instantiation mode \"" + value + "\"");
+			}
+			break;
+		case APPLY_PLURAL_FORM:
+			configuration.setApplyPluralForm(Boolean.parseBoolean(value));
+			break;
+		case ANNOTATE:
+			if (!(configuration instanceof ClassConfiguration)) {
+				throw new IllegalArgumentException("The option " + option + " is not applicable");
+			}
+			((ClassConfiguration) configuration).setAnnotatable(Boolean.parseBoolean(value));
+			break;
+		}
+	}
+
+	/**
+	 * Clone given configuration and apply settings from global/class/field JAXB customization.
+	 */
+	private <T extends CommonConfiguration> T applyConfigurationFromCustomizations(CommonConfiguration configuration,
+	            CCustomizations customizations, boolean cloneClassConfiguration)
+	            throws IOException, ClassNotFoundException {
+		CPluginCustomization customization = customizations.find(XEW_QNAME.getNamespaceURI(), XEW_QNAME.getLocalPart());
+
+		if (customization == null) {
+			if (cloneClassConfiguration) {
+				return (T) new ClassConfiguration(configuration);
+			}
+
+			return (T) configuration;
+		}
+
+		customization.markAsAcknowledged();
+
+		NamedNodeMap attributes = customization.element.getAttributes();
+
+		if (cloneClassConfiguration) {
+			configuration = new ClassConfiguration(configuration);
+		}
+
+		for (int i = 0; i < attributes.getLength(); i++) {
+			Node attribute = attributes.item(i);
+			if (attribute.getNamespaceURI() == null) {
+				applyConfigurationOption(configuration, ConfigurationOption.byOption(attribute.getNodeName()),
+				            attribute.getNodeValue());
+			}
+		}
+
+		return (T) configuration;
 	}
 
 	@Override
@@ -334,7 +352,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		}
 	}
 
-	private void runInternal(Outline outline) throws IOException, ClassNotFoundException {
+	private void runInternal(Outline outline) throws ClassNotFoundException, IOException {
 		JCodeModel codeModel = outline.getCodeModel();
 		JClass xmlElementWrapperModelClass = codeModel.ref(XmlElementWrapper.class);
 		JClass xmlElementModelClass = codeModel.ref(XmlElement.class);
@@ -352,20 +370,16 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 		logger.debug("JAXB Process Model (run)...");
 
-		Configuration globalConfiguration = new Configuration(logger);
-
-		applyConfigurationFromOptions(globalConfiguration, globalOptions);
-
-		globalConfiguration = applyConfigurationFromCustomizations(globalConfiguration,
-		            CustomizationUtils.getCustomizations(outline.getModel()));
+		applyConfigurationFromCustomizations(globalConfiguration,
+		            CustomizationUtils.getCustomizations(outline.getModel()), false);
 
 		// Write summary information on the option for this compilation.
 		writeSummary("Compilation:");
 		writeSummary("  JAXB version         : " + Options.getBuildID());
-		writeSummary("  Control file         : " + (!globalOptions.containsKey(OPTION_NAME_CONTROL) ? "<none>"
-		            : globalOptions.get(OPTION_NAME_CONTROL)));
-		writeSummary("  Summary file         : " + (!globalOptions.containsKey(OPTION_NAME_SUMMARY) ? "<none>"
-		            : globalOptions.get(OPTION_NAME_SUMMARY)));
+		writeSummary("  Control file         : "
+		            + ObjectUtils.defaultIfNull(globalConfiguration.getControlFileName(), "<none>"));
+		writeSummary("  Summary file         : "
+		            + ObjectUtils.defaultIfNull(globalConfiguration.getSummaryFileName(), "<none>"));
 		writeSummary("  Instantiation mode   : " + globalConfiguration.getInstantiationMode());
 		writeSummary("  Collection impl      : " + globalConfiguration.getCollectionImplClass().getName());
 		writeSummary("  Collection interface : " + globalConfiguration.getCollectionInterfaceClass().getName());
@@ -411,8 +425,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 			// Get the implementation class for the current class.
 			JDefinedClass targetClass = outlineClass.implClass;
 
-			Configuration classConfiguration = applyConfigurationFromCustomizations(globalConfiguration,
-			            CustomizationUtils.getCustomizations(outlineClass));
+			ClassConfiguration classConfiguration = applyConfigurationFromCustomizations(globalConfiguration,
+			            CustomizationUtils.getCustomizations(outlineClass), true);
 
 			// We cannot remove candidates that have parent classes, but we can still substitute them:
 			Candidate parentCandidate = candidatesMap.get(targetClass._extends().fullName());
@@ -455,8 +469,18 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 				final JFieldVar originalImplField = targetClass.fields().get(fieldName);
 
-				if (candidate == null) {
+				if (candidate == null || !classConfiguration.isAnnotatable()) {
 					checkAnnotationReference(candidatesMap, originalImplField);
+
+					continue;
+				}
+
+				ClassConfiguration fieldConfiguration = applyConfigurationFromCustomizations(classConfiguration,
+				            CustomizationUtils.getCustomizations(field), true);
+
+				if (!fieldConfiguration.isAnnotatable()) {
+					logger.debug("Field " + fieldName + " is excluded for processing.");
+					candidate.unmarkForRemoval();
 
 					continue;
 				}
@@ -471,9 +495,6 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				if (moveInnerClassToParent(outline, candidate)) {
 					modificationCount++;
 				}
-
-				Configuration fieldConfiguration = applyConfigurationFromCustomizations(classConfiguration,
-				            CustomizationUtils.getCustomizations(field));
 
 				List<JClass> fieldTypeParametrisations = candidate.getFieldClass().getTypeParameters();
 
@@ -525,7 +546,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				originalImplField.type(collectionInterfaceClass);
 
 				// If instantiation is specified to be "early", add code for creating new instance of the collection class.
-				if (fieldConfiguration.getInstantiationMode() == Configuration.InstantiationMode.EARLY) {
+				if (fieldConfiguration.getInstantiationMode() == CommonConfiguration.InstantiationMode.EARLY) {
 					logger.debug("Applying EARLY instantiation...");
 					// GENERATED CODE: ... fieldName = new C<T>();
 					originalImplField.init(JExpr._new(collectionImplClass));
@@ -693,7 +714,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 				// GENERATED CODE: public I<T> getFieldName() { ... return fieldName; }
 				JMethod getterMethod = targetClass.method(JMod.PUBLIC, collectionInterfaceClass, "get" + propertyName);
 
-				if (fieldConfiguration.getInstantiationMode() == Configuration.InstantiationMode.LAZY) {
+				if (fieldConfiguration.getInstantiationMode() == CommonConfiguration.InstantiationMode.LAZY) {
 					logger.debug("Applying LAZY instantiation...");
 					// GENERATED CODE: if (fieldName == null) fieldName = new C<T>();
 					getterMethod.body()._if(JExpr.ref(fieldName).eq(JExpr._null()))._then().assign(JExpr.ref(fieldName),
@@ -737,7 +758,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		writeSummary("\t" + deletionCount + " deletion(s) from original code.");
 		writeSummary("");
 
-		closeSummary();
+		globalConfiguration.closeSummary();
 
 		Ring.end(null);
 
@@ -1240,22 +1261,8 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 		}
 	}
 
-	//
-	// Logging helpers
-	//
-
 	private void writeSummary(String s) {
-		if (summary != null) {
-			summary.println(s);
-		}
-
-		logger.info(s);
-	}
-
-	private void closeSummary() {
-		if (summary != null) {
-			summary.close();
-		}
+		globalConfiguration.writeSummary(s);
 	}
 
 	/**
@@ -1285,7 +1292,7 @@ public class XmlElementWrapperPlugin extends AbstractParameterizablePlugin {
 
 		@Override
 		public String toString() {
-			return "[ScopedElementInfo name:" + name + " namespace:" + namespace + " type:" + type + "]";
+			return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 		}
 	}
 

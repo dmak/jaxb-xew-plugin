@@ -37,4 +37,12 @@ public class ObjectFactory {
         return new PostOffice();
     }
 
+    /**
+     * Create an instance of {@link Args }
+     * 
+     */
+    public Args createArgs() {
+        return new Args();
+    }
+
 }

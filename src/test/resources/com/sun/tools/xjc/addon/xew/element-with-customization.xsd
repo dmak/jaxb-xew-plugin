@@ -12,6 +12,7 @@
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_with_customization" />
 			</jaxb:schemaBindings>
+			<xew:xew collection="java.util.LinkedHashSet" collectionInterface="java.util.Collection" />
 		</xs:appinfo>
 	</xs:annotation>
 
@@ -21,7 +22,7 @@
 
 	<xs:element name="post-office">
 		<xs:complexType>
-			<!-- Example of class customization: all substituted fields in this class (if any) will inherit given settings -->
+			<!-- Example of type customization: all substituted fields in this class (if any) will inherit given settings -->
 			<xs:annotation>
 				<xs:appinfo>
 					<xew:xew collection="java.util.LinkedList" />
@@ -29,12 +30,20 @@
 			</xs:annotation>
 			<xs:sequence>
 				<xs:element ref="type-of-message" />
+				<xs:element ref="args">
+					<xs:annotation>
+						<xs:appinfo>
+							<!-- Example of field customization: exclude this field from substitution -->
+							<xew:xew annotate="false" />
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
 				<xs:element ref="class">
 					<xs:annotation>
 						<xs:appinfo>
 							<!-- Force the property name to be "classes" (otherwise it becomes "clazzs") -->
 							<jaxb:property name="classes" />
-							<!-- Example of field customization: this very field uses settings different from global -->
+							<!-- Example of field customization: this field uses collection class different from global -->
 							<xew:xew collection="java.util.Vector" />
 						</xs:appinfo>
 					</xs:annotation>
@@ -63,6 +72,14 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="name" type="xs:string" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="args">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="arg" type="xs:string" maxOccurs="unbounded" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
