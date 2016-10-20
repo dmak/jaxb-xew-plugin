@@ -30,14 +30,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SecondaryContractorReferenceType }
-     * 
-     */
-    public SecondaryContractorReferenceType createSecondaryContractorReferenceType() {
-        return new SecondaryContractorReferenceType();
-    }
-
-    /**
      * Create an instance of {@link ContractorReferenceType }
      * 
      */
@@ -51,6 +43,14 @@ public class ObjectFactory {
      */
     public PrimaryContractorReferenceType createPrimaryContractorReferenceType() {
         return new PrimaryContractorReferenceType();
+    }
+
+    /**
+     * Create an instance of {@link SecondaryContractorReferenceType }
+     * 
+     */
+    public SecondaryContractorReferenceType createSecondaryContractorReferenceType() {
+        return new SecondaryContractorReferenceType();
     }
 
 }

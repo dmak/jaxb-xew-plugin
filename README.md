@@ -136,7 +136,7 @@ The following options are applicable for plugin:
 </tr>
 </table>
 
-### Control file
+### Control file for substitution candidates
 
 Each control file line specifies a fully qualified class name or regex pattern (provided between slashes `/.../`) plus mode associated with it.
 
@@ -145,11 +145,11 @@ The following control modes are available:
 <table>
 <tr>
 	<td>exclude</td>
-	<td>Given class is excluded from becoming candidate for substitution.</td>
+	<td>Given candidate class is excluded from becoming candidate for substitution and will not be removed from the model.</td>
 </tr>
 <tr>
 	<td>include</td>
-	<td>Given class is not excluded from becoming candidate for substitution. Used usually in conjunction with exclude to include back a part of the exclusion space.</td>
+	<td>Given candidate class is not excluded from becoming candidate for substitution. Used usually in conjunction with exclude to include back a part of the exclusion space.</td>
 </tr>
 <tr>
 	<td>keep</td>
@@ -169,6 +169,30 @@ org.company.Processor=include
 ```
 Empty lines or lines started with `#` (comment) are ignored. See also [`inner-element-control.txt`](src/test/resources/com/sun/tools/xjc/addon/xew/inner-element-control.txt) and other control files in test suit.
 
+### JAXB customization
+
+With JAXB customization it is possible to pass the same options as via XJC arguments. Here is the example with all global options enumerated:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xew="http://github.com/jaxb-xew-plugin"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	jaxb:extensionBindingPrefixes="xew"
+	elementFormDefault="qualified"
+>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<xew:xew control="control.txt" summary="summary.txt" collection="java.util.LinkedHashSet" collectionInterface="java.util.Collection" instantiate="early" plural="true" />
+		</xsd:appinfo>
+	</xsd:annotation>
+	
+	...
+</xsd:schema>
+```
+XJC arguments are overridden with JAXB global customizations, which are overridden with JAXB type customizations, which are overridden with JAXB field customizations. Per-type and per-field customizations cannot override `control` and `summary` configuration options, but have additionally `annotate` option, which if set to `false`, disables annotation/replacement of the particular field or all fields of the type/class (see [`element-with-customization.xsd`](src/test/resources/com/sun/tools/xjc/addon/xew/element-with-customization.xsd) example for global, per-type and per-field customization). Note that in contrast to `exclude` mode in control file, this option controls the behaviour for the particular field (or all fields of a type/class) which are being annotated with `@XmlElementWrapper`, but not the types/classes which are used for substitution (candidate classes).
+
 ### Ant task
 
 First you need to download the plugin jar (for example, from [Maven repository](http://mirrors.ibiblio.org/pub/mirrors/maven2/com/github/jaxb-xew-plugin/jaxb-xew-plugin)) and put it to your project `libs` folder together with other dependencies.
@@ -179,9 +203,9 @@ To use the plugin from Ant you will need something like the following in your bu
 <project name="SunlightDataService" default="build" basedir=".">
 	<path id="runtime.classpath">
 		<fileset dir="libs">
-			<include name="jaxb-xjc-2.2.7.jar" />
-			<include name="jaxb-api-2.2.7.jar" />
-			<include name="jaxb-core-2.2.7.jar" />
+			<include name="jaxb-xjc-2.2.11.jar" />
+			<include name="jaxb-api-2.2.11.jar" />
+			<include name="jaxb-core-2.2.11.jar" />
 			<include name="commons-logging-1.1.1.jar" />
 			<include name="commons-lang-2.2.jar" />
 		</fileset>
@@ -189,7 +213,7 @@ To use the plugin from Ant you will need something like the following in your bu
 	<path id="xjc.classpath">
 		<fileset dir="libs">
 			<include name="jaxb2-basics-tools-0.6.5.jar" />
-			<include name="jaxb-xew-plugin-1.7.jar" />
+			<include name="jaxb-xew-plugin-1.8.jar" />
 		</fileset>
 	</path>
 	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
@@ -211,7 +235,7 @@ To use the plugin from Ant you will need something like the following in your bu
 
 #### maven-jaxb2-plugin
 
-Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API which _is not compatible with this plugin_. Version 0.8.1 is guaranteed to work, versions [0.8.2…0.12.1] should also work.
+Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API which _is not compatible with this plugin_. Versions [0.8.1…0.12.1] should work fine.
 ```xml
 <plugin>
 	<groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -240,7 +264,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.7</version>
+						<version>1.8</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -248,7 +272,8 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 	</executions>
 </plugin>
 ```
-Versions ≥ 0.12.2 work with the following correction (see [issue#50](https://github.com/dmak/jaxb-xew-plugin/issues/50)):
+Versions ≥ 0.12.2 work with `jaxb-xew-plugin` ≥ v1.8 (see [issue#50](https://github.com/dmak/jaxb-xew-plugin/issues/50) for other options):
+```xml
 <plugin>
 	<groupId>org.jvnet.jaxb2.maven2</groupId>
 	<artifactId>maven-jaxb2-plugin</artifactId>
@@ -269,13 +294,7 @@ Versions ≥ 0.12.2 work with the following correction (see [issue#50](https://g
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.7</version>
-						<exclusions>
-							<exclusion>
-								<groupId>com.sun.xml.bind</groupId>
-								<artifactId>jaxb-xjc</artifactId>
-							</exclusion>
-						</exclusions>
+						<version>1.8</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -286,7 +305,7 @@ Versions ≥ 0.12.2 work with the following correction (see [issue#50](https://g
 
 #### jaxb2-maven-plugin
 
-Note: `jaxb2-maven-plugin` v1.5 (the same apples to v1.6) was compiled against JAXB XJC API v2.1.13 which _is not compatible with this plugin_, thus additional dependency is needed to be added to **plugin classpath**.
+Note: `jaxb2-maven-plugin` ≤ v1.5 was compiled against JAXB XJC API v2.1.13 which _is not compatible with this plugin_, thus additional dependency is needed to be added to **plugin classpath**.
 ```xml
 <plugin>
 	<groupId>org.codehaus.mojo</groupId>
@@ -313,21 +332,23 @@ Note: `jaxb2-maven-plugin` v1.5 (the same apples to v1.6) was compiled against J
 		<dependency>
 			<groupId>com.github.jaxb-xew-plugin</groupId>
 			<artifactId>jaxb-xew-plugin</artifactId>
-			<version>1.7</version>
+			<version>1.8</version>
 		</dependency>
 		<!--
-		 | We need to update the jaxb-xjc plugin from v2.1.13 to v2.2.4-1
+		 | We need to update the jaxb-xjc dependency from v2.1.13 to v2.2.11
 		 | used by the jaxb-xew-plugin (v2.1.13 does not have the required
 		 | method com.sun.codemodel.JAnnotatable.annotations()Ljava/util/Collection).
 		 -->
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-xjc</artifactId>
-			<version>2.2.4-1</version>
+			<version>2.2.11</version>
 		</dependency>
 	</dependencies>
 </plugin>
 ```
+`jaxb2-maven-plugin` ≥ v2.1 should work just fine.
+
 You can find more examples of this plugin in [`samples`](samples/) directory (including how to call this plugin using `jaxws-maven-plugin` or `cxf-codegen-plugin`).
 
 ### Gradle
@@ -345,7 +366,7 @@ repositories {
 }
 
 project.ext {
-    jaxbVersion = "2.2.7"
+    jaxbVersion = "2.2.11"
     generatedSourcesDir = "target/generated-sources"
 }
 
@@ -372,7 +393,7 @@ dependencies {
     compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     compile "javax.xml.bind:jaxb-api:${jaxbVersion}"
 
-    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.7"
+    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.8"
     xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
 }
 
@@ -423,11 +444,11 @@ These plugins don't work with `xew` as last one is causing side effects (see [#4
 
 ## What's new
 
-### v1.8 (not yet released)
-
-<!--- (http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.8|jar) -->
+### [v1.8](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.8|jar)
 
 * Bugs fixed ([#48](https://github.com/dmak/jaxb-xew-plugin/issues/48)).
+* Improvements:
+  * added `exclude` customization option
 
 ### [v1.7](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.7|jar)
 
@@ -449,7 +470,7 @@ These plugins don't work with `xew` as last one is causing side effects (see [#4
 
 * Improvements:
   * More flexible control file ([#23](https://github.com/dmak/jaxb-xew-plugin/issues/23))
-  * In-schema plugin customization [#28](https://github.com/dmak/jaxb-xew-plugin/issues/28))
+  * In-schema plugin customization ([#28](https://github.com/dmak/jaxb-xew-plugin/issues/28))
 * Bugs fixed ([#22](https://github.com/dmak/jaxb-xew-plugin/issues/22), [#26](https://github.com/dmak/jaxb-xew-plugin/issues/26)).
 * The option `-Xxew:delete` is removed as in majority of usecases it is set to true. Now by default plugin deletes all candidates. To prevent them from being deleted, create [control file](#control-file) with only line `/.*/=keep`.
 
@@ -598,7 +619,7 @@ There are many pitfalls in JAXB Code Model API which are forcing the developer t
 * [JAXB-878](https://java.net/jira/browse/JAXB-878) and [JAXB-879](https://java.net/jira/browse/JAXB-879) describe the lack of public getters for class fields.
 * [JAXB-957](https://java.net/jira/browse/JAXB-957) mentions what need to be added to make it possible for the inner class to be moved to another class or package.
 * [JAXB-883](http://java.net/jira/browse/JAXB-883) does not allow to learn if "simpleMode" setting is enabled, which in its turn controls plural form for collection property names. There are however some more difficulties to overcome.
-* [Marshalling of text nodes for mixed-mode contents](http://stackoverflow.com/questions/21444292/)
+* [JAXB-1107](https://java.net/jira/browse/JAXB-1107) – marshalling of text nodes for mixed-mode contents
 
 ## Authors
 

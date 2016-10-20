@@ -71,9 +71,9 @@ public class Order implements Equals, HashCode
         final Order that = ((Order) object);
         {
             List<String> lhsItems;
-            lhsItems = this.getItems();
+            lhsItems = ((this.items!= null)?this.getItems():null);
             List<String> rhsItems;
-            rhsItems = that.getItems();
+            rhsItems = ((that.items!= null)?that.getItems():null);
             if (!strategy.equals(LocatorUtils.property(thisLocator, "items", lhsItems), LocatorUtils.property(thatLocator, "items", rhsItems), lhsItems, rhsItems)) {
                 return false;
             }
@@ -90,7 +90,7 @@ public class Order implements Equals, HashCode
         int currentHashCode = 1;
         {
             List<String> theItems;
-            theItems = this.getItems();
+            theItems = ((this.items!= null)?this.getItems():null);
             currentHashCode = strategy.hashCode(LocatorUtils.property(locator, "items", theItems), currentHashCode, theItems);
         }
         return currentHashCode;

@@ -28,6 +28,7 @@
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
+				<!-- See https://github.com/dmak/jaxb-xew-plugin/issues/50#issuecomment-248238663 about how to solve the issue with maven-jaxb2-plugin >= v0.12.1 + jaxb-xew-plugin <= v1.7 -->
 				<version>0.13.1</version>
 				<executions>
 					<execution>
@@ -47,7 +48,7 @@
 					<args>
 						<arg>-no-header</arg>
 			  			<arg>-Xxew</arg>
-			                    	<arg>-Xxew:instantiate lazy</arg>
+			  			<arg>-Xxew:instantiate lazy</arg>
 						<arg>-XsimpleEquals</arg>
 						<arg>-XsimpleHashCode</arg>
 						<arg>-Xannotate</arg> 
