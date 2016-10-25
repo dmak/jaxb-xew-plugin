@@ -1,9 +1,9 @@
-<xs:schema xmlns="budgetary/commitment" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:con="budgetary/reference" targetNamespace="budgetary/commitment" elementFormDefault="qualified">
-	<xs:import namespace="budgetary/reference" schemaLocation="ContractorReference.xsd" />
-	<xs:element name="BudgetaryCommitment" type="BudgetaryCommitmentType" />
-	<xs:complexType name="BudgetaryCommitmentType">
-		<xs:sequence>
-			<xs:element name="ContractorReferences" type="con:ContractorReferencesType" minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-</xs:schema>
+<xsd:schema xmlns="budgetary/commitment" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:con="budgetary/reference" targetNamespace="budgetary/commitment" elementFormDefault="qualified">
+	<xsd:import namespace="budgetary/reference" schemaLocation="ContractorReference.xsd" />
+	<xsd:element name="BudgetaryCommitment" type="BudgetaryCommitmentType" />
+	<xsd:complexType name="BudgetaryCommitmentType">
+		<xsd:sequence>
+			<xsd:element name="ContractorReferences" type="con:ContractorReferencesType" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

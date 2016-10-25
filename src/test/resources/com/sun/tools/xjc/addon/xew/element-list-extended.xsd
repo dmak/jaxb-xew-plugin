@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xew="http://github.com/jaxb-xew-plugin"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	jaxb:extensionBindingPrefixes="xew"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_list_extended" />
 			</jaxb:schemaBindings>
 			<xew:xew collection="java.util.HashSet" collectionInterface="java.util.Set" plural="true" />
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:element name="foo">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="bar">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="e" minOccurs="0" maxOccurs="unbounded">
-								<xs:complexType>
-									<xs:attribute name="id" type="xs:string" />
-								</xs:complexType>
-							</xs:element>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="foo">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="bar">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="e" minOccurs="0" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:attribute name="id" type="xsd:string" />
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

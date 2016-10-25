@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<xsd:schema
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-	<xs:complexType name="article">
-		<xs:sequence>
-			<xs:element name="title" type="xs:string" />
-			<xs:element name="author" type="xs:string" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="article">
+		<xsd:sequence>
+			<xsd:element name="title" type="xsd:string" />
+			<xsd:element name="author" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="articles">
-		<xs:sequence>
-			<xs:element name="article" type="article" maxOccurs="unbounded" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="articles">
+		<xsd:sequence>
+			<xsd:element name="article" type="article" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="articles-collections">
-		<xs:sequence>
-			<xs:element name="articles" type="articles" maxOccurs="unbounded" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="articles-collections">
+		<xsd:sequence>
+			<xsd:element name="articles" type="articles" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="publisher">
-		<xs:sequence>
-			<xs:element name="articles" type="articles" />
-		</xs:sequence>
-	</xs:complexType>
-</xs:schema>
+	<xsd:complexType name="publisher">
+		<xsd:sequence>
+			<xsd:element name="articles" type="articles" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

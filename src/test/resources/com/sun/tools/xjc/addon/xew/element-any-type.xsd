@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema jaxb:version="2.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-	<xs:annotation>
-		<xs:appinfo>
+<xsd:schema jaxb:version="2.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_any_type" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:complexType name="Entry">
-		<xs:sequence>
-			<xs:element name="key" minOccurs="0" nillable="true" type="xs:anyType" />
-			<xs:element name="value" minOccurs="0" nillable="true" type="xs:anyType" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="Entry">
+		<xsd:sequence>
+			<xsd:element name="key" minOccurs="0" nillable="true" type="xsd:anyType" />
+			<xsd:element name="value" minOccurs="0" nillable="true" type="xsd:anyType" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="Map">
-		<xs:sequence>
-			<xs:element name="entry" maxOccurs="unbounded" nillable="true" type="Entry" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="Map">
+		<xsd:sequence>
+			<xsd:element name="entry" maxOccurs="unbounded" nillable="true" type="Entry" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="List">
-		<xs:sequence>
-			<xs:element name="elements" maxOccurs="unbounded" nillable="true" type="xs:anyType" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="List">
+		<xsd:sequence>
+			<xsd:element name="elements" maxOccurs="unbounded" nillable="true" type="xsd:anyType" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:element name="conversion">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="accept" type="List" />
-				<xs:element name="return" type="Map" nillable="false" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="conversion">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="accept" type="List" />
+				<xsd:element name="return" type="Map" nillable="false" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

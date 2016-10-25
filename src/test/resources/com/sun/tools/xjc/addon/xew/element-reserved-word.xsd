@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_reserved_word" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
 	<!--
 		Elements use Java reserved words.
 	-->
 
-	<xs:complexType name="class">
-		<xs:sequence>
-			<xs:element name="extends" type="types" />
-			<xs:element name="implements" type="types" />
-			<xs:element name="methods" type="methods" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="class">
+		<xsd:sequence>
+			<xsd:element name="extends" type="types" />
+			<xsd:element name="implements" type="types" />
+			<xsd:element name="methods" type="methods" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="types">
-		<xs:sequence>
-			<xs:choice maxOccurs="unbounded">
-				<xs:element name="type" type="xs:string" />
-				<xs:element name="primitive" type="xs:byte" />
-			</xs:choice>
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="types">
+		<xsd:sequence>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="type" type="xsd:string" />
+				<xsd:element name="primitive" type="xsd:byte" />
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="methods">
-		<xs:sequence>
-			<xs:element name="method" maxOccurs="unbounded">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="return" type="types" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-</xs:schema>
+	<xsd:complexType name="methods">
+		<xsd:sequence>
+			<xsd:element name="method" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="return" type="types" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

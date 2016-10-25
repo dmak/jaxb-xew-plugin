@@ -11,27 +11,27 @@ If you like this plugin, please give in a star in GutHub! Report the issues to [
 To illustrate the problem let's take the following XSD:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<xsd:schema
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	elementFormDefault="qualified">
 
-	<xs:element name="order">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="items" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xsd:element name="order">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="items" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 
-	<xs:element name="items">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="item" type="xs:string" maxOccurs="unbounded" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="items">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="item" type="xsd:string" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
 ```
 From this XSD by default `xjc` will generate two classes:
 ```java
@@ -136,9 +136,9 @@ The following options are applicable for plugin:
 </tr>
 </table>
 
-### Control file for substitution candidates
+### Control file
 
-Each control file line specifies a fully qualified class name or regex pattern (provided between slashes `/.../`) plus mode associated with it.
+This file allows to control how substituted classes (candidates) are handled. Each control file line specifies a fully qualified candidate class name or regex pattern (provided between slashes `/.../`) plus mode associated with it.
 
 The following control modes are available:
 
@@ -184,14 +184,33 @@ With JAXB customization it is possible to pass the same options as via XJC argum
 >
 	<xsd:annotation>
 		<xsd:appinfo>
-			<xew:xew control="control.txt" summary="summary.txt" collection="java.util.LinkedHashSet" collectionInterface="java.util.Collection" instantiate="early" plural="true" />
+			<xew:xew
+				control="control.txt" summary="summary.txt"
+				collection="java.util.LinkedHashSet" collectionInterface="java.util.Collection"
+				instantiate="early" plural="true" />
 		</xsd:appinfo>
 	</xsd:annotation>
 	
 	...
 </xsd:schema>
 ```
-XJC arguments are overridden with JAXB global customizations, which are overridden with JAXB type customizations, which are overridden with JAXB field customizations. Per-type and per-field customizations cannot override `control` and `summary` configuration options, but have additionally `annotate` option, which if set to `false`, disables annotation/replacement of the particular field or all fields of the type/class (see [`element-with-customization.xsd`](src/test/resources/com/sun/tools/xjc/addon/xew/element-with-customization.xsd) example for global, per-type and per-field customization). Note that in contrast to `exclude` mode in control file, this option controls the behaviour for the particular field (or all fields of a type/class) which are being annotated with `@XmlElementWrapper`, but not the types/classes which are used for substitution (candidate classes).
+XJC arguments are overridden with JAXB global customizations, which are overridden with JAXB type customizations, which are overridden with JAXB field customizations. Per-type and per-field customizations cannot override `control` and `summary` configuration options, but have additionally `annotate` option, which if set to `false`, disables annotation/replacement of the particular field or all fields of the type/class (see [`element-with-customization.xsd`](src/test/resources/com/sun/tools/xjc/addon/xew/element-with-customization.xsd) example for global, per-type and per-field customization). Note that in contrast to `exclude` mode in control file, this option controls the behaviour for the particular field (or all fields of a type/class) which are being annotated with `@XmlElementWrapper`, but not the types/classes which are used for substitution (candidate classes). Example of per-field JXB file:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xew="http://github.com/jaxb-xew-plugin"
+	jaxb:extensionBindingPrefixes="xew"
+	xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance" version="2.1">
+
+	<jaxb:bindings node="xsd:complexType[@name='container']">
+		<jaxb:bindings node=".//xsd:element[@name='items']">
+			<xew:xew annotate="false" />
+		</jaxb:bindings>
+	</jaxb:bindings>
+</jaxb:bindings>
+```
 
 ### Ant task
 
@@ -532,12 +551,6 @@ If you provide the code in any way (patch, pull request, post, comment, …) you
 
 #### Build and release procedure
 
-<!-- width, height, align attributes are not supported.
-[<img width="148" height="50" src="http://www.cloudbees.com/sites/default/files/Button-Powered-by-CB.png" align="right" />](https://dmak.ci.cloudbees.com/job/jaxb-xew-plugin/)
--->
-
-[![Build job](http://www.cloudbees.com/sites/default/files/Button-Powered-by-CB.png)](https://dmak.ci.cloudbees.com/job/jaxb-xew-plugin/)
-
 * Read [Sonatype OSS Maven Repository Usage Guide](http://central.sonatype.org/pages/ossrh-guide.html) from cover to cover.
 * Use the following `settings.xml` for your Maven (see [Sharing Files with Build Agents](http://wiki.cloudbees.com/bin/view/DEV/Sharing+Files+with+Build+Executors) about how to share `settings.xml` with build nodes on CloudBees):
 ```xml
@@ -590,7 +603,7 @@ If you provide the code in any way (patch, pull request, post, comment, …) you
 </settings>
 ```
 * Make sure you have git ≥ v1.7.10 installed, otherwise you may face [this bug#341221](https://bugs.eclipse.org/bugs/show_bug.cgi?id=341221).
-* You need to put JAXB API ≥ v2.2.3 to `jre/lib/endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
+* In case JDK  you need to put JAXB API ≥ v2.2.3 to `jre/lib/endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
 * For Hudson freestyle job specify:
   * Pre-release step `git checkout master; git reset --hard origin/master` (see [Can't get automated release working with Hudson + Git + Maven Release Plugin](http://stackoverflow.com/questions/1877027) for more details about the problem).
   * Next step (release):

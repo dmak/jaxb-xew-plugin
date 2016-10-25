@@ -44,9 +44,9 @@
 					<bindingDirectory>${xjb.folder}</bindingDirectory>
 					<verbose>true</verbose>
 					<strict>false</strict>
+					<noFileHeader>true</noFileHeader>
 					<extension>true</extension>
 					<args>
-						<arg>-no-header</arg>
 			  			<arg>-Xxew</arg>
 			  			<arg>-Xxew:instantiate lazy</arg>
 						<arg>-XsimpleEquals</arg>

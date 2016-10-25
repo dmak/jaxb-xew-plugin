@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xmlns:annox="http://annox.dev.java.net"
     xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix"
@@ -14,19 +14,19 @@
     </jaxb:globalBindings>
 
     <!-- Annotate the following classes with XmlRootElement -->
-    <jaxb:bindings schemaLocation="model.xsd" node="/xs:schema">
-     	<jaxb:bindings node="xs:complexType[@name='SampleData']">
+    <jaxb:bindings schemaLocation="model.xsd" node="/xsd:schema">
+     	<jaxb:bindings node="xsd:complexType[@name='SampleData']">
             <annox:annotate>
                 <annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="SampleData"/>
             </annox:annotate>
         </jaxb:bindings>
-        <jaxb:bindings node="xs:complexType[@name='SampleDataList']">
+        <jaxb:bindings node="xsd:complexType[@name='SampleDataList']">
             <annox:annotate>
                 <annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="SampleDataList"/>
             </annox:annotate>
         </jaxb:bindings>
 
-        <jaxb:bindings node="xs:simpleType[@name='DataType']">
+        <jaxb:bindings node="xsd:simpleType[@name='DataType']">
             <jaxb:typesafeEnumClass>
                 <jaxb:typesafeEnumMember value="one" name="ONE"/>
                 <jaxb:typesafeEnumMember value="two" name="TWO"/>

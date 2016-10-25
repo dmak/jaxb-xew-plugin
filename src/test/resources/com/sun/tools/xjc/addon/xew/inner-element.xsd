@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	jaxb:extensionBindingPrefixes="xjc"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="inner_element" />
 			</jaxb:schemaBindings>
@@ -16,8 +16,8 @@
 				<xjc:superClass name="com.sun.tools.xjc.addon.xew.CommonBean" />
 				<xjc:superInterface name="java.lang.Cloneable" />
 			</jaxb:globalBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:include schemaLocation="inner-element-shared.xsd" />
-</xs:schema>
+	<xsd:include schemaLocation="inner-element-shared.xsd" />
+</xsd:schema>

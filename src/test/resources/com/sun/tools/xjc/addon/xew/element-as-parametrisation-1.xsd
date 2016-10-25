@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_as_parametrisation_1" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:include schemaLocation="publisher-shared.xsd" />
-</xs:schema>
+	<xsd:include schemaLocation="publisher-shared.xsd" />
+</xsd:schema>

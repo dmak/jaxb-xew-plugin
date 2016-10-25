@@ -1,86 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	targetNamespace="http://foo.org/"
 	xmlns:foo="http://foo.org/"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_mixed" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:complexType name="b" mixed="true">
-		<xs:sequence minOccurs="0">
-			<xs:element name="i" type="foo:i" />
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="i" mixed="true">
-		<xs:sequence minOccurs="0">
-			<xs:element name="b" type="foo:b" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="b" mixed="true">
+		<xsd:sequence minOccurs="0">
+			<xsd:element name="i" type="foo:i" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="i" mixed="true">
+		<xsd:sequence minOccurs="0">
+			<xsd:element name="b" type="foo:b" />
+		</xsd:sequence>
+	</xsd:complexType>
 
 	<!--
 		Example of element with no fields.
 	-->
-	<xs:complexType name="br" />
+	<xsd:complexType name="br" />
 
-	<xs:simpleType name="text">
-		<xs:restriction base="xs:string" />
-	</xs:simpleType>
+	<xsd:simpleType name="text">
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
 
-	<xs:simpleType name="number">
-		<xs:restriction base="xs:int" />
-	</xs:simpleType>
+	<xsd:simpleType name="number">
+		<xsd:restriction base="xsd:int" />
+	</xsd:simpleType>
 
 	<!--
 		Example of "List<Object>" field + @XmlElements annotation.
 	-->
-	<xs:complexType name="formatted-text">
-		<xs:choice maxOccurs="unbounded">
-			<xs:element name="i" type="foo:i" />
-			<xs:element name="b" type="foo:b" />
-			<xs:element name="br" type="foo:br" />
-		</xs:choice>
-	</xs:complexType>
+	<xsd:complexType name="formatted-text">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="i" type="foo:i" />
+			<xsd:element name="b" type="foo:b" />
+			<xsd:element name="br" type="foo:br" />
+		</xsd:choice>
+	</xsd:complexType>
 
 	<!--
 		Example of "List<Serializable>" field + @XmlElements annotation.
 		FIXME: Marshalling of text nodes does not work, see http://stackoverflow.com/questions/21444292/
 	-->
-	<xs:complexType name="fixed-text" mixed="true">
-		<xs:choice maxOccurs="unbounded">
-			<xs:element name="title" type="foo:text" />
-			<xs:element name="year" type="foo:number" />
-		</xs:choice>
-	</xs:complexType>
+	<xsd:complexType name="fixed-text" mixed="true">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="title" type="foo:text" />
+			<xsd:element name="year" type="foo:number" />
+		</xsd:choice>
+	</xsd:complexType>
 
 	<!--
 		Example of "List<JAXBElement<String>>" field + @XmlElementRefs annotation.
 		Results scoped declarations @XmlElementDecl(..., scope = PrefixedText.class) in ObjectFactory.
 		However as PrefixedText class is removed, the scope needs to be adapted accordingly.
 	-->
-	<xs:complexType name="prefixed-text">
-		<xs:choice maxOccurs="unbounded">
-			<xs:element name="prefix" type="foo:text" />
-			<xs:element name="title" type="foo:text" />
-			<xs:element name="suffix" type="foo:text" />
-		</xs:choice>
-	</xs:complexType>
+	<xsd:complexType name="prefixed-text">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="prefix" type="foo:text" />
+			<xsd:element name="title" type="foo:text" />
+			<xsd:element name="suffix" type="foo:text" />
+		</xsd:choice>
+	</xsd:complexType>
 
-	<xs:element name="any-text">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="formatted-text" type="foo:formatted-text" />
-				<xs:element name="fixed-text" type="foo:fixed-text" />
-				<xs:element name="prefixed-text" type="foo:prefixed-text" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="any-text">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="formatted-text" type="foo:formatted-text" />
+				<xsd:element name="fixed-text" type="foo:fixed-text" />
+				<xsd:element name="prefixed-text" type="foo:prefixed-text" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

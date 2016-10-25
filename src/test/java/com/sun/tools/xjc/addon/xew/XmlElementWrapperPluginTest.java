@@ -59,6 +59,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -109,6 +110,7 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
+	@Ignore
 	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
 		// Plural form in this case will have no impact as all properties are already in plural:
 		assertXsd("different-namespaces", new String[] { "-Xxew:collection", "java.util.LinkedList",

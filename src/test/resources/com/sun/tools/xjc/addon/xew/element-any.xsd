@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_any" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:element name="message">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="item" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xsd:element name="message">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="item" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 
-	<xs:element name="item">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="item">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

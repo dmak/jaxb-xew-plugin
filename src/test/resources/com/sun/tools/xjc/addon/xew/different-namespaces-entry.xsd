@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	targetNamespace="http://example.com/entry"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="different_namespaces" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:element name="entry">
-		<xs:complexType>
-			<xs:attribute name="name" />
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="entry">
+		<xsd:complexType>
+			<xsd:attribute name="name" />
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

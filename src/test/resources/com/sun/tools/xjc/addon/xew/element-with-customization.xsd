@@ -1,94 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xew="http://github.com/jaxb-xew-plugin"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	jaxb:extensionBindingPrefixes="xew"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_with_customization" />
 			</jaxb:schemaBindings>
 			<xew:xew collection="java.util.LinkedHashSet" collectionInterface="java.util.Collection" />
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
 	<!--
 		Elements use Java reserved words.
 	-->
 
-	<xs:element name="post-office">
-		<xs:complexType>
+	<xsd:element name="post-office">
+		<xsd:complexType>
 			<!-- Example of type customization: all substituted fields in this class (if any) will inherit given settings -->
-			<xs:annotation>
-				<xs:appinfo>
+			<xsd:annotation>
+				<xsd:appinfo>
 					<xew:xew collection="java.util.LinkedList" />
-				</xs:appinfo>
-			</xs:annotation>
-			<xs:sequence>
-				<xs:element ref="type-of-message" />
-				<xs:element ref="args">
-					<xs:annotation>
-						<xs:appinfo>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element ref="type-of-message" />
+				<xsd:element ref="args">
+					<xsd:annotation>
+						<xsd:appinfo>
 							<!-- Example of field customization: exclude this field from substitution -->
 							<xew:xew annotate="false" />
-						</xs:appinfo>
-					</xs:annotation>
-				</xs:element>
-				<xs:element ref="class">
-					<xs:annotation>
-						<xs:appinfo>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element ref="class">
+					<xsd:annotation>
+						<xsd:appinfo>
 							<!-- Force the property name to be "classes" (otherwise it becomes "clazzs") -->
 							<jaxb:property name="classes" />
 							<!-- Example of field customization: this field uses collection class different from global -->
 							<xew:xew collection="java.util.Vector" />
-						</xs:appinfo>
-					</xs:annotation>
-				</xs:element>
-				<xs:element ref="misc" minOccurs="0">
-					<xs:annotation>
-						<xs:appinfo>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element ref="misc" minOccurs="0">
+					<xsd:annotation>
+						<xsd:appinfo>
 							<!-- Force the property name to be "misc" (otherwise it becomes "miscs") -->
 							<jaxb:property name="misc" />
-						</xs:appinfo>
-					</xs:annotation>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 
-	<xs:element name="type-of-message">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="type" type="xs:string" maxOccurs="unbounded" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xsd:element name="type-of-message">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="type" type="xsd:string" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 
-	<xs:element name="class">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="name" type="xs:string" maxOccurs="unbounded" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xsd:element name="class">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="name" type="xsd:string" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 
-	<xs:element name="args">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="arg" type="xs:string" maxOccurs="unbounded" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xsd:element name="args">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="arg" type="xsd:string" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 
-	<xs:element name="misc">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="misc">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

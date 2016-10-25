@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	targetNamespace="http://sample.jaxb-xew-plugin.github.com/container"
 	xmlns:entries="http://sample.jaxb-xew-plugin.github.com/entries"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified">
 
-	<xs:import schemaLocation="different-namespaces-entries.xsd" namespace="http://sample.jaxb-xew-plugin.github.com/entries" />
+	<xsd:import schemaLocation="different-namespaces-entries.xsd" namespace="http://sample.jaxb-xew-plugin.github.com/entries" />
 
-	<xs:element name="container">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="entries" type="entries:entries" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="container">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="entries" type="entries:entries" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

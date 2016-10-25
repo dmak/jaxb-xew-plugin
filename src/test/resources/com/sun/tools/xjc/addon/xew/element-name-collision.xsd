@@ -1,58 +1,57 @@
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	targetNamespace="http://foo.org/"
 	xmlns:foo="http://foo.org/"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_name_collision" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:element name="root">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="action">
-					<xs:complexType>
-						<xs:choice>
-							<xs:element name="update">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="item" minOccurs="0" maxOccurs="unbounded">
-											<xs:complexType>
-												<xs:all>
-													<xs:element name="key" type="xs:string" />
-													<xs:element name="value" type="xs:string" />
-												</xs:all>
-											</xs:complexType>
-										</xs:element>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="add">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="item" minOccurs="0" maxOccurs="unbounded" nillable="true">
-											<xs:complexType>
-												<xs:all>
-													<xs:element name="key" type="xs:string" />
-													<xs:element name="value" type="xs:string" />
-												</xs:all>
-											</xs:complexType>
-										</xs:element>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-						</xs:choice>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="root">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="action">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element name="update">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+											<xsd:complexType>
+												<xsd:all>
+													<xsd:element name="key" type="xsd:string" />
+													<xsd:element name="value" type="xsd:string" />
+												</xsd:all>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="add">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="item" minOccurs="0" maxOccurs="unbounded" nillable="true">
+											<xsd:complexType>
+												<xsd:all>
+													<xsd:element name="key" type="xsd:string" />
+													<xsd:element name="value" type="xsd:string" />
+												</xsd:all>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

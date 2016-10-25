@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_as_parametrisation_2" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 
-	<xs:complexType name="family">
-		<xs:choice>
-			<xs:element name="family-member" type="family-member" maxOccurs="unbounded"/>
-			<xs:element name="parent" type="xs:boolean" />
-		</xs:choice>
-	</xs:complexType>
+	<xsd:complexType name="family">
+		<xsd:choice>
+			<xsd:element name="family-member" type="family-member" maxOccurs="unbounded"/>
+			<xsd:element name="parent" type="xsd:boolean" />
+		</xsd:choice>
+	</xsd:complexType>
 
 	<!--
 		Important is that class "FamilyMember" is referred from class "Family"
 		and thus should not be deleted.
 	-->
-	<xs:complexType name="family-member">
-		<xs:sequence>
-			<xs:element name="id" maxOccurs="unbounded">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="number" />
-						<xs:element name="type" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-</xs:schema>
+	<xsd:complexType name="family-member">
+		<xsd:sequence>
+			<xsd:element name="id" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="number" />
+						<xsd:element name="type" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

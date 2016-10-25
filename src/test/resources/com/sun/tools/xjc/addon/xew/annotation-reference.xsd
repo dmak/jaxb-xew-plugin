@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:globalBindings fixedAttributeAsConstantProperty="true" />
 			<jaxb:schemaBindings>
 				<jaxb:package name="annotation_reference" />
 			</jaxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
+		</xsd:appinfo>
+	</xsd:annotation>
 	
 	<!--
 		**************************
@@ -20,66 +20,65 @@
 		**************************
 	-->
 
-	<xs:complexType name="search-eu">
-		<xs:sequence>
-			<xs:element name="classes-eu" type="classes-eu" nillable="true" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="search-eu">
+		<xsd:sequence>
+			<xsd:element name="classes-eu" type="classes-eu" nillable="true" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="search-multi">
-		<xs:choice maxOccurs="unbounded">
-			<xs:element name="classes-eu" type="classes-eu" />
-			<xs:element name="classes-us" type="classes-us" />
-		</xs:choice>
-		<xs:attribute name="mode" use="required" fixed="OTH">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:minLength value="3" />
-					<xs:maxLength value="3" />
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-	</xs:complexType>
+	<xsd:complexType name="search-multi">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="classes-eu" type="classes-eu" />
+			<xsd:element name="classes-us" type="classes-us" />
+		</xsd:choice>
+		<xsd:attribute name="mode" use="required" fixed="OTH">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="3" />
+					<xsd:maxLength value="3" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
 
+	<xsd:complexType name="class-common">
+		<xsd:sequence>
+			<xsd:element name="id" type="xsd:byte" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<xs:complexType name="class-common">
-		<xs:sequence>
-			<xs:element name="id" type="xs:byte" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="class-ext">
-		<xs:complexContent>
-			<xs:extension base="class-common">
-				<xs:sequence>
-					<xs:element name="country" type="xs:string" />
-					<xs:element name="code" type="xs:string" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+	<xsd:complexType name="class-ext">
+		<xsd:complexContent>
+			<xsd:extension base="class-common">
+				<xsd:sequence>
+					<xsd:element name="country" type="xsd:string" />
+					<xsd:element name="code" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 
 	<!--
 		Important is that this class is referred from class "SearchMulti" via
 		@XmlElement(name = "classes-eu", type = ClassesEu.class)
 		and thus should not be deleted.
 	-->
-	<xs:complexType name="classes-eu">
-		<xs:sequence>
-			<xs:element name="class-eu" type="class-common" maxOccurs="unbounded" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="classes-eu">
+		<xsd:sequence>
+			<xsd:element name="class-eu" type="class-common" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
 
 	<!--
 		Important is that this class is referred from class "SearchMulti" via
 		@XmlElement(name = "classes-us", type = ClassesUs.class)
 		and thus should not be deleted.
 	-->
-	<xs:complexType name="classes-us">
-		<xs:sequence>
-			<xs:element name="class-us" type="class-ext" maxOccurs="unbounded" />
-		</xs:sequence>
-	</xs:complexType>
+	<xsd:complexType name="classes-us">
+		<xsd:sequence>
+			<xsd:element name="class-us" type="class-ext" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
 
 	<!--
 		*****************************
@@ -87,27 +86,27 @@
 		*****************************
 	-->
 
-	<xs:complexType name="markup">
-		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<xs:element ref="br" />
-			<xs:element ref="page" />
-			<xs:element ref="para" />
-		</xs:choice>
-	</xs:complexType>
+	<xsd:complexType name="markup">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element ref="br" />
+			<xsd:element ref="page" />
+			<xsd:element ref="para" />
+		</xsd:choice>
+	</xsd:complexType>
 
-	<xs:element name="br" />
-	<xs:element name="page" />
+	<xsd:element name="br" />
+	<xsd:element name="page" />
 
 	<!--
 		Important is that class "Para" is referred from class "Markup" via
 		@XmlElementRef(name = "para", type = Para.class, required = false)
 		and thus should not be deleted.
 	-->
-	<xs:element name="para">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="sub" type="markup" maxOccurs="unbounded" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
+	<xsd:element name="para">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="sub" type="markup" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

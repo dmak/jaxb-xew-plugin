@@ -35,10 +35,10 @@
 							<schemaDirectory>xsd</schemaDirectory>
 							<removeOldOutput>false</removeOldOutput>
 							<episode>false</episode>
+							<noFileHeader>true</noFileHeader>
 
 							<extension>true</extension>
 							<args>
-								<arg>-no-header</arg>
 								<arg>-Xxew</arg>
 								<arg>-Xxew:instantiate lazy</arg>
 								<arg>-Xequals</arg>

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
+<xsd:schema
 	jaxb:version="2.0"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xew="http://github.com/jaxb-xew-plugin"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	jaxb:extensionBindingPrefixes="xew"
 	elementFormDefault="qualified"
 >
-	<xs:annotation>
-		<xs:appinfo>
+	<xsd:annotation>
+		<xsd:appinfo>
 			<jaxb:schemaBindings>
 				<jaxb:package name="element_with_invalid_customization" />
 			</jaxb:schemaBindings>
 			<xew:xew invalid="error" />
-		</xs:appinfo>
-	</xs:annotation>
-</xs:schema>
+		</xsd:appinfo>
+	</xsd:annotation>
+</xsd:schema>
