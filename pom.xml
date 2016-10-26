@@ -5,7 +5,7 @@
 
 	<groupId>com.github.jaxb-xew-plugin</groupId>
 	<artifactId>jaxb-xew-plugin</artifactId>
-	<version>1.8</version>
+	<version>1.9-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -23,7 +23,7 @@
 		<url>https://github.com/dmak/jaxb-xew-plugin</url>
 		<connection>scm:git:https://github.com/dmak/jaxb-xew-plugin.git</connection>
 		<developerConnection>scm:git:https://dmak@github.com/dmak/jaxb-xew-plugin.git</developerConnection>
-	  <tag>release-1.8</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<issueManagement>
