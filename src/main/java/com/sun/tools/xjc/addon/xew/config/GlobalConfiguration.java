@@ -1,4 +1,4 @@
-package com.sun.tools.xjc.addon.xew;
+package com.sun.tools.xjc.addon.xew.config;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

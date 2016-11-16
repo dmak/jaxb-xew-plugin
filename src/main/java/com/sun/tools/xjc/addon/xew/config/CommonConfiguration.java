@@ -4,7 +4,7 @@
  * Copyright (c) 2007-2014 UShareSoft SAS, All rights reserved
  * @author UShareSoft
  */
-package com.sun.tools.xjc.addon.xew;
+package com.sun.tools.xjc.addon.xew.config;
 
 import java.util.EnumMap;
 

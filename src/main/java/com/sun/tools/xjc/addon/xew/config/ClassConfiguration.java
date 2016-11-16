@@ -1,4 +1,4 @@
-package com.sun.tools.xjc.addon.xew;
+package com.sun.tools.xjc.addon.xew.config;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
