@@ -23,8 +23,8 @@
 		<url>https://github.com/dmak/jaxb-xew-plugin</url>
 		<connection>scm:git:https://github.com/dmak/jaxb-xew-plugin.git</connection>
 		<developerConnection>scm:git:https://dmak@github.com/dmak/jaxb-xew-plugin.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
@@ -93,6 +93,7 @@
 			</build>
 		</profile>
 		<profile>
+			<id>jdk-tools-dependency</id>
 			<activation>
 				<file>
 					<exists>${java.home}/../lib/tools.jar</exists>
@@ -107,6 +108,26 @@
 					<systemPath>${java.home}/../lib/tools.jar</systemPath>
 				</dependency>
 			</dependencies>
+		</profile>
+		<profile>
+			<id>jdk-specific-test</id>
+			<activation>
+				<jdk>1.8</jdk>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-surefire-plugin</artifactId>
+							<configuration>
+								<excludes>
+									<exclude>**/*SpecificTest.java</exclude>
+								</excludes>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
 		</profile>
 	</profiles>
 
@@ -185,12 +206,15 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
 						<source>1.5</source>
 						<target>1.5</target>
 					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.19.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

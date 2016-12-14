@@ -59,7 +59,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -107,15 +106,6 @@ public class XmlElementWrapperPluginTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testInvalidCustomization() throws Exception {
 		assertXsd("element-with-invalid-customization", null, false);
-	}
-
-	@Test
-	@Ignore
-	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
-		// Plural form in this case will have no impact as all properties are already in plural:
-		assertXsd("different-namespaces", new String[] { "-Xxew:collection", "java.util.LinkedList",
-		        "-Xxew:instantiate", "lazy", "-Xxew:plural" }, false, "BaseContainer", "Container", "Entry",
-		            "package-info");
 	}
 
 	@Test
@@ -252,7 +242,7 @@ public class XmlElementWrapperPluginTest {
 	 *            expected classes/files in target directory; these files content is checked if it is present in
 	 *            resources directory; {@code ObjectFactory.java} is automatically included
 	 */
-	private void assertXsd(String testName, String[] extraXewOptions, boolean generateEpisode, String... classesToCheck)
+	static void assertXsd(String testName, String[] extraXewOptions, boolean generateEpisode, String... classesToCheck)
 	            throws Exception {
 		String resourceXsd = testName + ".xsd";
 		String packageName = testName.replace('-', '_');
@@ -260,7 +250,7 @@ public class XmlElementWrapperPluginTest {
 		// Force plugin to reinitialize the logger:
 		System.clearProperty(XmlElementWrapperPlugin.COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY);
 
-		URL xsdUrl = getClass().getResource(resourceXsd);
+		URL xsdUrl = XmlElementWrapperPluginTest.class.getResource(resourceXsd);
 
 		File targetDir = new File(GENERATED_SOURCES_PREFIX);
 
@@ -336,7 +326,7 @@ public class XmlElementWrapperPluginTest {
 
 		JAXBContext jaxbContext = compileAndLoad(packageName, targetDir, generatedJavaSources);
 
-		URL xmlTestFile = getClass().getResource(testName + ".xml");
+		URL xmlTestFile = XmlElementWrapperPluginTest.class.getResource(testName + ".xml");
 
 		if (xmlTestFile != null) {
 			StringWriter writer = new StringWriter();
@@ -374,8 +364,8 @@ public class XmlElementWrapperPluginTest {
 	 * @param generatedJavaSources
 	 *            list of Java source files which should become a part of JAXB context
 	 */
-	private JAXBContext compileAndLoad(String packageName, File targetDir, Collection<String> generatedJavaSources)
-	            throws MalformedURLException, JAXBException {
+	private static JAXBContext compileAndLoad(String packageName, File targetDir,
+	            Collection<String> generatedJavaSources) throws MalformedURLException, JAXBException {
 		String[] javaSources = new String[generatedJavaSources.size()];
 
 		int i = 0;
@@ -400,7 +390,7 @@ public class XmlElementWrapperPluginTest {
 	/**
 	 * Return values of all {@code <jaxb:class ref="..." />} attributes.
 	 */
-	private Set<String> getClassReferencesFromEpisodeFile(String episodeFile) throws SAXException {
+	private static Set<String> getClassReferencesFromEpisodeFile(String episodeFile) throws SAXException {
 		DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic(), new Options());
 
 		Document episodeDocument = forest.parse(new InputSource(episodeFile), true);
