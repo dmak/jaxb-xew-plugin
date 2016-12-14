@@ -119,9 +119,9 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
 		assertXsd("inner-element-value-objects", new String[] { "-debug" }, false, "Article", "Articles",
-		            "ArticlesCollections", "Filesystem", "Publisher", "Volume", "impl.ArticleImpl", "impl.ArticlesImpl",
-		            "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl", "impl.PublisherImpl", "impl.VolumeImpl",
-		            "impl.ObjectFactory", "impl.JAXBContextFactory", "package-info");
+		            "ArticlesCollections", "Filesystem", "Publisher", "Volume", "package-info", "impl.ArticleImpl",
+		            "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl", "impl.PublisherImpl",
+		            "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory", "impl.package-info");
 	}
 
 	@Test

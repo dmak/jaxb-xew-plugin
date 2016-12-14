@@ -107,9 +107,9 @@ import org.jvnet.jaxb2_commons.util.CustomizationUtils;
  */
 public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 
-	private JClass				xmlElementDeclModelClass;
+	private JClass		xmlElementDeclModelClass;
 
-	private static final String	FACTORY_CLASS_NAME = "ObjectFactory";
+	static final String	FACTORY_CLASS_NAME = "ObjectFactory";
 
 	@Override
 	protected void runInternal(Outline outline) throws ClassNotFoundException, IOException {
@@ -457,6 +457,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				else {
 					// There could be no other option as candidate field is a collection, hence not simple property.
 					assert false;
+					propertyInfoClone = candidateFieldPropertyInfo;
 				}
 
 				copyFields(candidateFieldPropertyInfo, propertyInfoClone);
@@ -500,13 +501,13 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 					setterMethod.param(collectionInterfaceClass, fieldName);
 				}
 
-				modificationCount += createScopedFactoryMethods(codeModel, candidate.getValueObjectFactoryClass(),
-				            candidate.getScopedElementInfos().values(), targetClass);
-
-				if (candidate.isValueObjectDisabled()) {
-					modificationCount += createScopedFactoryMethods(codeModel, candidate.getObjectFactoryClass(),
+				// Adapt factory class:
+				for (JDefinedClass objectFactoryClass : candidate.getObjectFactoryClasses()) {
+					modificationCount += createScopedFactoryMethods(codeModel, objectFactoryClass,
 					            candidate.getScopedElementInfos().values(), targetClass);
 				}
+
+				candidate.addObjectFactoryForClass(targetClass);
 			}
 		}
 
@@ -566,7 +567,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	}
 
 	/**
-	 * Create factory methods with a new scope for elements that should be scoped.
+	 * Create additional factory methods with a new scope for elements that should be scoped.
 	 * 
 	 * @param targetClass
 	 *            the class that is applied the transformation of properties
@@ -602,6 +603,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 
 			JDefinedClass container = targetClass;
 
+			// To avoid potential name conflicts method name starts with scope class name:
 			while (true) {
 				methodName.insert(0, container.name());
 
@@ -725,53 +727,9 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				}
 			}
 
-			JDefinedClass objectFactoryClass = null;
-
-			// If class has a non-hidden interface, then there is object factory in another package.
-			for (Iterator<JClass> iter = candidateClass._implements(); iter.hasNext();) {
-				JClass interfaceClass = iter.next();
-
-				if (!isHiddenClass(interfaceClass)) {
-					objectFactoryClass = interfaceClass._package()._getClass(FACTORY_CLASS_NAME);
-
-					if (objectFactoryClass != null) {
-						break;
-					}
-				}
-			}
-
-			JDefinedClass valueObjectFactoryClass = candidateClass._package()._getClass(FACTORY_CLASS_NAME);
-
-			assert objectFactoryClass != valueObjectFactoryClass;
-
-			String fieldTargetNamespace = null;
-
-			XSDeclaration xsdDeclaration = getXsdDeclaration(classOutline.target.getProperty(field.name()));
-
-			if (xsdDeclaration != null && !xsdDeclaration.getTargetNamespace().isEmpty()) {
-				fieldTargetNamespace = xsdDeclaration.getTargetNamespace();
-			}
-			else {
-				// Default (mostly used) namespace is generated as annotation for the package,
-				// see com.sun.tools.xjc.generator.bean.PackageOutlineImpl#calcDefaultValues()
-				JAnnotationUse schemaAnnotation = getAnnotation(
-				            (objectFactoryClass != null ? objectFactoryClass : valueObjectFactoryClass).getPackage(),
-				            xmlSchemaModelClass);
-				JExpression elementFormDefault = getAnnotationMemberExpression(schemaAnnotation, "elementFormDefault");
-
-				if (elementFormDefault != null && generableToString(elementFormDefault).endsWith(".QUALIFIED")) {
-					JExpression packageWideNamespace = getAnnotationMemberExpression(schemaAnnotation, "namespace");
-
-					if (packageWideNamespace != null) {
-						fieldTargetNamespace = generableToString(packageWideNamespace);
-					}
-				}
-			}
-
 			// We have a candidate class:
-			Candidate candidate = new Candidate(candidateClass, classOutline.target, field, fieldTargetNamespace,
-			            fieldParametrisationClass, fieldParametrisationImpl, objectFactoryClass,
-			            valueObjectFactoryClass, xmlElementDeclModelClass);
+			Candidate candidate = new Candidate(candidateClass, classOutline.target, field, fieldParametrisationClass,
+			            fieldParametrisationImpl, xmlElementDeclModelClass, xmlSchemaModelClass);
 			candidates.add(candidate);
 
 			logger.debug("Found " + candidate);
@@ -800,15 +758,15 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 			// Get the defined class for candidate class.
 			JDefinedClass candidateClass = candidate.getClazz();
 
-			deletionCount += deleteFactoryMethod(candidate.getValueObjectFactoryClass(), candidate);
-
 			deleteClass(outline, candidateClass);
 			deletionCount++;
 
+			for (JDefinedClass objectFactoryClass : candidate.getObjectFactoryClasses()) {
+				deletionCount += deleteFactoryMethod(objectFactoryClass, candidate);
+			}
+
 			// Replay the same for interface:
 			if (candidate.isValueObjectDisabled()) {
-				deletionCount += deleteFactoryMethod(candidate.getObjectFactoryClass(), candidate);
-
 				for (Iterator<JClass> iter = candidateClass._implements(); iter.hasNext();) {
 					JClass interfaceClass = iter.next();
 

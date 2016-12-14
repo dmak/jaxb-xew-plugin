@@ -3,8 +3,15 @@ package com.sun.tools.xjc.addon.xew;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.getXsdDeclaration;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
+import static com.sun.tools.xjc.addon.xew.XmlElementWrapperPlugin.FACTORY_CLASS_NAME;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.sun.codemodel.JAnnotationUse;
@@ -15,6 +22,7 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.tools.xjc.model.CClassInfo;
 import com.sun.tools.xjc.model.CPropertyInfo;
+import com.sun.xml.xsom.XSDeclaration;
 
 /**
  * Describes the collection container class - a candidate for removal. This class class has only one field - collection
@@ -33,38 +41,63 @@ public final class Candidate {
 
 	private final JDefinedClass					 fieldParametrisationImpl;
 
-	private final JDefinedClass					 objectFactoryClass;
+	// Order matters (value Object Factory is first):
+	private final Map<String, JDefinedClass>	 objectFactoryClasses = new LinkedHashMap<String, JDefinedClass>();
 
-	private final JDefinedClass					 valueObjectFactoryClass;
+	private final boolean						 valueObjectDisabled;
 
-	private final Map<String, ScopedElementInfo> scopedElementInfos	= new HashMap<String, ScopedElementInfo>();
+	private final Map<String, ScopedElementInfo> scopedElementInfos	  = new HashMap<String, ScopedElementInfo>();
 
 	/**
 	 * By default the candidate is marked for removal unless something prevents it from being removed.
 	 */
-	private boolean								 markedForRemoval	= true;
+	private boolean								 markedForRemoval	  = true;
 
 	/**
 	 * Number of times this candidate has been substituted in the model.
 	 */
 	private int									 substitutionsCount;
 
-	Candidate(JDefinedClass candidateClass, CClassInfo candidateClassInfo, JFieldVar field, String fieldTargetNamespace,
+	Candidate(JDefinedClass candidateClass, CClassInfo candidateClassInfo, JFieldVar field,
 	            JDefinedClass fieldParametrizationClass, JDefinedClass fieldParametrisationImpl,
-	            JDefinedClass objectFactoryClass, JDefinedClass valueObjectFactoryClass,
-	            JClass xmlElementDeclModelClass) {
+	            JClass xmlElementDeclModelClass, JClass xmlSchemaModelClass) {
 		this.candidateClass = candidateClass;
 		this.field = field;
 		this.fieldPropertyInfo = candidateClassInfo.getProperty(field.name());
-		this.fieldTargetNamespace = fieldTargetNamespace;
 		this.fieldParametrisationClass = fieldParametrizationClass;
 		this.fieldParametrisationImpl = fieldParametrisationImpl;
-		this.objectFactoryClass = objectFactoryClass;
-		this.valueObjectFactoryClass = valueObjectFactoryClass;
+		this.valueObjectDisabled = addObjectFactoryForClass(candidateClass);
+		this.fieldTargetNamespace = getTargetNamespace(candidateClassInfo, xmlSchemaModelClass);
+		collectScopedElementInfos(xmlElementDeclModelClass);
+	}
 
+	private String getTargetNamespace(CClassInfo candidateClassInfo, JClass xmlSchemaModelClass) {
+		XSDeclaration xsdDeclaration = getXsdDeclaration(candidateClassInfo.getProperty(field.name()));
+
+		if (xsdDeclaration != null && !xsdDeclaration.getTargetNamespace().isEmpty()) {
+			return xsdDeclaration.getTargetNamespace();
+		}
+		else {
+			// Default (mostly used) namespace is generated as annotation for the package,
+			// see com.sun.tools.xjc.generator.bean.PackageOutlineImpl#calcDefaultValues()
+			for (JDefinedClass objectFactoryClass : objectFactoryClasses.values()) {
+				JAnnotationUse schemaAnnotation = getAnnotation(objectFactoryClass.getPackage(), xmlSchemaModelClass);
+				JExpression elementFormDefault = getAnnotationMemberExpression(schemaAnnotation, "elementFormDefault");
+
+				if (elementFormDefault != null && generableToString(elementFormDefault).endsWith(".QUALIFIED")) {
+					return generableToString(getAnnotationMemberExpression(schemaAnnotation, "namespace"));
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private void collectScopedElementInfos(JClass xmlElementDeclModelClass) {
 		String dotClazz = candidateClass.fullName() + ".class";
 
-		for (JMethod method : valueObjectFactoryClass.methods()) {
+		// Only value Object Factory methods are inspected:
+		for (JMethod method : objectFactoryClasses.values().iterator().next().methods()) {
 			JAnnotationUse xmlElementDeclAnnotation = getAnnotation(method, xmlElementDeclModelClass);
 			JExpression scope = getAnnotationMemberExpression(xmlElementDeclAnnotation, "scope");
 
@@ -155,25 +188,49 @@ public final class Candidate {
 	}
 
 	/**
-	 * Object Factory class for interface classes. It's usually located in {@code impl.} subpackage relative to
-	 * {@code valueObjectFactoryClass} package. May be {@code null}.
+	 * Object Factory classes for value (implementation) classes, interface classes and extra packages. Cannot be empty.
 	 */
-	public JDefinedClass getObjectFactoryClass() {
-		return objectFactoryClass;
+	public Collection<JDefinedClass> getObjectFactoryClasses() {
+		return objectFactoryClasses.values();
 	}
 
 	/**
-	 * Object Factory class for value (implementation) classes. Is not {@code null}.
+	 * For the given class locate and add Object Factory classes to the map.
+	 * 
+	 * @return {@code true} if value class generation is enabled
 	 */
-	public JDefinedClass getValueObjectFactoryClass() {
-		return valueObjectFactoryClass;
+	public boolean addObjectFactoryForClass(JDefinedClass clazz) {
+		JDefinedClass valueObjectFactoryClass = clazz._package()._getClass(FACTORY_CLASS_NAME);
+
+		if (objectFactoryClasses.containsKey(valueObjectFactoryClass.fullName())) {
+			return false;
+		}
+
+		objectFactoryClasses.put(valueObjectFactoryClass.fullName(), valueObjectFactoryClass);
+
+		JDefinedClass objectFactoryClass = null;
+
+		// If class has a non-hidden interface, then there is object factory in another package.
+		for (Iterator<JClass> iter = clazz._implements(); iter.hasNext();) {
+			JClass interfaceClass = iter.next();
+
+			if (!isHiddenClass(interfaceClass)) {
+				objectFactoryClass = interfaceClass._package()._getClass(FACTORY_CLASS_NAME);
+
+				if (objectFactoryClass != null) {
+					objectFactoryClasses.put(objectFactoryClass.fullName(), objectFactoryClass);
+				}
+			}
+		}
+
+		return objectFactoryClass != null;
 	}
 
 	/**
 	 * Returns {@code true} if the setting {@code <jaxb:globalBindings generateValueClass="false">} is active.
 	 */
 	public boolean isValueObjectDisabled() {
-		return objectFactoryClass != null;
+		return valueObjectDisabled;
 	}
 
 	/**
@@ -199,6 +256,6 @@ public final class Candidate {
 
 	@Override
 	public String toString() {
-		return "Candidate[" + getClassName() + " field " + getFieldClass().name() + " " + getFieldName() + "]";
+		return "Candidate[" + getClassName() + " in field " + getFieldClass().name() + " " + getFieldName() + "]";
 	}
 }

@@ -56,7 +56,8 @@ public final class CommonUtils {
 	//
 
 	/**
-	 * Returns the annotation for the given field.
+	 * Returns the annotation for the given field. This method has side effect as it initailizes the lazy list of
+	 * annotations on the given {@code annotatable}.
 	 */
 	public static JAnnotationUse getAnnotation(JAnnotatable annotatable, JClass annotationClass) {
 		for (JAnnotationUse annotation : annotatable.annotations()) {

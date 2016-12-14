@@ -463,6 +463,10 @@ These plugins don't work with `xew` as last one is causing side effects (see [#4
 
 ## What's new
 
+### v1.9 (future release)
+
+* Bugs fixed ([#52](https://github.com/dmak/jaxb-xew-plugin/issues/52)).
+
 ### [v1.8](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.8|jar)
 
 * Bugs fixed ([#48](https://github.com/dmak/jaxb-xew-plugin/issues/48)).

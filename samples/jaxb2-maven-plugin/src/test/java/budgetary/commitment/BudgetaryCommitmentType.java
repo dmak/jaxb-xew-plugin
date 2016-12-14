@@ -25,7 +25,7 @@ import budgetary.reference.SecondaryContractorReferenceType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="ContractorReferences" type="{budgetary/reference}ContractorReferencesType" minOccurs="0"/&gt;
+ *         &lt;element ref="{budgetary/commitment}ContractorReferences" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;

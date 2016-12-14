@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _ContractorReferences_QNAME = new QName("budgetary/commitment", "ContractorReferences");
     private final static QName _BudgetaryCommitment_QNAME = new QName("budgetary/commitment", "BudgetaryCommitment");
 
     /**
