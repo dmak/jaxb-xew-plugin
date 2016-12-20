@@ -1,0 +1,11 @@
+#
+# Travis CI configuration
+# For more information see https://docs.travis-ci.com/user/customizing-the-build/
+#
+language: java
+
+jdk:
+  - oraclejdk7
+
+script:
+  - mvn -B clean install

@@ -140,12 +140,18 @@ public class GlobalConfiguration extends CommonConfiguration {
 		return builder;
 	}
 
+	/**
+	 * Tune summary writer to write to given {@code fileName}.
+	 */
 	public void initSummaryWriter(String fileName) throws FileNotFoundException {
 		closeSummary();
 		summaryWriter = new PrintWriter(new FileOutputStream(fileName));
 		configurationValues.put(ConfigurationOption.SUMMARY, fileName);
 	}
 
+	/**
+	 * Returns filename that is currently used for summary or {@code null} if summary is disabled.
+	 */
 	public String getSummaryFileName() {
 		return (String) configurationValues.get(ConfigurationOption.SUMMARY);
 	}
@@ -165,6 +171,7 @@ public class GlobalConfiguration extends CommonConfiguration {
 	public void closeSummary() {
 		if (summaryWriter != null) {
 			summaryWriter.close();
+			summaryWriter = null;
 		}
 		configurationValues.remove(ConfigurationOption.SUMMARY);
 	}

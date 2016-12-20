@@ -23,7 +23,7 @@ public class CommonConfiguration {
 	protected Log								   logger;
 
 	/**
-	 * Types of collection instantiation modes.
+	 * Types of configuration options.
 	 */
 	public enum ConfigurationOption {
 	    /**
@@ -73,6 +73,9 @@ public class CommonConfiguration {
 			return optionName;
 		}
 
+		/**
+		 * Resolve enum from option name.
+		 */
 		public static ConfigurationOption byOption(String optionName) {
 			for (ConfigurationOption option : values()) {
 				if (option.optionName().equals(optionName)) {
@@ -106,7 +109,7 @@ public class CommonConfiguration {
 	}
 
 	/**
-	 * Types of collection instantiation modes.
+	 * Types of control modes.
 	 */
 	public enum ControlMode {
 
@@ -139,6 +142,9 @@ public class CommonConfiguration {
 		this.configurationValues = configuration.configurationValues.clone();
 	}
 
+	/**
+	 * Returns the value of {@code collection} option. By default returns {@link java.util.ArrayList}.
+	 */
 	public Class<?> getCollectionImplClass() {
 		return (Class<?>) configurationValues.get(ConfigurationOption.COLLECTION_IMPLEMENTATION);
 	}
@@ -147,6 +153,9 @@ public class CommonConfiguration {
 		configurationValues.put(ConfigurationOption.COLLECTION_IMPLEMENTATION, collectionImplClass);
 	}
 
+	/**
+	 * Returns the value of {@code collectionInterface} option. By default returns {@link java.util.List}.
+	 */
 	public Class<?> getCollectionInterfaceClass() {
 		return (Class<?>) configurationValues.get(ConfigurationOption.COLLECTION_INTERFACE);
 	}
@@ -155,6 +164,9 @@ public class CommonConfiguration {
 		configurationValues.put(ConfigurationOption.COLLECTION_INTERFACE, collectionInterfaceClass);
 	}
 
+	/**
+	 * Returns the value of {@code instantiate} option. By default returns {@code early}.
+	 */
 	public InstantiationMode getInstantiationMode() {
 		return (InstantiationMode) configurationValues.get(ConfigurationOption.INSTANTIATION_MODE);
 	}
@@ -163,6 +175,9 @@ public class CommonConfiguration {
 		configurationValues.put(ConfigurationOption.INSTANTIATION_MODE, instantiationMode);
 	}
 
+	/**
+	 * Returns the value of {@code plural} option. By default returns {@code false}.
+	 */
 	public boolean isApplyPluralForm() {
 		return ((Boolean) configurationValues.get(ConfigurationOption.APPLY_PLURAL_FORM)).booleanValue();
 	}

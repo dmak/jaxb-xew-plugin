@@ -1,5 +1,9 @@
 # JAXB @XmlElementWrapper Plugin
 
+[![Build Status](https://travis-ci.org/dmak/jaxb-xew-plugin.svg)](https://travis-ci.org/dmak/jaxb-xew-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.jaxb-xew-plugin/jaxb-xew-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
+[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/com.github.jaxb-xew-plugin/jaxb-xew-plugin/badge.svg)](http://www.javadoc.io/doc/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
+
 ## Description
 
 This JAXB plugin utilises the power of `@XmlElementWrapper` annotation. Originally `xjc` trends to create wrapper classes which are the containers for collections. This plugin goes through all properties to find ones which can be represented in the model in more optimal way.

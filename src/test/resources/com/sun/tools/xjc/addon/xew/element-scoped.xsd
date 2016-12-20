@@ -18,7 +18,7 @@
 	<xsd:import schemaLocation="element-scoped-extra.xsd" namespace="http://example.com/extra" />
 
 	<!--
-		Special case when element with same name ("second-name") exists in two different namespaces, thus
+		Special case when element with same name ("age") exists in two different namespaces, thus
 		ObjectFactory should have two factory methods annotated with @XmlElementDecl with different namespaces.
 	-->
 	<xsd:element name="return">

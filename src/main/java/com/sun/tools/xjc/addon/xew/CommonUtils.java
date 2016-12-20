@@ -70,7 +70,7 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Returns the annotation element as {@href JAnnotationValue}.
+	 * Returns the annotation element as {@link JAnnotationValue}.
 	 */
 	public static JAnnotationValue getAnnotationMember(JAnnotationUse annotation, String annotationMember) {
 		if (annotation == null) {
@@ -88,7 +88,7 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Returns the value of annotation element as {@href JExpression}. For example, for annotation
+	 * Returns the value of annotation element as {@link JExpression}. For example, for annotation
 	 * <code>@XmlElementRef(name = "last-name", namespace = "http://mycompany.org/exchange", type = JAXBElement.class)</code>
 	 * for member <code>name</code> the value <code>last-name</code> will be returned.
 	 */
@@ -112,7 +112,7 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Append the given annotation to list of annotations.
+	 * Append the given {@code annotation} to list of annotations for the given {@code field}.
 	 */
 	public static void addAnnotation(JVar field, JAnnotationUse annotation) {
 		List<JAnnotationUse> annotations = getPrivateField(field, "annotations");
@@ -120,7 +120,7 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Remove the given annotation from the list of annotations.
+	 * Remove the given {@code annotation} from the list of annotations for the given {@code field}.
 	 */
 	public static void removeAnnotation(JVar field, JAnnotationUse annotation) {
 		List<JAnnotationUse> annotations = getPrivateField(field, "annotations");
