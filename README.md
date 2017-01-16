@@ -1,6 +1,8 @@
 # JAXB @XmlElementWrapper Plugin
 
 [![Build Status](https://travis-ci.org/dmak/jaxb-xew-plugin.svg)](https://travis-ci.org/dmak/jaxb-xew-plugin)
+[![Coverage Status](https://coveralls.io/repos/github/dmak/jaxb-xew-plugin/badge.svg?branch=master)](https://coveralls.io/github/dmak/jaxb-xew-plugin?branch=master)
+[![Dependency Status](https://www.versioneye.com/java/com.github.jaxb-xew-plugin:jaxb-xew-plugin/badge?style=flat)](https://www.versioneye.com/java/com.github.jaxb-xew-plugin:jaxb-xew-plugin/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.jaxb-xew-plugin/jaxb-xew-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
 [![Javadoc](https://javadoc-emblem.rhcloud.com/doc/com.github.jaxb-xew-plugin/jaxb-xew-plugin/badge.svg)](http://www.javadoc.io/doc/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
 
@@ -611,7 +613,7 @@ If you provide the code in any way (patch, pull request, post, comment, …) you
 </settings>
 ```
 * Make sure you have git ≥ v1.7.10 installed, otherwise you may face [this bug#341221](https://bugs.eclipse.org/bugs/show_bug.cgi?id=341221).
-* In case JDK  you need to put JAXB API ≥ v2.2.3 to `jre/lib/endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
+* For JDK 1.6 you need to put [JAXB API](http://search.maven.org/#artifactdetails|javax.xml.bind|jaxb-api|2.2.3|jar) ≥ v2.2.3 to `jre/lib/endorsed` directory of JDK which is used to build the project. Otherwise build will fail with `java.lang.NoSuchMethodError: javax.xml.bind.annotation.XmlElementWrapper.required()Z`.
 * For Hudson freestyle job specify:
   * Pre-release step `git checkout master; git reset --hard origin/master` (see [Can't get automated release working with Hudson + Git + Maven Release Plugin](http://stackoverflow.com/questions/1877027) for more details about the problem).
   * Next step (release):

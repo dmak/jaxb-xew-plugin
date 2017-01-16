@@ -8,4 +8,4 @@ jdk:
   - oraclejdk7
 
 script:
-  - mvn -B clean install
+  - mvn -B -Ptravis clean install
