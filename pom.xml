@@ -138,7 +138,16 @@
 					<plugin>
 						<groupId>org.eluder.coveralls</groupId>
 						<artifactId>coveralls-maven-plugin</artifactId>
-						<version>2.2.0</version>
+						<version>4.3.0</version>
+
+						<executions>
+							<execution>
+							<phase>install</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
