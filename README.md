@@ -238,7 +238,7 @@ To use the plugin from Ant you will need something like the following in your bu
 	<path id="xjc.classpath">
 		<fileset dir="libs">
 			<include name="jaxb2-basics-tools-0.6.5.jar" />
-			<include name="jaxb-xew-plugin-1.8.jar" />
+			<include name="jaxb-xew-plugin-1.9.jar" />
 		</fileset>
 	</path>
 	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
@@ -289,7 +289,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.8</version>
+						<version>1.9</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -319,7 +319,7 @@ Versions ≥ 0.12.2 work with `jaxb-xew-plugin` ≥ v1.8 (see [issue#50](https:/
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.8</version>
+						<version>1.9</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -357,7 +357,7 @@ Note: `jaxb2-maven-plugin` ≤ v1.5 was compiled against JAXB XJC API v2.1.13 wh
 		<dependency>
 			<groupId>com.github.jaxb-xew-plugin</groupId>
 			<artifactId>jaxb-xew-plugin</artifactId>
-			<version>1.8</version>
+			<version>1.9</version>
 		</dependency>
 		<!--
 		 | We need to update the jaxb-xjc dependency from v2.1.13 to v2.2.11
@@ -418,7 +418,7 @@ dependencies {
     compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     compile "javax.xml.bind:jaxb-api:${jaxbVersion}"
 
-    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.8"
+    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.9"
     xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
 }
 
@@ -469,7 +469,7 @@ These plugins don't work with `xew` as last one is causing side effects (see [#4
 
 ## What's new
 
-### v1.9 (future release)
+### [v1.9](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.9|jar)
 
 * Bugs fixed ([#52](https://github.com/dmak/jaxb-xew-plugin/issues/52)).
 
