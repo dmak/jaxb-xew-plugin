@@ -524,8 +524,8 @@ The original code of Bjarne Hansen, with some fixes.
 If you have time and desire to contribute to this project you can do it in many ways:
 
 * Improve this very documentation.
-* Implement Unit tests.
-* Provide more samples.
+* Implement unit tests.
+* Provide extra samples.
 
 ### Development
 
@@ -539,10 +539,15 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 - Verify your outgoing changeset. Make sure that:
   - your changeset is _minimal and sufficient_ for the feature implementation
   - your formatting rules have not caused changes in each and every line (e.g. due to end-of-line markers)
+  - unit tests run successfully
 - Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (fixes #22)`). Check [here](https://github.com/blog/831-issues-2-0-the-next-generation) the commit message syntax sugar.
 - [Request for pull](http://help.github.com/send-pull-requests/).
 
 If you provide the code in any way (patch, pull request, post, comment, …) you automatically agree with a [project license](#license).
+
+### Bug reports
+
+This very open source project is maintained and improved during my free time. That is why I have no ability to test the functionality will all different combinations of Java, JAXB, JAXB plugins and Maven plugins. I leave this to community. Also newly created bug report should mention Java version and have a simple project attached (or one can clone the repository and alter one of the [`samples`](samples/)) that demonstrates the problem.
 
 #### Code style
 

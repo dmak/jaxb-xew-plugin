@@ -33,7 +33,7 @@
 
 	<ciManagement>
 		<system>Jenkins</system>
-		<url>https://dmak.ci.cloudbees.com/job/jaxb-xew-plugin/</url>
+		<url>https://travis-ci.org/dmak/jaxb-xew-plugin</url>
 	</ciManagement>
 
 	<licenses>
