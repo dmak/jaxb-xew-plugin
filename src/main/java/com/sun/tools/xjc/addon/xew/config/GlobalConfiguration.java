@@ -22,9 +22,9 @@ public class GlobalConfiguration extends CommonConfiguration {
 	private List<ControlEntry> controlList	 = new ArrayList<ControlEntry>();
 
 	private static class ControlEntry {
-		Pattern		pattern;
+		final Pattern	  pattern;
 
-		ControlMode	controlMode;
+		final ControlMode controlMode;
 
 		ControlEntry(Pattern pattern, ControlMode controlMode) {
 			this.pattern = pattern;

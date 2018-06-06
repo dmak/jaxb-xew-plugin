@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://foo.bar"
+	xmlns="http://foo.bar"
+	elementFormDefault="qualified">
+
+	<xsd:element name="table" type="table-type" />
+	<xsd:complexType name="table-type">
+		<xsd:sequence>
+			<xsd:element ref="table-row" maxOccurs="unbounded" />
+			<xsd:element ref="caption" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="caption" type="xsd:string" />
+	<xsd:element name="table-row" type="table-row-type" />
+	<xsd:complexType name="table-row-type">
+		<xsd:sequence>
+			<xsd:element name="table-column" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="table-column" type="table-column-type" />
+	<xsd:complexType name="table-column-type">
+		<xsd:sequence>
+			<xsd:element name="paragraph" type="xsd:string" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="preferred-width" type="xsd:string" />
+	</xsd:complexType>
+</xsd:schema>

@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.sun.codemodel.JAnnotationUse;
@@ -162,8 +161,8 @@ public final class Candidate {
 	}
 
 	/**
-	 * The only parametrisation class of the field (collection type). In case of basic parametrisation like {@link List
-	 * <String>} this property is {@code null}.
+	 * The only parametrisation class of the field (collection type). In case of basic parametrisation like
+	 * {@code List<String>} this property is {@code null}.
 	 */
 	public JDefinedClass getFieldParametrisationClass() {
 		return fieldParametrisationClass;

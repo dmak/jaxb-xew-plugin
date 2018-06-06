@@ -43,8 +43,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link BudgetaryCommitmentType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link BudgetaryCommitmentType }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link BudgetaryCommitmentType }{@code >}
      */
     @XmlElementDecl(namespace = "budgetary/commitment", name = "BudgetaryCommitment")
     public JAXBElement<BudgetaryCommitmentType> createBudgetaryCommitment(BudgetaryCommitmentType value) {

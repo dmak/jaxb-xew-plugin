@@ -107,23 +107,23 @@ import org.jvnet.jaxb2_commons.util.CustomizationUtils;
  */
 public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 
-	private JClass		xmlElementDeclModelClass;
-
-	static final String	FACTORY_CLASS_NAME = "ObjectFactory";
+	static final String FACTORY_CLASS_NAME = "ObjectFactory";
 
 	@Override
 	protected void runInternal(Outline outline) throws ClassNotFoundException, IOException {
-		JCodeModel codeModel = outline.getCodeModel();
-		JClass xmlElementWrapperModelClass = codeModel.ref(XmlElementWrapper.class);
-		JClass xmlElementModelClass = codeModel.ref(XmlElement.class);
-		JClass xmlAnyElementModelClass = codeModel.ref(XmlAnyElement.class);
-		JClass xmlMixedModelClass = codeModel.ref(XmlMixed.class);
-		JClass xmlElementRefModelClass = codeModel.ref(XmlElementRef.class);
-		JClass xmlElementRefsModelClass = codeModel.ref(XmlElementRefs.class);
-		JClass xmlElementsModelClass = codeModel.ref(XmlElements.class);
-		JClass xmlJavaTypeAdapterModelClass = codeModel.ref(XmlJavaTypeAdapter.class);
-		JClass xmlTypeModelClass = codeModel.ref(XmlType.class);
-		xmlElementDeclModelClass = codeModel.ref(XmlElementDecl.class);
+		final JCodeModel codeModel = outline.getCodeModel();
+		final JClass xmlElementWrapperModelClass = codeModel.ref(XmlElementWrapper.class);
+		final JClass xmlElementModelClass = codeModel.ref(XmlElement.class);
+		final JClass xmlAnyElementModelClass = codeModel.ref(XmlAnyElement.class);
+		final JClass xmlMixedModelClass = codeModel.ref(XmlMixed.class);
+		final JClass xmlElementRefModelClass = codeModel.ref(XmlElementRef.class);
+		final JClass xmlElementRefsModelClass = codeModel.ref(XmlElementRefs.class);
+		final JClass xmlElementsModelClass = codeModel.ref(XmlElements.class);
+		final JClass xmlJavaTypeAdapterModelClass = codeModel.ref(XmlJavaTypeAdapter.class);
+		final JClass xmlTypeModelClass = codeModel.ref(XmlType.class);
+		final JClass xmlElementDeclModelClass = codeModel.ref(XmlElementDecl.class);
+		final JClass jaxbElementModelClass = codeModel.ref(JAXBElement.class);
+		final JClass qNameModelClass = codeModel.ref(QName.class);
 
 		Ring.begin();
 		Ring.add(outline.getModel());
@@ -152,7 +152,8 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 		// Write information on candidate classes to summary file.
 		writeSummary("Candidates:");
 
-		for (Iterator<Candidate> iter = findCandidateClasses(outline).iterator(); iter.hasNext();) {
+		for (Iterator<Candidate> iter = findCandidateClasses(outline, xmlElementDeclModelClass).iterator(); iter
+		            .hasNext();) {
 			Candidate candidate = iter.next();
 
 			if (globalConfiguration.isClassIncluded(candidate.getClassName())) {
@@ -504,7 +505,8 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				// Adapt factory class:
 				for (JDefinedClass objectFactoryClass : candidate.getObjectFactoryClasses()) {
 					modificationCount += createScopedFactoryMethods(codeModel, objectFactoryClass,
-					            candidate.getScopedElementInfos().values(), targetClass);
+					            candidate.getScopedElementInfos().values(), targetClass, xmlElementDeclModelClass,
+					            jaxbElementModelClass, qNameModelClass);
 				}
 
 				candidate.addObjectFactoryForClass(targetClass);
@@ -571,11 +573,16 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	 * 
 	 * @param targetClass
 	 *            the class that is applied the transformation of properties
+	 * @param jaxbElementModelClass
+	 *            TODO
+	 * @param qNameModelClass
+	 *            TODO
 	 * @return number of created methods
 	 * @see com.sun.tools.xjc.generator.bean.ObjectFactoryGenerator
 	 */
 	private int createScopedFactoryMethods(JCodeModel codeModel, JDefinedClass factoryClass,
-	            Collection<ScopedElementInfo> scopedElementInfos, JDefinedClass targetClass) {
+	            Collection<ScopedElementInfo> scopedElementInfos, JDefinedClass targetClass,
+	            JClass xmlElementDeclModelClass, JClass jaxbElementModelClass, JClass qNameModelClass) {
 		int createdMethods = 0;
 
 		NEXT: for (ScopedElementInfo info : scopedElementInfos) {
@@ -617,17 +624,16 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 
 			methodName.insert(0, "create").append(NameConverter.standard.toPropertyName(generableToString(info.name)));
 
-			JClass wrapperType = codeModel.ref(JAXBElement.class).narrow(info.type);
+			JClass jaxbElementType = jaxbElementModelClass.narrow(info.type);
 
-			JMethod method = factoryClass.method(JMod.PUBLIC, wrapperType, methodName.toString());
+			JMethod method = factoryClass.method(JMod.PUBLIC, jaxbElementType, methodName.toString());
 
 			method.annotate(xmlElementDeclModelClass).param("namespace", info.namespace).param("name", info.name)
 			            .param("scope", targetClass);
 
-			// FIXME: Make a try to load constants and (a) rename it appropriately (b) use it?
-			JInvocation qname = JExpr._new(codeModel.ref(QName.class)).arg(info.namespace).arg(info.name);
+			JInvocation qname = JExpr._new(qNameModelClass).arg(info.namespace).arg(info.name);
 
-			method.body()._return(JExpr._new(wrapperType).arg(qname).arg(info.type.boxify().dotclass())
+			method.body()._return(JExpr._new(jaxbElementType).arg(qname).arg(info.type.boxify().dotclass())
 			            .arg(targetClass.dotclass()).arg(method.param(info.type, "value")));
 
 			createdMethods++;
@@ -641,7 +647,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	 * 
 	 * @return a map className -> Candidate
 	 */
-	private Collection<Candidate> findCandidateClasses(Outline outline) {
+	private Collection<Candidate> findCandidateClasses(Outline outline, JClass xmlElementDeclModelClass) {
 		Map<String, ClassOutline> interfaceImplementations = new HashMap<String, ClassOutline>();
 
 		// Visit all classes to create a map "interfaceName -> ClassOutline".

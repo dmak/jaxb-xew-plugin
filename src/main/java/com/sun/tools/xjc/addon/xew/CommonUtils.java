@@ -11,7 +11,6 @@ import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
-import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
@@ -34,8 +33,8 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 public final class CommonUtils {
 
 	/**
-	 * Returns {@code true} if given class is hidden, that is not generated & saved by XJC. These are for example
-	 * instances of {@link JCodeModel.JReferencedClass} (JVM-wide classes) or instances of {@link JDefinedClass} with
+	 * Returns {@code true} if given class is hidden, that is not generated and saved by XJC. These are for example
+	 * instances of {@code JCodeModel.JReferencedClass} (JVM-wide classes) or instances of {@link JDefinedClass} with
 	 * hidden flag (customized super-class or super-interface).
 	 */
 	public static boolean isHiddenClass(JClass clazz) {
@@ -130,7 +129,7 @@ public final class CommonUtils {
 	/**
 	 * Check that given field property has name customization ({@code <jaxb:property name="..." />}).
 	 * 
-	 * @see com.sun.xml.bind.api.impl.NameUtil
+	 * @see <code>com.sun.xml.bind.api.impl.NameUtil</code>
 	 * @see com.sun.codemodel.JJavaName
 	 * @see com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty#getCustomization(XSComponent)
 	 */
@@ -175,7 +174,7 @@ public final class CommonUtils {
 	/**
 	 * Set the {@code newValue} to private field {@code fieldName} of given object {@code obj}.
 	 * 
-	 * @throws NoSuchFieldException
+	 * @throws IllegalArgumentException
 	 *             if given field was not found
 	 */
 	public static void setPrivateField(Object obj, String fieldName, Object newValue) {
@@ -205,7 +204,7 @@ public final class CommonUtils {
 
 	/**
 	 * Perform the copying of all fields from {@code src} to {@code dest}. The code was copied from
-	 * {@link org.springframework.util.ReflectionUtils#shallowCopyFieldState(Object, Object)}.
+	 * {@code org.springframework.util.ReflectionUtils#shallowCopyFieldState(Object, Object)}.
 	 */
 	public static <S, D extends S> void copyFields(final S src, D dest) throws IllegalArgumentException {
 		Class<?> targetClass = src.getClass();

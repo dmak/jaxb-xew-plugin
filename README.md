@@ -547,7 +547,9 @@ If you provide the code in any way (patch, pull request, post, comment, …) you
 
 ### Bug reports
 
-This very open source project is maintained and improved during my free time. That is why I have no ability to test the functionality will all different combinations of Java, JAXB, JAXB plugins and Maven plugins. I leave this to community. Also newly created bug report should mention Java version and have a simple project attached (or one can clone the repository and alter one of the [`samples`](samples/)) that demonstrates the problem.
+This very open source project is maintained and improved during my free time. That is why I have no ability to test the functionality will all different combinations of Java, JAXB, JAXB plugins and Maven plugins. I leave this to community. Hence please in newly created bug report:
+- mention Java version
+- attach a simple project (or one can clone the repository and alter one of the [`samples`](samples/)) that demonstrates the problem
 
 #### Code style
 
@@ -642,12 +644,12 @@ The plugin flow consists of the following parts:
 
 There are many pitfalls in JAXB Code Model API which are forcing the developer to use dirty tricks (like accessing private fields) in order to implement the manipulation of code model. Among others:
 
-* [JAXB-784](http://java.net/jira/browse/JAXB-784) is about NPE in `JAnnotationUse#getAnnotationMembers()` method.
-* [JAXB-884](https://java.net/jira/browse/JAXB-884) is about ClassCastException in `JAnnotationArrayMember#annotations()` method.
-* [JAXB-878](https://java.net/jira/browse/JAXB-878) and [JAXB-879](https://java.net/jira/browse/JAXB-879) describe the lack of public getters for class fields.
-* [JAXB-957](https://java.net/jira/browse/JAXB-957) mentions what need to be added to make it possible for the inner class to be moved to another class or package.
-* [JAXB-883](http://java.net/jira/browse/JAXB-883) does not allow to learn if "simpleMode" setting is enabled, which in its turn controls plural form for collection property names. There are however some more difficulties to overcome.
-* [JAXB-1107](https://java.net/jira/browse/JAXB-1107) – marshalling of text nodes for mixed-mode contents
+* [JAXB-784](https://github.com/javaee/jaxb-v2/issues/784) is about NPE in `JAnnotationUse#getAnnotationMembers()` method.
+* [JAXB-884](https://github.com/javaee/jaxb-v2/issues/884) is about ClassCastException in `JAnnotationArrayMember#annotations()` method.
+* [JAXB-878](https://github.com/javaee/jaxb-v2/issues/878) and [JAXB-879](https://github.com/javaee/jaxb-v2/issues/879) describe the lack of public getters for class fields.
+* [JAXB-957](https://github.com/javaee/jaxb-v2/issues/957) mentions what need to be added to make it possible for the inner class to be moved to another class or package.
+* [JAXB-883](https://github.com/javaee/jaxb-v2/issues/883) does not allow to learn if "simpleMode" setting is enabled, which in its turn controls plural form for collection property names. There are however some more difficulties to overcome.
+* [JAXB-1107](https://github.com/javaee/jaxb-v2/issues/1107) – marshalling of text nodes for mixed-mode contents
 
 ## Authors
 

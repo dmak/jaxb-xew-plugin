@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	targetNamespace="http://foo.bar"
+	xmlns="http://foo.bar"
+	jaxb:version="2.1"
+	jaxb:extensionBindingPrefixes="xjc"
+	elementFormDefault="qualified">
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<jaxb:globalBindings>
+				<xjc:simple />
+			</jaxb:globalBindings>
+		</xsd:appinfo>
+	</xsd:annotation>
+
+	<xsd:element name="comment" type="markup" />
+
+	<xsd:complexType name="markup" mixed="true">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<jaxb:class name="Style" />
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="comment" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -19,8 +19,6 @@
 	<properties>
 		<xsd.folder>xsd</xsd.folder>
 		<xjb.folder>xsd</xjb.folder>
-
-		<jaxb2-basics.version>0.11.1</jaxb2-basics.version>
 	</properties>
 
 	<build>
@@ -28,8 +26,7 @@
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
-				<!-- See https://github.com/dmak/jaxb-xew-plugin/issues/50#issuecomment-248238663 about how to solve the issue with maven-jaxb2-plugin >= v0.12.1 + jaxb-xew-plugin <= v1.7 -->
-				<version>0.13.1</version>
+				<version>${maven-jaxb2-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>generate</id>
