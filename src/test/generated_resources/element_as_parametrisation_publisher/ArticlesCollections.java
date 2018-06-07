@@ -1,5 +1,5 @@
 
-package element_as_parametrisation_1;
+package element_as_parametrisation_publisher;
 
 import java.util.ArrayList;
 import java.util.List;

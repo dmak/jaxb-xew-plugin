@@ -8,12 +8,6 @@
 	<version>1.10-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>9</version>
-	</parent>
-
 	<name>JAXB @XmlElementWrapper Plugin</name>
 	<inceptionYear>2012</inceptionYear>
 	<description>This JAXB plugin utilizes the power of @XmlElementWrapper annotation. Originally xjc trends to create wrapper classes which are the containers for collections. This plugin goes through all properties to find ones which can be represented in the model in more optimal way.</description>
@@ -25,6 +19,19 @@
 		<developerConnection>scm:git:https://dmak@github.com/dmak/jaxb-xew-plugin.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Nexus Release Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<issueManagement>
 		<system>GitHub</system>
@@ -53,18 +60,11 @@
 			<id>stage-release</id>
 
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-
 				<pluginManagement>
 					<plugins>
 						<plugin>
 							<artifactId>maven-release-plugin</artifactId>
-							<version>2.5.2</version>
+							<version>2.5.3</version>
 							<configuration>
 								<tagNameFormat>release-@{project.version}</tagNameFormat>
 								<preparationGoals>clean verify</preparationGoals>
@@ -80,7 +80,7 @@
 						<plugin>
 							<groupId>org.sonatype.plugins</groupId>
 							<artifactId>nexus-staging-maven-plugin</artifactId>
-							<version>1.6.7</version>
+							<version>1.6.8</version>
 							<extensions>true</extensions>
 							<configuration>
 								<serverId>sonatype-nexus-staging</serverId>
@@ -90,6 +90,34 @@
 						</plugin>
 					</plugins>
 				</pluginManagement>
+
+				<plugins>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<configuration>
+							<!-- Fix for "gpg: signing failed: Inappropriate ioctl for device", see https://gist.github.com/michaelajr/ff4693bce9fc20e5200b34683aa4ba51 and https://ru.stackoverflow.com/questions/791317/ -->
+							<gpgArguments>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+						</configuration>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
 			</build>
 		</profile>
 		<profile>
@@ -109,25 +137,31 @@
 				</dependency>
 			</dependencies>
 		</profile>
-        <!-- This profile excludes Unit tests which fail on JDK 1.8. -->
 		<profile>
-			<id>jdk-specific-test</id>
-			<activation>
-				<jdk>1.8</jdk>
-			</activation>
+			<id>secure</id>
 			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<artifactId>maven-surefire-plugin</artifactId>
-							<configuration>
-								<excludes>
-									<exclude>**/*SpecificTest.java</exclude>
-								</excludes>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<configuration>
+							<!-- Fix for "gpg: signing failed: Inappropriate ioctl for device", see https://gist.github.com/michaelajr/ff4693bce9fc20e5200b34683aa4ba51 and https://ru.stackoverflow.com/questions/791317/ -->
+							<gpgArguments>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
 			</build>
 		</profile>
 		<!-- This profile publishes code coverage report on https://coveralls.io. -->
@@ -142,7 +176,7 @@
 
 						<executions>
 							<execution>
-							<phase>install</phase>
+								<phase>install</phase>
 								<goals>
 									<goal>report</goal>
 								</goals>
@@ -191,12 +225,22 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.5</version>
+			<version>3.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jvnet.jaxb2_commons</groupId>
 			<artifactId>jaxb2-basics-tools</artifactId>
 			<version>0.12.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -220,7 +264,7 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.5</version>
+			<version>2.6</version>
 			<scope>test</scope>
 		</dependency>
    	</dependencies>
@@ -231,13 +275,13 @@
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<source>1.5</source>
-						<target>1.5</target>
+						<source>1.6</source>
+						<target>1.6</target>
 					</configuration>
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.19.1</version>
+					<version>2.21.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

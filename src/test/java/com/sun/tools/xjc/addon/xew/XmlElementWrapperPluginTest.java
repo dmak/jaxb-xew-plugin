@@ -33,6 +33,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -85,32 +86,42 @@ public class XmlElementWrapperPluginTest {
 
 	@Test(expected = BadCommandLineException.class)
 	public void testUnknownOption() throws Exception {
-		assertXsd("different-namespaces", new String[] { "-Xxew:unknown" }, false);
+		runTest("different-namespaces", new String[] { "-Xxew:unknown" }, false);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testInvalidInstantiationMode() throws Exception {
-		assertXsd("element-list-extended", new String[] { "-Xxew:instantiate invalid" }, false);
+		runTest("element-list-extended", new String[] { "-Xxew:instantiate invalid" }, false);
 	}
 
 	@Test(expected = BadCommandLineException.class)
 	public void testInvalidControlFile() throws Exception {
-		assertXsd("element-list-extended", new String[] { "-Xxew:control invalid" }, false);
+		runTest("element-list-extended", new String[] { "-Xxew:control invalid" }, false);
 	}
 
 	@Test(expected = BadCommandLineException.class)
 	public void testInvalidCollectionClass() throws Exception {
-		assertXsd("element-list-extended", new String[] { "-Xxew:collection badvalue" }, false);
+		runTest("element-list-extended", new String[] { "-Xxew:collection badvalue" }, false);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testInvalidCustomization() throws Exception {
-		assertXsd("element-with-invalid-customization", null, false);
+		runTest("element-with-invalid-customization", null, false);
+	}
+
+	/**
+	 * This test works reliably on Java7 but produces different results from run to run on Java8.
+	 */
+	@Test
+	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
+		// Plural form in this case will have no impact as all properties are already in plural:
+		runTest("different-namespaces", new String[] { "-Xxew:collection", "java.util.LinkedList", "-Xxew:instantiate",
+		        "lazy", "-Xxew:plural" }, false, "BaseContainer", "Container", "Entry", "package-info");
 	}
 
 	@Test
 	public void testInnerElement() throws Exception {
-		assertXsd("inner-element",
+		runTest("inner-element",
 		            new String[] { "-verbose", "-Xxew:instantiate none",
 		                    "-Xxew:control " + getClass().getResource("inner-element-control.txt").getFile() },
 		            true, "Filesystem", "Volumes", "package-info");
@@ -118,7 +129,7 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
-		assertXsd("inner-element-value-objects", new String[] { "-debug" }, false, "Article", "Articles",
+		runTest("inner-element-value-objects", new String[] { "-debug" }, false, "Article", "Articles",
 		            "ArticlesCollections", "Filesystem", "Publisher", "Volume", "package-info", "impl.ArticleImpl",
 		            "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl", "impl.FilesystemImpl", "impl.PublisherImpl",
 		            "impl.VolumeImpl", "impl.ObjectFactory", "impl.JAXBContextFactory", "impl.package-info");
@@ -129,24 +140,25 @@ public class XmlElementWrapperPluginTest {
 		// "Markup.java" cannot be verified for content because the content is changing from
 		// one compilation to other as order of @XmlElementRef/@XmlElement annotations is not pre-defined
 		// (set is used as their container).
-		assertXsd("annotation-reference", new String[] { "-verbose", "-debug" }, false, "ClassCommon", "ClassesEu",
+		runTest("annotation-reference", new String[] { "-verbose", "-debug" }, false, "ClassCommon", "ClassesEu",
 		            "ClassesUs", "ClassExt", "Markup", "Para", "SearchEu", "SearchMulti", "package-info");
 	}
 
 	@Test
-	public void testElementAsParametrisation1() throws Exception {
-		assertXsd("element-as-parametrisation-1",
-		            new String[] { "-Xxew:control "
-		                        + getClass().getResource("element-as-parametrisation-1-control.txt").getFile() },
+	public void testElementAsParametrisationPublisher() throws Exception {
+		runTest("element-as-parametrisation-publisher",
+		            new String[] { "-debug",
+		                    "-Xxew:control " + getClass()
+		                                .getResource("element-as-parametrisation-publisher-control.txt").getFile() },
 		            false, "Article", "Articles", "ArticlesCollections", "Publisher", "package-info");
 	}
 
 	@Test
-	public void testElementAsParametrisation2() throws Exception {
-		assertXsd("element-as-parametrisation-2",
-		            new String[] {
-		                    "-Xxew:control "
-		                                + getClass().getResource("element-as-parametrisation-2-control.txt").getFile(),
+	public void testElementAsParametrisationFamily() throws Exception {
+		runTest("element-as-parametrisation-family",
+		            new String[] { "-debug",
+		                    "-Xxew:control " + getClass().getResource("element-as-parametrisation-family-control.txt")
+		                                .getFile(),
 		                    "-Xxew:summary " + GENERATED_SOURCES_PREFIX + "summary.txt" },
 		            false, "Family", "FamilyMember", "package-info");
 
@@ -159,49 +171,49 @@ public class XmlElementWrapperPluginTest {
 
 	@Test
 	public void testElementWithParent() throws Exception {
-		assertXsd("element-with-parent", new String[] { "-debug" }, false, "Alliance", "Group", "Organization",
+		runTest("element-with-parent", new String[] { "-debug" }, false, "Alliance", "Group", "Organization",
 		            "package-info");
 	}
 
 	@Test
 	public void testElementAny() throws Exception {
-		assertXsd("element-any", new String[] { "-quiet", "-Xxew:plural" }, false, "Message", "package-info");
+		runTest("element-any", new String[] { "-quiet", "-Xxew:plural" }, false, "Message", "package-info");
 	}
 
 	@Test
 	public void testElementAnyType() throws Exception {
-		assertXsd("element-any-type", new String[] { "-Xxew:plural" }, false, "Conversion", "Entry", "package-info");
+		runTest("element-any-type", new String[] { "-Xxew:plural" }, false, "Conversion", "Entry", "package-info");
 	}
 
 	@Test
 	public void testElementMixed() throws Exception {
 		// Most classes cannot be tested for content
-		assertXsd("element-mixed", new String[] { "-debug" }, false, "B", "Br", "I", "AnyText", "package-info");
+		runTest("element-mixed", new String[] { "-debug" }, false, "B", "Br", "I", "AnyText", "package-info");
 	}
 
 	@Test
 	public void testElementListExtended() throws Exception {
 		// This run is configured from XSD (<xew:xew ... >):
-		assertXsd("element-list-extended", null, false, "Foo", "package-info");
+		runTest("element-list-extended", null, false, "Foo", "package-info");
 	}
 
 	@Test
 	public void testElementNameCollision() throws Exception {
 		// Most classes cannot be tested for content
-		assertXsd("element-name-collision", new String[] { "-debug", "-Xxew:instantiate", "lazy" }, false, "Root",
+		runTest("element-name-collision", new String[] { "-debug", "-Xxew:instantiate", "lazy" }, false, "Root",
 		            "package-info");
 	}
 
 	@Test
 	public void testElementScoped() throws Exception {
 		// Most classes cannot be tested for content
-		assertXsd("element-scoped", new String[] { "-debug" }, false, "Return", "SearchParameters", "package-info");
+		runTest("element-scoped", new String[] { "-debug" }, false, "Return", "SearchParameters", "package-info");
 	}
 
 	@Test
 	public void testElementWithAdapter() throws Exception {
 		// Plural form in this case will have no impact as there is property customization:
-		assertXsd("element-with-adapter",
+		runTest("element-with-adapter",
 		            new String[] { "-Xxew:plural", "-Xxew:collectionInterface java.util.Collection" }, false,
 		            "Calendar", "Adapter1", "package-info");
 	}
@@ -209,24 +221,24 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementWithCustomization() throws Exception {
 		// This run is additionally configured from XSD (<xew:xew ... >):
-		assertXsd("element-with-customization", new String[] { "-debug", "-Xxew:plural" }, false, "PostOffice", "Args",
+		runTest("element-with-customization", new String[] { "-debug", "-Xxew:plural" }, false, "PostOffice", "Args",
 		            "package-info");
 	}
 
 	@Test
 	public void testElementReservedWord() throws Exception {
-		assertXsd("element-reserved-word", null, false, "Class", "Method", "package-info");
+		runTest("element-reserved-word", null, false, "Class", "Method", "package-info");
 	}
 
 	@Test
 	public void testSubstitutionGroups() throws Exception {
-		assertXsd("substitution-groups", null, false, "Address", "ContactInfo", "Customer", "PhoneNumber",
+		runTest("substitution-groups", null, false, "Address", "ContactInfo", "Customer", "PhoneNumber",
 		            "package-info");
 	}
 
 	@Test
 	public void testUnqualifiedSchema() throws Exception {
-		assertXsd("unqualified", null, false, "RootElement", "package-info");
+		runTest("unqualified", null, false, "RootElement", "package-info");
 	}
 
 	/**
@@ -242,7 +254,7 @@ public class XmlElementWrapperPluginTest {
 	 *            expected classes/files in target directory; these files content is checked if it is present in
 	 *            resources directory; {@code ObjectFactory.java} is automatically included
 	 */
-	static void assertXsd(String testName, String[] extraXewOptions, boolean generateEpisode, String... classesToCheck)
+	static void runTest(String testName, String[] extraXewOptions, boolean generateEpisode, String... classesToCheck)
 	            throws Exception {
 		String resourceXsd = testName + ".xsd";
 		String packageName = testName.replace('-', '_');
@@ -313,14 +325,40 @@ public class XmlElementWrapperPluginTest {
 
 		// Check the contents for those files which exist in resources:
 		for (String className : classesToCheck) {
-			className = className.replace('.', '/') + ".java";
+			className = className.replace('.', '/');
 
-			File sourceFile = new File(PREGENERATED_SOURCES_PREFIX + packageName, className);
+			AssertionError lastFailedAssertion = null;
 
-			if (sourceFile.exists()) {
-				// To avoid CR/LF conflicts:
-				assertEquals("For " + className, FileUtils.readFileToString(sourceFile).replace("\r", ""),
-				            FileUtils.readFileToString(new File(targetDir, className)).replace("\r", ""));
+			byte sourceFileSuffix = -1;
+
+			while (true) {
+				sourceFileSuffix++;
+
+				File sourceFile = new File(PREGENERATED_SOURCES_PREFIX + packageName,
+				            className + (sourceFileSuffix == 0 ? "" : "_" + sourceFileSuffix) + ".java");
+
+				if (!sourceFile.isFile()) {
+					if (lastFailedAssertion != null) {
+						throw lastFailedAssertion;
+					}
+
+					break;
+				}
+
+				String targetClassName = className + ".java";
+
+				try {
+					// To avoid CR/LF conflicts:
+					assertEquals("For " + targetClassName + " in " + PREGENERATED_SOURCES_PREFIX + packageName,
+					            FileUtils.readFileToString(sourceFile, StandardCharsets.UTF_8).replace("\r", ""),
+					            FileUtils.readFileToString(new File(targetDir, targetClassName), StandardCharsets.UTF_8)
+					                        .replace("\r", ""));
+
+					break;
+				}
+				catch (AssertionError e) {
+					lastFailedAssertion = e;
+				}
 			}
 		}
 
@@ -343,7 +381,7 @@ public class XmlElementWrapperPluginTest {
 
 			XMLUnit.setIgnoreComments(true);
 			XMLUnit.setIgnoreWhitespace(true);
-			Diff xmlDiff = new Diff(IOUtils.toString(xmlTestFile), writer.toString());
+			Diff xmlDiff = new Diff(IOUtils.toString(xmlTestFile, StandardCharsets.UTF_8), writer.toString());
 
 			assertXMLEqual("Generated XML is wrong: " + writer.toString(), xmlDiff, true);
 		}

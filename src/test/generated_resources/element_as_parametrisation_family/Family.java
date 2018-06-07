@@ -1,5 +1,5 @@
 
-package element_as_parametrisation_2;
+package element_as_parametrisation_family;
 
 import java.util.ArrayList;
 import java.util.List;

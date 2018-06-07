@@ -8,7 +8,7 @@
 	<xsd:annotation>
 		<xsd:appinfo>
 			<jaxb:schemaBindings>
-				<jaxb:package name="element_as_parametrisation_2" />
+				<jaxb:package name="element_as_parametrisation_family" />
 			</jaxb:schemaBindings>
 		</xsd:appinfo>
 	</xsd:annotation>

@@ -8,10 +8,11 @@
 	<xsd:annotation>
 		<xsd:appinfo>
 			<jaxb:schemaBindings>
-				<jaxb:package name="element_as_parametrisation_1" />
+				<jaxb:package name="element_as_parametrisation_publisher" />
 			</jaxb:schemaBindings>
 		</xsd:appinfo>
 	</xsd:annotation>
 
+	<!-- "Articles" class is a candidate for being removed, but it is used as parametrisation in "ArticlesCollections" and hence cannot be removed. -->
 	<xsd:include schemaLocation="publisher-shared.xsd" />
 </xsd:schema>

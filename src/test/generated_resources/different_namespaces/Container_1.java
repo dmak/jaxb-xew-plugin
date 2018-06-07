@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlType;
     "items",
     "tests"
 })
-@XmlRootElement(name = "container")
+@XmlRootElement(name = "container", namespace = "http://example.com/namespaces")
 public class Container
     extends BaseContainer
 {
@@ -59,7 +59,7 @@ public class Container
     @XmlElementWrapper(name = "items", required = true, namespace = "http://example.com/items")
     @XmlElement(name = "entry", namespace = "http://example.com/entry")
     protected List<Entry> items;
-    @XmlElementWrapper(name = "tests")
+    @XmlElementWrapper(name = "tests", namespace = "http://example.com/namespaces")
     @XmlElement(name = "test", namespace = "http://example.com/namespaces")
     protected List<String> tests;
 

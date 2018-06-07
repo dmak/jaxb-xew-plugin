@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/dmak/jaxb-xew-plugin/badge.svg?branch=master)](https://coveralls.io/github/dmak/jaxb-xew-plugin?branch=master)
 [![Dependency Status](https://www.versioneye.com/java/com.github.jaxb-xew-plugin:jaxb-xew-plugin/badge?style=flat)](https://www.versioneye.com/java/com.github.jaxb-xew-plugin:jaxb-xew-plugin/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.jaxb-xew-plugin/jaxb-xew-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
-[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/com.github.jaxb-xew-plugin/jaxb-xew-plugin/badge.svg)](http://www.javadoc.io/doc/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
+[![Javadoc](http://javadoc.io/badge/com.github.jaxb-xew-plugin/jaxb-xew-plugin.svg)](http://www.javadoc.io/doc/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
 
 ## Description
 
@@ -469,6 +469,11 @@ These plugins don't work with `xew` as last one is causing side effects (see [#4
 
 ## What's new
 
+### [v1.10](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.10|jar) (future release)
+
+* Bugs fixed ([#57](https://github.com/dmak/jaxb-xew-plugin/issues/57)).
+* Updated dependencies and plugins versions. Made JavaDocs Java8-compliant.
+
 ### [v1.9](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.9|jar)
 
 * Bugs fixed ([#52](https://github.com/dmak/jaxb-xew-plugin/issues/52)).
@@ -569,7 +574,7 @@ This very open source project is maintained and improved during my free time. Th
 #### Build and release procedure
 
 * Read [Sonatype OSS Maven Repository Usage Guide](http://central.sonatype.org/pages/ossrh-guide.html) from cover to cover.
-* Use the following `settings.xml` for your Maven (see [Sharing Files with Build Agents](http://wiki.cloudbees.com/bin/view/DEV/Sharing+Files+with+Build+Executors) about how to share `settings.xml` with build nodes on CloudBees):
+* Use the following `settings.xml` for your Maven (see [Sharing Files with Build Agents](http://wiki.cloudbees.com/bin/view/DEV/Sharing+Files+with+Build+Executors) about how to share `settings.xml` with build nodes on CloudBees and [Configuring GPG/PGP for Maven Releases](https://nblair.github.io/2015/10/29/maven-gpg-sonatype/) about GPG profile):
 ```xml
 <settings>
 	<!-- Optional proxy configuration (if applicable to your environment) -->
@@ -612,6 +617,7 @@ This very open source project is maintained and improved during my free time. Th
 		<profile>
 			<id>secure</id>
 			<properties>
+				<gpg.useagent>false</gpg.useagent>
 				<gpg.passphrase>...passphrase...</gpg.passphrase>
 				<gpg.homedir>/private/...github_user.../gpg</gpg.homedir>
 			</properties>

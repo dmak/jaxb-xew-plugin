@@ -1,25 +1,28 @@
 
-package element_as_parametrisation_1;
+package element_mixed;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for articles complex type.
+ * <p>Java class for i complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="articles"&gt;
+ * &lt;complexType name="i"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="article" type="{}article" maxOccurs="unbounded"/&gt;
+ *       &lt;sequence minOccurs="0"&gt;
+ *         &lt;element name="b" type="{http://foo.org/}b"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -29,41 +32,43 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "articles", propOrder = {
-    "article"
+@XmlType(name = "i", propOrder = {
+    "content"
 })
-public class Articles {
+public class I {
 
-    @XmlElement(required = true)
-    protected List<Article> article;
+    @XmlElementRef(name = "b", namespace = "http://foo.org/", type = JAXBElement.class, required = false)
+    @XmlMixed
+    protected List<Serializable> content;
 
     /**
-     * Gets the value of the article property.
+     * Gets the value of the content property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the article property.
+     * This is why there is not a <CODE>set</CODE> method for the content property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getArticle().add(newItem);
+     *    getContent().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Article }
+     * {@link JAXBElement }{@code <}{@link B }{@code >}
+     * {@link String }
      * 
      * 
      */
-    public List<Article> getArticle() {
-        if (article == null) {
-            article = new ArrayList<Article>();
+    public List<Serializable> getContent() {
+        if (content == null) {
+            content = new ArrayList<Serializable>();
         }
-        return this.article;
+        return this.content;
     }
 
 }
