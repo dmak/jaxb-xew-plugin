@@ -15,4 +15,11 @@
 		<age>26</age>
 	</users>
 	<x:age>12</x:age>
+	<search-parameters>
+		<provider-ids>
+			<id>A12</id>
+			<id>B49</id>
+			<id>C91</id>
+		</provider-ids>
+	</search-parameters>
 </return>

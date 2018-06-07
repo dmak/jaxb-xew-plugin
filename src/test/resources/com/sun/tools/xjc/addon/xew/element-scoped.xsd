@@ -2,6 +2,7 @@
 <xsd:schema
 	jaxb:version="2.0"
 	targetNamespace="http://example.com/scope"
+	xmlns:s="http://example.com/scope"
 	xmlns:x="http://example.com/extra"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -33,7 +34,29 @@
 					</xsd:complexType>
 				</xsd:element>
 				<xsd:element ref="x:age" />
+				<xsd:element name="search-parameters" type="s:search-parameters" />
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
+
+	<!--
+		Special case when JAXB will generate a wrapper object to hold list of items:
+			JAXBElement<List<String>>
+		and this wrapper object is scoped to "search-parameters" type.
+	-->
+	<xsd:complexType name="id-list">
+		<xsd:sequence>
+			<xsd:element name="id" minOccurs="1" maxOccurs="unbounded">
+				<xsd:simpleType>
+					<xsd:list itemType="xsd:string" />
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="search-parameters">
+		<xsd:sequence>
+			<xsd:element name="provider-ids" type="s:id-list" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
 </xsd:schema>

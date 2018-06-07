@@ -195,7 +195,7 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementScoped() throws Exception {
 		// Most classes cannot be tested for content
-		assertXsd("element-scoped", new String[] { "-debug" }, false, "Return", "package-info");
+		assertXsd("element-scoped", new String[] { "-debug" }, false, "Return", "SearchParameters", "package-info");
 	}
 
 	@Test

@@ -1,6 +1,7 @@
 
 package element_scoped;
 
+import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
@@ -25,6 +26,7 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _Age_QNAME = new QName("http://example.com/extra", "age");
+    private final static QName _IdListId_QNAME = new QName("http://example.com/scope", "id");
     private final static QName _ReturnUsersName_QNAME = new QName("http://example.com/scope", "name");
     private final static QName _ReturnUsersAge_QNAME = new QName("http://example.com/scope", "age");
 
@@ -44,6 +46,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link SearchParameters }
+     * 
+     */
+    public SearchParameters createSearchParameters() {
+        return new SearchParameters();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
@@ -60,6 +70,11 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://example.com/scope", name = "age", scope = Return.class)
     public JAXBElement<String> createReturnAge(String value) {
         return new JAXBElement<String>(new QName("http://example.com/scope", "age"), String.class, Return.class, value);
+    }
+
+    @XmlElementDecl(namespace = "http://example.com/scope", name = "id", scope = SearchParameters.class)
+    public JAXBElement<List<String>> createSearchParametersId(List<String> value) {
+        return new JAXBElement<List<String>>(new QName("http://example.com/scope", "id"), ((Class) List.class), SearchParameters.class, value);
     }
 
 }

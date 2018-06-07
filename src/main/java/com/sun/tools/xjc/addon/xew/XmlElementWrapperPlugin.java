@@ -633,8 +633,15 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 
 			JInvocation qname = JExpr._new(qNameModelClass).arg(info.namespace).arg(info.name);
 
-			method.body()._return(JExpr._new(jaxbElementType).arg(qname).arg(info.type.boxify().dotclass())
-			            .arg(targetClass.dotclass()).arg(method.param(info.type, "value")));
+			// The primitive type get boxed and cannot be a narrowed class. However in general case if this type
+			// is a collection (i.e. is narrowed), then it should be additionally casted to Class (e.g. "(Class) List.class").
+			JClass declaredType = info.type.boxify();
+
+			method.body()
+			            ._return(JExpr._new(jaxbElementType).arg(qname)
+			                        .arg(declaredType.erasure() == declaredType ? declaredType.dotclass()
+			                                    : JExpr.cast(codeModel.ref(Class.class), declaredType.dotclass()))
+			                        .arg(targetClass.dotclass()).arg(method.param(info.type, "value")));
 
 			createdMethods++;
 		}
