@@ -53,6 +53,7 @@
 
 	<properties>
 		<jaxb.version>2.2.11</jaxb.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<profiles>
@@ -99,14 +100,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<configuration>
-							<!-- Fix for "gpg: signing failed: Inappropriate ioctl for device", see https://gist.github.com/michaelajr/ff4693bce9fc20e5200b34683aa4ba51 and https://ru.stackoverflow.com/questions/791317/ -->
-							<gpgArguments>
-								<arg>--pinentry-mode</arg>
-								<arg>loopback</arg>
-							</gpgArguments>
-						</configuration>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -136,33 +129,6 @@
 					<systemPath>${java.home}/../lib/tools.jar</systemPath>
 				</dependency>
 			</dependencies>
-		</profile>
-		<profile>
-			<id>secure</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<configuration>
-							<!-- Fix for "gpg: signing failed: Inappropriate ioctl for device", see https://gist.github.com/michaelajr/ff4693bce9fc20e5200b34683aa4ba51 and https://ru.stackoverflow.com/questions/791317/ -->
-							<gpgArguments>
-								<arg>--pinentry-mode</arg>
-								<arg>loopback</arg>
-							</gpgArguments>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 		<!-- This profile publishes code coverage report on https://coveralls.io. -->
 		<profile>
@@ -282,6 +248,18 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.21.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>1.6</version>
+					<configuration>
+						<!-- Fix for "gpg: signing failed: Inappropriate ioctl for device", see https://gist.github.com/michaelajr/ff4693bce9fc20e5200b34683aa4ba51 and https://ru.stackoverflow.com/questions/791317/ -->
+						<gpgArguments>
+							<arg>--pinentry-mode</arg>
+							<arg>loopback</arg>
+						</gpgArguments>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
