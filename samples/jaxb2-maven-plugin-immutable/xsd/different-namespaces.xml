@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container
+	xmlns="http://sample.jaxb-xew-plugin.github.com/container"
+	xmlns:e="http://sample.jaxb-xew-plugin.github.com/entries"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://sample.jaxb-xew-plugin.github.com/container different-namespaces.xsd"
+>
+	<entries>
+		<e:entry name="son" />
+		<e:entry name="daughter" />
+	</entries>
+</container>

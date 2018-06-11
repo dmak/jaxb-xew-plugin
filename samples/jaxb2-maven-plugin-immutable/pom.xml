@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.jaxb-xew-plugin.sample</groupId>
+	<artifactId>jaxb2-maven-plugin</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>jaxb2-maven-plugin with jaxb-xew-plugin + immutable</name>
+
+	<parent>
+		<groupId>com.github.jaxb-xew-plugin.sample</groupId>
+		<artifactId>sample-parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.testSourceDirectory}</outputDirectory>
+							<sources>
+								<source>xsd</source>
+							</sources>
+							<!-- Since jaxb2-maven-plugin v2.4, see https://github.com/mojohaus/jaxb2-maven-plugin/issues/58 -->
+							<xjcSourceExcludeFilters>
+								<filter implementation="org.codehaus.mojo.jaxb2.shared.filters.pattern.PatternFileFilter">
+									<patterns>
+										<pattern>\.xml</pattern>
+									</patterns>
+								</filter>
+							</xjcSourceExcludeFilters>
+							<clearOutputDir>true</clearOutputDir>
+							<noGeneratedHeaderComments>true</noGeneratedHeaderComments>
+
+							<verbose>true</verbose>
+							<extension>true</extension>
+
+							<arguments>
+								<argument>-Xxew</argument>
+								<argument>-Xxew:instantiate lazy</argument>
+								<argument>-immutable</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.github.jaxb-xew-plugin</groupId>
+						<artifactId>jaxb-xew-plugin</artifactId>
+						<version>${jaxb-xew-plugin.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>com.github.sabomichal</groupId>
+						<artifactId>immutable-xjc-plugin</artifactId>
+						<version>1.4</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+	</dependencies>
+</project>

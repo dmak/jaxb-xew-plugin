@@ -471,7 +471,7 @@ These plugins don't work with `xew` as last one is causing side effects (see [#4
 
 ### [v1.10](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.10|jar) (future release)
 
-* Bugs fixed ([#57](https://github.com/dmak/jaxb-xew-plugin/issues/57)).
+* Bugs fixed ([#54](https://github.com/dmak/jaxb-xew-plugin/issues/54), [#57](https://github.com/dmak/jaxb-xew-plugin/issues/57)).
 * Updated dependencies and plugins versions. Made JavaDocs Java8-compliant.
 
 ### [v1.9](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.9|jar)

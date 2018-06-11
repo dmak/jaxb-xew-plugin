@@ -1,0 +1,10 @@
+<xsd:schema xmlns="budgetary/commitment" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:con="budgetary/reference" targetNamespace="budgetary/commitment" elementFormDefault="qualified">
+	<xsd:import namespace="budgetary/reference" schemaLocation="ContractorReference.xsd" />
+	<xsd:complexType name="BudgetaryCommitmentType">
+		<xsd:sequence>
+			<xsd:element ref="ContractorReferences" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ContractorReferences" type="con:ContractorReferencesType" />
+	<xsd:element name="BudgetaryCommitment" type="BudgetaryCommitmentType" />
+</xsd:schema>

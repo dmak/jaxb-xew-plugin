@@ -1,0 +1,31 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="budgetary/reference" targetNamespace="budgetary/reference" elementFormDefault="qualified">
+	<xsd:complexType name="ContractorReferencesType" abstract="false">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="PrimaryContractorReference" type="PrimaryContractorReferenceType" />
+			<xsd:element name="SecondaryContractorReference" type="SecondaryContractorReferenceType" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="ContractorReferenceType">
+		<xsd:sequence>
+			<xsd:element name="contractorId" type="xsd:string" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PrimaryContractorReferenceType" abstract="false">
+		<xsd:complexContent>
+			<xsd:extension base="ContractorReferenceType">
+				<xsd:sequence>
+					<xsd:element name="primaryId" type="xsd:string" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SecondaryContractorReferenceType" abstract="false">
+		<xsd:complexContent>
+			<xsd:extension base="ContractorReferenceType">
+				<xsd:sequence>
+					<xsd:element name="secondaryId" type="xsd:string" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

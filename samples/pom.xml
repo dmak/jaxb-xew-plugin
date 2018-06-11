@@ -35,6 +35,7 @@
 	<modules>
 		<module>cxf-codegen-plugin</module>
 		<module>jaxb2-maven-plugin</module>
+		<module>jaxb2-maven-plugin-immutable</module>
 		<module>jaxws-maven-plugin-exclude</module>
 		<module>jaxws-maven-plugin-visitor</module>
 		<module>maven-jaxb2-plugin</module>
