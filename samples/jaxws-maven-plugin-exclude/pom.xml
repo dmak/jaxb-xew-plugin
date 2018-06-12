@@ -8,7 +8,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>jaxws-maven-plugin with jaxb-xew-plugin and deletion excludes</name>
+	<name>jaxws-maven-plugin-exclude: jaxb-xew-plugin with deletion excludes</name>
 
 	<parent>
 		<groupId>com.github.jaxb-xew-plugin.sample</groupId>
@@ -38,6 +38,10 @@
 								<xjcArg>-Xxew:instantiate lazy</xjcArg>
 								<xjcArg>-Xxew:control src/main/wsdl/classes-control.txt</xjcArg>
 							</xjcArgs>
+							<!-- Fixes the issue "Caused by: org.xml.sax.SAXParseException; systemId: jar:file:/.m2/repository/com/sun/xml/bind/jaxb-xjc/2.2.8-b01/jaxb-xjc-2.2.8-b01.jar!/com/sun/tools/xjc/reader/xmlschema/bindinfo/binding.xsd; lineNumber: 52; columnNumber: 88; schema_reference: Failed to read schema document 'xjc.xsd', because 'file' access is not allowed due to restriction set by the accessExternalSchema property." -->
+							<vmArgs>
+								<arg>-Djavax.xml.accessExternalSchema=all</arg>
+							</vmArgs>
 
 							<sourceDestDir>${project.build.directory}/generated-sources/jaxws</sourceDestDir>
 							<wsdlDirectory>src/main/wsdl</wsdlDirectory>

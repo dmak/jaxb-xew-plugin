@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/dmak/jaxb-xew-plugin.svg)](https://travis-ci.org/dmak/jaxb-xew-plugin)
 [![Coverage Status](https://coveralls.io/repos/github/dmak/jaxb-xew-plugin/badge.svg?branch=master)](https://coveralls.io/github/dmak/jaxb-xew-plugin?branch=master)
-[![Dependency Status](https://www.versioneye.com/java/com.github.jaxb-xew-plugin:jaxb-xew-plugin/badge?style=flat)](https://www.versioneye.com/java/com.github.jaxb-xew-plugin:jaxb-xew-plugin/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.jaxb-xew-plugin/jaxb-xew-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
 [![Javadoc](http://javadoc.io/badge/com.github.jaxb-xew-plugin/jaxb-xew-plugin.svg)](http://www.javadoc.io/doc/com.github.jaxb-xew-plugin/jaxb-xew-plugin)
 
@@ -237,8 +236,8 @@ To use the plugin from Ant you will need something like the following in your bu
 	</path>
 	<path id="xjc.classpath">
 		<fileset dir="libs">
-			<include name="jaxb2-basics-tools-0.6.5.jar" />
-			<include name="jaxb-xew-plugin-1.9.jar" />
+			<include name="jaxb2-basics-tools-0.12.0.jar" />
+			<include name="jaxb-xew-plugin-1.10.jar" />
 		</fileset>
 	</path>
 	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
@@ -289,7 +288,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.9</version>
+						<version>1.10</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -319,7 +318,7 @@ Versions ≥ 0.12.2 work with `jaxb-xew-plugin` ≥ v1.8 (see [issue#50](https:/
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.9</version>
+						<version>1.10</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -357,7 +356,7 @@ Note: `jaxb2-maven-plugin` ≤ v1.5 was compiled against JAXB XJC API v2.1.13 wh
 		<dependency>
 			<groupId>com.github.jaxb-xew-plugin</groupId>
 			<artifactId>jaxb-xew-plugin</artifactId>
-			<version>1.9</version>
+			<version>1.10</version>
 		</dependency>
 		<!--
 		 | We need to update the jaxb-xjc dependency from v2.1.13 to v2.2.11
@@ -418,7 +417,7 @@ dependencies {
     compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     compile "javax.xml.bind:jaxb-api:${jaxbVersion}"
 
-    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.9"
+    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.10"
     xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
 }
 
@@ -441,6 +440,8 @@ compileJava.dependsOn processXSD
 
 ## Compatibility and side effects
 
+It could be that some plugins fail if executed after Xew, check [this my comment](https://github.com/dmak/jaxb-xew-plugin/issues/48#issuecomment-241999382) for further details.
+
 ### Episode file
 
 For correct generation of episode file the corresponding XJC options should follow `-Xxew`, for example:
@@ -449,11 +450,11 @@ For correct generation of episode file the corresponding XJC options should foll
 
 This will trigger episode plugin _after_ Xew plugin and episode file will be correctly generated. Note that `maven-jaxb2-plugin` adds `-episode` to the end of argument list, hence works correctly.
 
-### `equals`, `hashCode`, `fluent-api`, `value-constructor` and `jaxbindex` plugins
+### `equals`, `hashCode`, `simpleEquals`, `simpleHashCode`, `fluent-api`, `value-constructor`, `jaxbindex` and [`immutable`](https://github.com/sabomichal/immutable-xjc) plugins
 
 These plugins should be activated _after_ Xew plugin:
 
-`... -Xxew -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xjaxbindex ...`
+`... -Xxew -Xequals -XhashCode -XsimpleEquals -XsimpleHashCode -Xfluent-api -Xvalue-constructor -Xjaxbindex -immutable ...`
 
 Otherwise (if they are activated before) Xew plugin cannot revert/complement the changes they made and compile-time error is guaranteed.
 
@@ -462,67 +463,6 @@ Otherwise (if they are activated before) Xew plugin cannot revert/complement the
 This plugin should be activated _before_ Xew plugin due to problem described in [issue#15](https://github.com/dmak/jaxb-xew-plugin/issues/15):
 
 `... -Xsetters -Xxew ...`
-
-### `simpleEquals` and `simpleHashCode` plugins
-
-These plugins don't work with `xew` as last one is causing side effects (see [#48](https://github.com/dmak/jaxb-xew-plugin/issues/48)).
-
-## What's new
-
-### [v1.10](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.10|jar) (future release)
-
-* Bugs fixed ([#54](https://github.com/dmak/jaxb-xew-plugin/issues/54), [#57](https://github.com/dmak/jaxb-xew-plugin/issues/57)).
-* Updated dependencies and plugins versions. Made JavaDocs Java8-compliant.
-
-### [v1.9](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.9|jar)
-
-* Bugs fixed ([#52](https://github.com/dmak/jaxb-xew-plugin/issues/52)).
-
-### [v1.8](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.8|jar)
-
-* Bugs fixed ([#48](https://github.com/dmak/jaxb-xew-plugin/issues/48)).
-* Improvements:
-  * added `exclude` customization option
-
-### [v1.7](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.7|jar)
-
-* Bugs fixed ([#45](https://github.com/dmak/jaxb-xew-plugin/issues/45)).
-
-### [v1.6](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.6|jar)
-
-* Bugs fixed ([#41](https://github.com/dmak/jaxb-xew-plugin/issues/41)).
-
-### [v1.5](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.5|jar)
-
-* Bugs fixed ([#32](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#39](https://github.com/dmak/jaxb-xew-plugin/issues/39), [#40](https://github.com/dmak/jaxb-xew-plugin/issues/40)).
-
-### [v1.4](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.4|jar)
-
-* Bugs fixed ([#21](https://github.com/dmak/jaxb-xew-plugin/issues/21), [#32](https://github.com/dmak/jaxb-xew-plugin/issues/32), [#33](https://github.com/dmak/jaxb-xew-plugin/issues/33)).
-
-### [v1.3](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.3|jar)
-
-* Improvements:
-  * More flexible control file ([#23](https://github.com/dmak/jaxb-xew-plugin/issues/23))
-  * In-schema plugin customization ([#28](https://github.com/dmak/jaxb-xew-plugin/issues/28))
-* Bugs fixed ([#22](https://github.com/dmak/jaxb-xew-plugin/issues/22), [#26](https://github.com/dmak/jaxb-xew-plugin/issues/26)).
-* The option `-Xxew:delete` is removed as in majority of usecases it is set to true. Now by default plugin deletes all candidates. To prevent them from being deleted, create [control file](#control-file) with only line `/.*/=keep`.
-
-### [v1.2](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.2|jar)
-
-* Plugin is improved ([#14](https://github.com/dmak/jaxb-xew-plugin/issues/14)). Bugs fixed ([#12](https://github.com/dmak/jaxb-xew-plugin/issues/12), [#19](https://github.com/dmak/jaxb-xew-plugin/issues/19)).
-* Plugin can now automatically apply plural form to collection properties (see `-Xxew:plural`).
-* Unit tests now compile the model with `javac` and create JAXB context. Some test involve also XML marshalling/unmarshalling/comparing.
-
-### [v1.1](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.1|jar)
-
-* Plugin is re-worked. Bugs fixed ([#1](https://github.com/dmak/jaxb-xew-plugin/issues/1), [#3](https://github.com/dmak/jaxb-xew-plugin/issues/3), [#6](https://github.com/dmak/jaxb-xew-plugin/issues/6), [#7](https://github.com/dmak/jaxb-xew-plugin/issues/7)). Some functionality is possible only by accessing private fields, so Xew plugin may not work in security-managed environment.
-* Testing framework introduced. XSDs in [`com/sun/tools/xjc/addon/xew/`](src/test/resources/com/sun/tools/xjc/addon/xew/) directory can be referred as collection of examples.
-* Logging is done via `commons-logging`. Log level is configurable like this `mvn -Dorg.apache.commons.logging.simplelog.defaultlog=DEBUG`.
-
-### [v1.0](http://search.maven.org/#artifactdetails|com.github.jaxb-xew-plugin|jaxb-xew-plugin|1.0|jar)
-
-The original code of Bjarne Hansen, with some fixes.
 
 ## Contribution
 
@@ -544,7 +484,7 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 - Verify your outgoing changeset. Make sure that:
   - your changeset is _minimal and sufficient_ for the feature implementation
   - your formatting rules have not caused changes in each and every line (e.g. due to end-of-line markers)
-  - unit tests run successfully
+  - all unit tests run successfully
 - Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (fixes #22)`). Check [here](https://github.com/blog/831-issues-2-0-the-next-generation) the commit message syntax sugar.
 - [Request for pull](http://help.github.com/send-pull-requests/).
 
@@ -554,7 +494,7 @@ If you provide the code in any way (patch, pull request, post, comment, …) you
 
 This very open source project is maintained and improved during my free time. That is why I have no ability to test the functionality will all different combinations of Java, JAXB, JAXB plugins and Maven plugins. I leave this to community. Hence please in newly created bug report:
 - mention Java version
-- attach a simple project (or one can clone the repository and alter one of the [`samples`](samples/)) that demonstrates the problem
+- attach a simple minimalistic project (preferably based on Ant, Maven, Gradle) that demonstrates the problem (alternatively one can clone this repository plus alter one of the [`samples`](samples/))
 
 #### Code style
 

@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.jaxb-xew-plugin.sample</groupId>
-	<artifactId>jaxb2-maven-plugin</artifactId>
+	<artifactId>jaxb2-maven-plugin-immutable</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>jaxb2-maven-plugin with jaxb-xew-plugin + immutable</name>
+	<name>jaxb2-maven-plugin-immutable: jaxb-xew-plugin + immutable</name>
 
 	<parent>
 		<groupId>com.github.jaxb-xew-plugin.sample</groupId>

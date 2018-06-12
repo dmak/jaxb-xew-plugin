@@ -68,10 +68,10 @@
 							<version>2.5.3</version>
 							<configuration>
 								<tagNameFormat>release-@{project.version}</tagNameFormat>
-								<preparationGoals>clean verify</preparationGoals>
 							</configuration>
 						</plugin>
 						<plugin>
+							<!-- This plugin is suppressed by nexus-staging-maven-plugin but we tune it just for case. -->
 							<artifactId>maven-deploy-plugin</artifactId>
 							<version>2.8.2</version>
 							<configuration>
@@ -94,10 +94,6 @@
 
 				<plugins>
 					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-					</plugin>
-					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<executions>
@@ -110,9 +106,15 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<!-- This plugin suppresses maven-deploy-plugin and binds itself to deploy phase. -->
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
+		<!-- This profile automatically adds "tools.jar" to the list of dependencies, which is used by Unit Tests. -->
 		<profile>
 			<id>jdk-tools-dependency</id>
 			<activation>
@@ -233,7 +235,7 @@
 			<version>2.6</version>
 			<scope>test</scope>
 		</dependency>
-   	</dependencies>
+	</dependencies>
 
 	<build>
 		<pluginManagement>
