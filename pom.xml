@@ -5,7 +5,7 @@
 
 	<groupId>com.github.jaxb-xew-plugin</groupId>
 	<artifactId>jaxb-xew-plugin</artifactId>
-	<version>1.10-SNAPSHOT</version>
+	<version>1.10</version>
 	<packaging>jar</packaging>
 
 	<name>JAXB @XmlElementWrapper Plugin</name>
@@ -17,7 +17,7 @@
 		<url>https://github.com/dmak/jaxb-xew-plugin</url>
 		<connection>scm:git:https://github.com/dmak/jaxb-xew-plugin.git</connection>
 		<developerConnection>scm:git:https://dmak@github.com/dmak/jaxb-xew-plugin.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>release-1.10</tag>
 	</scm>
 
 	<distributionManagement>
