@@ -329,6 +329,8 @@ Versions ≥ 0.12.2 work with `jaxb-xew-plugin` ≥ v1.8 (see [issue#50](https:/
 
 #### jaxb2-maven-plugin
 
+`jaxb2-maven-plugin` ≥ v2.1 should work just fine, see [example](samples/jaxb2-maven-plugin/pom.xml).
+
 Note: `jaxb2-maven-plugin` ≤ v1.5 was compiled against JAXB XJC API v2.1.13 which _is not compatible with this plugin_, thus additional dependency is needed to be added to **plugin classpath**.
 ```xml
 <plugin>
@@ -371,7 +373,6 @@ Note: `jaxb2-maven-plugin` ≤ v1.5 was compiled against JAXB XJC API v2.1.13 wh
 	</dependencies>
 </plugin>
 ```
-`jaxb2-maven-plugin` ≥ v2.1 should work just fine.
 
 You can find more examples of this plugin in [`samples`](samples/) directory (including how to call this plugin using `jaxws-maven-plugin` or `cxf-codegen-plugin`).
 
