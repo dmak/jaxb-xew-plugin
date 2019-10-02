@@ -462,6 +462,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				}
 
 				copyFields(candidateFieldPropertyInfo, propertyInfoClone);
+				setPrivateField(propertyInfoClone, "customizations", CustomizationUtils.getCustomizations(field));
 
 				if (pluralFormWasApplied) {
 					propertyName = JJavaName.getPluralForm(propertyName);
