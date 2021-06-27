@@ -1,8 +1,8 @@
 
 package element_as_parametrisation_publisher;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
 public class ArticlesCollections {
 
     @XmlElement(required = true)
-    protected List<Articles> articles;
+    protected List<Articles> articles = new Vector<Articles>();
 
     /**
      * Gets the value of the articles property.
@@ -61,7 +61,7 @@ public class ArticlesCollections {
      */
     public List<Articles> getArticles() {
         if (articles == null) {
-            articles = new ArrayList<Articles>();
+            articles = new Vector<Articles>();
         }
         return this.articles;
     }

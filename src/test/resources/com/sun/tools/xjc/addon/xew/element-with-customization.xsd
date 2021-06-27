@@ -70,9 +70,9 @@
 
 	<xsd:element name="class">
 		<xsd:complexType>
-			<xsd:sequence>
+			<xsd:choice>
 				<xsd:element name="name" type="xsd:string" maxOccurs="unbounded" />
-			</xsd:sequence>
+			</xsd:choice>
 		</xsd:complexType>
 	</xsd:element>
 

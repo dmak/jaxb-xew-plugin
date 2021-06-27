@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema
+	jaxb:version="2.0"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
@@ -18,9 +20,16 @@
 
 	<xsd:complexType name="articles-collections">
 		<xsd:sequence>
-			<xsd:element name="articles" type="articles" maxOccurs="unbounded" />
+			<xsd:element name="articles" type="articles" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<jaxb:property collectionType="java.util.Vector" />
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
+
 
 	<xsd:complexType name="publisher">
 		<xsd:sequence>
