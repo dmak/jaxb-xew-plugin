@@ -16,12 +16,11 @@ public class ClassConfiguration extends CommonConfiguration {
 	 * Returns the value of {@code annotate} option. By default returns {@code true}.
 	 */
 	public boolean isAnnotatable() {
-		return ObjectUtils.defaultIfNull((Boolean) configurationValues.get(ConfigurationOption.ANNOTATE), Boolean.TRUE)
-		            .booleanValue();
+		return ObjectUtils.defaultIfNull((Boolean) configurationValues.get(ConfigurationOption.ANNOTATE), Boolean.TRUE);
 	}
 
 	public void setAnnotatable(boolean annotate) {
-		configurationValues.put(ConfigurationOption.ANNOTATE, Boolean.valueOf(annotate));
+		configurationValues.put(ConfigurationOption.ANNOTATE, annotate);
 	}
 
 	@Override

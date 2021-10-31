@@ -1,10 +1,10 @@
 
 package element_mixed;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**
@@ -71,8 +71,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link B }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link B }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link B }{@code >}
      */
     @XmlElementDecl(namespace = "http://foo.org/", name = "b", scope = I.class)
     public JAXBElement<B> createIB(B value) {
@@ -80,8 +84,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link I }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link I }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link I }{@code >}
      */
     @XmlElementDecl(namespace = "http://foo.org/", name = "i", scope = B.class)
     public JAXBElement<I> createBI(I value) {

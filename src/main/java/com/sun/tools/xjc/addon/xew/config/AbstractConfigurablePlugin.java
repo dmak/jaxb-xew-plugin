@@ -1,40 +1,71 @@
 package com.sun.tools.xjc.addon.xew.config;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-
-import javax.xml.namespace.QName;
-
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
+import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.addon.xew.config.CommonConfiguration.ConfigurationOption;
 import com.sun.tools.xjc.model.CCustomizations;
 import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.outline.Outline;
-
+import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Plugin base class that only contains code for plugin initalization and logging.
- * 
+ *
  * @author <a href="mailto:dkatsubo@epo.org">Dmitry Katsubo</a>
  */
-public abstract class AbstractConfigurablePlugin extends AbstractParameterizablePlugin {
+public abstract class AbstractConfigurablePlugin extends Plugin {
+	private static final String PLUGIN_NAME = "Xxew";
 
-	private static final String	  PLUGIN_NAME							 = "Xxew";
+	private static final QName XEW_QNAME = new QName(
+			"http://github.com/jaxb-xew-plugin", "xew");
 
-	private static final QName	  XEW_QNAME								 = new QName(
-	            "http://github.com/jaxb-xew-plugin", "xew");
+	protected GlobalConfiguration globalConfiguration = new GlobalConfiguration();
 
-	protected GlobalConfiguration globalConfiguration					 = new GlobalConfiguration();
+	public static final String COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY = "org.apache.commons.logging.simplelog.defaultlog";
 
-	public static final String	  COMMONS_LOGGING_LOG_LEVEL_PROPERTY_KEY = "org.apache.commons.logging.simplelog.defaultlog";
+	protected Log logger = LogFactory.getLog(getClass());
+
+	private List<String> customizationURIs;
+
+	private Set<QName> customizationElementNames;
+
+	@Override
+	public List<String> getCustomizationURIs() {
+		if (this.customizationURIs == null) {
+			final Collection<QName> customizationElementNames = getCustomizationElementNames();
+			this.customizationURIs = new ArrayList<>( customizationElementNames.size());
+			for (QName customizationElementName : customizationElementNames) {
+				final String namespaceURI = customizationElementName .getNamespaceURI();
+				if (!(namespaceURI == null || namespaceURI.length() == 0)) {
+					this.customizationURIs.add(namespaceURI);
+				}
+			}
+		}
+		return this.customizationURIs;
+	}
+
+	@Override
+	public boolean isCustomizationTagName(String namespaceURI, String localName) {
+		if (this.customizationElementNames == null) {
+			this.customizationElementNames = new HashSet<>(getCustomizationElementNames());
+		}
+		return this.customizationElementNames.contains(new QName(namespaceURI, localName));
+	}
 
 	public AbstractConfigurablePlugin() {
 		// Reset logger in parent because it should be re-initialized with correct loglevel threshold:
@@ -52,9 +83,8 @@ public abstract class AbstractConfigurablePlugin extends AbstractParameterizable
 		            + " Replace collection types with fields having the @XmlElementWrapper and @XmlElement annotations.";
 	}
 
-	@Override
 	public Collection<QName> getCustomizationElementNames() {
-		return Arrays.asList(XEW_QNAME);
+		return Collections.singletonList(XEW_QNAME);
 	}
 
 	private void initLoggerIfNecessary(Options opts) {

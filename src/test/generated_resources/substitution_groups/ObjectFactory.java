@@ -1,10 +1,10 @@
 
 package substitution_groups;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**
@@ -61,8 +61,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Customer }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Customer }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link Customer }{@code >}
      */
     @XmlElementDecl(namespace = "", name = "customer")
     public JAXBElement<Customer> createCustomer(Customer value) {
@@ -70,8 +74,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ContactInfo }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ContactInfo }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ContactInfo }{@code >}
      */
     @XmlElementDecl(namespace = "", name = "contact-info")
     public JAXBElement<ContactInfo> createContactInfo(ContactInfo value) {
@@ -79,8 +87,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Address }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Address }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link Address }{@code >}
      */
     @XmlElementDecl(namespace = "", name = "address", substitutionHeadNamespace = "", substitutionHeadName = "contact-info")
     public JAXBElement<Address> createAddress(Address value) {
@@ -88,8 +100,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link PhoneNumber }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link PhoneNumber }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link PhoneNumber }{@code >}
      */
     @XmlElementDecl(namespace = "", name = "phone-number", substitutionHeadNamespace = "", substitutionHeadName = "contact-info")
     public JAXBElement<PhoneNumber> createPhoneNumber(PhoneNumber value) {

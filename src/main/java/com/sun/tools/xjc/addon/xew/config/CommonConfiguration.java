@@ -17,10 +17,9 @@ import org.apache.commons.logging.Log;
  */
 public class CommonConfiguration {
 
-	protected EnumMap<ConfigurationOption, Object> configurationValues = new EnumMap<ConfigurationOption, Object>(
-	            ConfigurationOption.class);
+	protected EnumMap<ConfigurationOption, Object> configurationValues = new EnumMap<>(ConfigurationOption.class);
 
-	protected Log								   logger;
+	protected Log logger;
 
 	/**
 	 * Types of configuration options.
@@ -65,7 +64,7 @@ public class CommonConfiguration {
 
 		final String optionName;
 
-		private ConfigurationOption(String optionName) {
+		ConfigurationOption(String optionName) {
 			this.optionName = optionName;
 		}
 
@@ -179,11 +178,11 @@ public class CommonConfiguration {
 	 * Returns the value of {@code plural} option. By default returns {@code false}.
 	 */
 	public boolean isApplyPluralForm() {
-		return ((Boolean) configurationValues.get(ConfigurationOption.APPLY_PLURAL_FORM)).booleanValue();
+		return (Boolean) configurationValues.get(ConfigurationOption.APPLY_PLURAL_FORM);
 	}
 
 	public void setApplyPluralForm(boolean applyPluralForm) {
-		configurationValues.put(ConfigurationOption.APPLY_PLURAL_FORM, Boolean.valueOf(applyPluralForm));
+		configurationValues.put(ConfigurationOption.APPLY_PLURAL_FORM, applyPluralForm);
 	}
 
 	public void setLogger(Log logger) {

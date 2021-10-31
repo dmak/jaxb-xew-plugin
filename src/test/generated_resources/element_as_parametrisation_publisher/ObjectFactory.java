@@ -1,7 +1,7 @@
 
 package element_as_parametrisation_publisher;
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

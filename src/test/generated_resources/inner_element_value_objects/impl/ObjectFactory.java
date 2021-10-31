@@ -1,13 +1,13 @@
 
 package inner_element_value_objects.impl;
 
-import javax.xml.bind.annotation.XmlRegistry;
 import inner_element_value_objects.Article;
 import inner_element_value_objects.Articles;
 import inner_element_value_objects.ArticlesCollections;
 import inner_element_value_objects.Filesystem;
 import inner_element_value_objects.Publisher;
 import inner_element_value_objects.Volume;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

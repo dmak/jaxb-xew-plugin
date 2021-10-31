@@ -1,4 +1,4 @@
-# JAXB @XmlElementWrapper Plugin
+# Jakarta XML Binding (JAXB) `@XmlElementWrapper` Plugin
 
 [![Build Status](https://travis-ci.org/dmak/jaxb-xew-plugin.svg)](https://travis-ci.org/dmak/jaxb-xew-plugin)
 [![Coverage Status](https://coveralls.io/repos/github/dmak/jaxb-xew-plugin/badge.svg?branch=master)](https://coveralls.io/github/dmak/jaxb-xew-plugin?branch=master)
@@ -180,8 +180,8 @@ With JAXB customization it is possible to pass the same options as via XJC argum
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema
-	jaxb:version="2.0"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	jaxb:version="3.0"
+    xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
 	xmlns:xew="http://github.com/jaxb-xew-plugin"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	jaxb:extensionBindingPrefixes="xew"
@@ -202,8 +202,8 @@ With JAXB customization it is possible to pass the same options as via XJC argum
 XJC arguments are overridden with JAXB global customizations, which are overridden with JAXB type customizations, which are overridden with JAXB field customizations. Per-type and per-field customizations cannot override `control` and `summary` configuration options, but have additionally `annotate` option, which if set to `false`, disables annotation/replacement of the particular field or all fields of the type/class (see [`element-with-customization.xsd`](src/test/resources/com/sun/tools/xjc/addon/xew/element-with-customization.xsd) example for global, per-type and per-field customization). Note that in contrast to `exclude` mode in control file, this option controls the behaviour for the particular field (or all fields of a type/class) which are being annotated with `@XmlElementWrapper`, but not the types/classes which are used for substitution (candidate classes). Example of per-field JXB file:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<jaxb:bindings
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+<jaxb:bindings 
+    xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:xew="http://github.com/jaxb-xew-plugin"
 	jaxb:extensionBindingPrefixes="xew"
@@ -383,15 +383,15 @@ plugins {
     id 'maven'
 }
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 8
+targetCompatibility = 8
 
 repositories {
     mavenCentral()
 }
 
 project.ext {
-    jaxbVersion = "2.2.11"
+    jaxbVersion = "3.0.1"
     generatedSourcesDir = "target/generated-sources"
 }
 
@@ -483,9 +483,9 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 - Create a branch referring the ticket number (`git branch issue-22`).
 - Do the changes.
 - Verify your outgoing changeset. Make sure that:
-  - your changeset is _minimal and sufficient_ for the feature implementation
-  - your formatting rules have not caused changes in each and every line (e.g. due to end-of-line markers)
-  - all unit tests run successfully
+  - Your changeset is _minimal and sufficient_ for the feature implementation.
+  - Your formatting rules have not caused changes in each and every line (e.g. due to end-of-line markers).
+  - All unit tests run successfully.
 - Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (fixes #22)`). Check [here](https://github.com/blog/831-issues-2-0-the-next-generation) the commit message syntax sugar.
 - [Request for pull](http://help.github.com/send-pull-requests/).
 

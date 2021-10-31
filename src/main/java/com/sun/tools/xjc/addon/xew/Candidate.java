@@ -41,11 +41,11 @@ public final class Candidate {
 	private final JDefinedClass					 fieldParametrisationImpl;
 
 	// Order matters (value Object Factory is first):
-	private final Map<String, JDefinedClass>	 objectFactoryClasses = new LinkedHashMap<String, JDefinedClass>();
+	private final Map<String, JDefinedClass>	 objectFactoryClasses = new LinkedHashMap<>();
 
 	private final boolean						 valueObjectDisabled;
 
-	private final Map<String, ScopedElementInfo> scopedElementInfos	  = new HashMap<String, ScopedElementInfo>();
+	private final Map<String, ScopedElementInfo> scopedElementInfos	  = new HashMap<>();
 
 	/**
 	 * By default the candidate is marked for removal unless something prevents it from being removed.
