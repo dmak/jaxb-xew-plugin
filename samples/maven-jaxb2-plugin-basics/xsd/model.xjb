@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+<jaxb:bindings xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xmlns:annox="http://annox.dev.java.net"
-    xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
-    version="2.1">
-    
+    xmlns:namespace="http://jaxb-xew-plugin.github.com/maven-jaxb2-plugin"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jaxb https://jakarta.ee/xml/ns/jaxb/bindingschema_3_0.xsd"
+    version="3.0">
+
     <jaxb:globalBindings collectionType="java.util.LinkedList" choiceContentProperty="true">
         <!-- Force all classes implements Serializable -->
         <xjc:serializable uid="1"/>

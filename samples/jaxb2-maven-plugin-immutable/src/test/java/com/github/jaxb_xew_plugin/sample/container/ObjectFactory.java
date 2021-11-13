@@ -1,7 +1,7 @@
 
 package com.github.jaxb_xew_plugin.sample.container;
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

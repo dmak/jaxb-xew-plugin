@@ -1,10 +1,10 @@
 
 package budgetary.reference;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -38,16 +38,16 @@ public class ContractorReferenceType {
 
     private final String contractorId;
 
+    public ContractorReferenceType(final String contractorId) {
+        this.contractorId = contractorId;
+    }
+
     /**
      * Used by JAX-B
      * 
      */
     protected ContractorReferenceType() {
         this.contractorId = null;
-    }
-
-    public ContractorReferenceType(final String contractorId) {
-        this.contractorId = contractorId;
     }
 
     /**

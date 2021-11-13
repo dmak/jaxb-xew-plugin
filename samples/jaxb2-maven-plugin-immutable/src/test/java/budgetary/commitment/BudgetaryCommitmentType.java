@@ -4,15 +4,15 @@ package budgetary.commitment;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
 import budgetary.reference.ContractorReferenceType;
 import budgetary.reference.PrimaryContractorReferenceType;
 import budgetary.reference.SecondaryContractorReferenceType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -47,20 +47,20 @@ public final class BudgetaryCommitmentType {
     })
     private final List<ContractorReferenceType> contractorReferences;
 
-    /**
-     * Used by JAX-B
-     * 
-     */
-    protected BudgetaryCommitmentType() {
-        this.contractorReferences = null;
-    }
-
     public BudgetaryCommitmentType(final List<ContractorReferenceType> contractorReferences) {
         if (contractorReferences == null) {
             this.contractorReferences = null;
         } else {
             this.contractorReferences = new ArrayList<ContractorReferenceType>(contractorReferences);
         }
+    }
+
+    /**
+     * Used by JAX-B
+     * 
+     */
+    protected BudgetaryCommitmentType() {
+        this.contractorReferences = null;
     }
 
     public List<ContractorReferenceType> getContractorReferences() {

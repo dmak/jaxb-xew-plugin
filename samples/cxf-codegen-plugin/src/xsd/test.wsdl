@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="wsdl-viewer.xsl"?>
-<wsdl:definitions xmlns="http://jax-ws-commons.jvnet.org/test" targetNamespace="http://jax-ws-commons.jvnet.org/test"
+<wsdl:definitions xmlns="http://jaxb-xew-plugin.github.com/cxf-codegen-plugin" targetNamespace="http://jaxb-xew-plugin.github.com/cxf-codegen-plugin"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                   name="testService">
 	<wsdl:types>
-		<xsd:schema elementFormDefault="unqualified" targetNamespace="http://jax-ws-commons.jvnet.org/test">
+		<xsd:schema elementFormDefault="unqualified" targetNamespace="http://jaxb-xew-plugin.github.com/cxf-codegen-plugin">
 			<xsd:element name="listRequest" type="xsd:string" />
 			<xsd:element name="listResponse" type="xsd:string" />
 		</xsd:schema>

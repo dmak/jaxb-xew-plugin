@@ -19,7 +19,7 @@ public class GlobalConfiguration extends CommonConfiguration {
 
 	private PrintWriter		   summaryWriter = null;
 
-	private List<ControlEntry> controlList	 = new ArrayList<ControlEntry>();
+	private final List<ControlEntry> controlList	 = new ArrayList<>();
 
 	private static class ControlEntry {
 		final Pattern	  pattern;
@@ -41,8 +41,7 @@ public class GlobalConfiguration extends CommonConfiguration {
 	 * Parse the given control file and initialize this config appropriately.
 	 */
 	void readControlFile(String fileName) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(fileName));
-		try {
+		try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
 			controlList.clear();
 
 			String line;
@@ -64,8 +63,7 @@ public class GlobalConfiguration extends CommonConfiguration {
 				ControlMode controlMode;
 				try {
 					controlMode = ControlMode.valueOf(line.substring(separatorIndex + 1).trim().toUpperCase());
-				}
-				catch (IllegalArgumentException e) {
+				} catch (IllegalArgumentException e) {
 					logger.warn("Control file line \"" + line + "\" is invalid as control mode is unknown.");
 					continue;
 				}
@@ -77,9 +75,6 @@ public class GlobalConfiguration extends CommonConfiguration {
 				            controlMode));
 			}
 			configurationValues.put(ConfigurationOption.CONTROL, fileName);
-		}
-		finally {
-			reader.close();
 		}
 	}
 
@@ -112,11 +107,7 @@ public class GlobalConfiguration extends CommonConfiguration {
 			return true;
 		}
 
-		if (exclusionForced) {
-			return false;
-		}
-
-		return true;
+		return !exclusionForced;
 	}
 
 	/**

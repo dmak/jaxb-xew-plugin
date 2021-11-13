@@ -1,9 +1,3 @@
-/**
- * com.sun.tools.xjc.addon.xew.Configuration.java
- *
- * Copyright (c) 2007-2014 UShareSoft SAS, All rights reserved
- * @author UShareSoft
- */
 package com.sun.tools.xjc.addon.xew.config;
 
 import java.util.EnumMap;
@@ -17,8 +11,7 @@ import org.apache.commons.logging.Log;
  */
 public class CommonConfiguration {
 
-	protected EnumMap<ConfigurationOption, Object> configurationValues = new EnumMap<ConfigurationOption, Object>(
-	            ConfigurationOption.class);
+	protected EnumMap<ConfigurationOption, Object> configurationValues = new EnumMap<>(ConfigurationOption.class);
 
 	protected Log								   logger;
 

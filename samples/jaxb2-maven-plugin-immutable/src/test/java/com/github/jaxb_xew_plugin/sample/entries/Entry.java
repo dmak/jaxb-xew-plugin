@@ -1,12 +1,12 @@
 
 package com.github.jaxb_xew_plugin.sample.entries;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -35,16 +35,16 @@ public final class Entry {
     @XmlSchemaType(name = "anySimpleType")
     private final String name;
 
+    public Entry(final String name) {
+        this.name = name;
+    }
+
     /**
      * Used by JAX-B
      * 
      */
     protected Entry() {
         this.name = null;
-    }
-
-    public Entry(final String name) {
-        this.name = name;
     }
 
     /**

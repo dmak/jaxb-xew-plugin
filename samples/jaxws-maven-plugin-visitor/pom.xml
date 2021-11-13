@@ -3,12 +3,11 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.jaxb-xew-plugin.sample</groupId>
 	<artifactId>jaxws-maven-plugin-visitor</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>jaxws-maven-plugin-visitor: jaxb-xew-plugin + jaxb-visitor and classpath voodoo</name>
+	<name>jaxws-maven-plugin-visitor: jaxb-xew-plugin + jaxb-visitor</name>
 
 	<parent>
 		<groupId>com.github.jaxb-xew-plugin.sample</groupId>
@@ -19,9 +18,9 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.jvnet.jax-ws-commons</groupId>
+				<groupId>com.sun.xml.ws</groupId>
 				<artifactId>jaxws-maven-plugin</artifactId>
-				<version>2.3.1-b03</version>
+				<version>${jaxws-maven-plugin.version}</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -58,11 +57,23 @@
 					<dependency>
 						<groupId>com.massfords</groupId>
 						<artifactId>jaxb-visitor</artifactId>
-						<!-- Versions >= 2.2 will need additional classpath exclusions for org.glassfish.jaxb:* artifacts. -->
-						<version>2.1</version>
+						<version>3.0.0</version>
 					</dependency>
 				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>jakarta.xml.ws</groupId>
+			<artifactId>jakarta.xml.ws-api</artifactId>
+			<version>${jakarta-api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+	</dependencies>
 </project>

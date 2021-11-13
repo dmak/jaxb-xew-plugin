@@ -44,7 +44,7 @@ public final class CommonUtils {
 
 	/**
 	 * Returns <code>true</code> of the given <code>type</code> is {@link JClass} and contains <code>classToCheck</code>
-	 * in the list of parametrisations.
+	 * in the list of parametrisation.
 	 */
 	public static boolean isListedAsParametrisation(JClass classToCheck, JType type) {
 		return type instanceof JClass && ((JClass) type).getTypeParameters().contains(classToCheck);
@@ -55,7 +55,7 @@ public final class CommonUtils {
 	//
 
 	/**
-	 * Returns the annotation for the given field. This method has side effect as it initailizes the lazy list of
+	 * Returns the annotation for the given field. This method has side effect as it initializes the lazy list of
 	 * annotations on the given {@code annotatable}.
 	 */
 	public static JAnnotationUse getAnnotation(JAnnotatable annotatable, JClass annotationClass) {
@@ -101,7 +101,7 @@ public final class CommonUtils {
 		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
 		try {
 			// In most cases the value is some expression...
-			return (JExpression) getPrivateField(annotationValue, "value");
+			return getPrivateField(annotationValue, "value");
 		}
 		catch (IllegalArgumentException e) {
 			// ... and in some cases (like enum) do the conversion from JGenerable to JExpression
@@ -156,7 +156,7 @@ public final class CommonUtils {
 	/**
 	 * Returns the string value of passed argument.
 	 */
-	public static final String generableToString(JGenerable generable) {
+	public static String generableToString(JGenerable generable) {
 		// There is hardly any clean universal way to get the value from e.g. JExpression except of serializing it.
 		// Compare JStringLiteral and JExp#dotclass().
 		Writer w = new StringWriter();

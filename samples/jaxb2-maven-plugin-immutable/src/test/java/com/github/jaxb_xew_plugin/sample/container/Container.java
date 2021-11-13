@@ -4,13 +4,13 @@ package com.github.jaxb_xew_plugin.sample.container;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import com.github.jaxb_xew_plugin.sample.entries.Entry;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -43,20 +43,20 @@ public final class Container {
     @XmlElement(name = "entry", namespace = "http://sample.jaxb-xew-plugin.github.com/entries")
     private final List<Entry> entries;
 
-    /**
-     * Used by JAX-B
-     * 
-     */
-    protected Container() {
-        this.entries = null;
-    }
-
     public Container(final List<Entry> entries) {
         if (entries == null) {
             this.entries = null;
         } else {
             this.entries = new ArrayList<Entry>(entries);
         }
+    }
+
+    /**
+     * Used by JAX-B
+     * 
+     */
+    protected Container() {
+        this.entries = null;
     }
 
     public List<Entry> getEntries() {

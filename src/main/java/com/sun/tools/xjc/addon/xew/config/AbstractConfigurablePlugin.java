@@ -1,8 +1,8 @@
 package com.sun.tools.xjc.addon.xew.config;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.xml.namespace.QName;
 
@@ -22,8 +22,6 @@ import org.xml.sax.SAXException;
 
 /**
  * Plugin base class that only contains code for plugin initalization and logging.
- * 
- * @author <a href="mailto:dkatsubo@epo.org">Dmitry Katsubo</a>
  */
 public abstract class AbstractConfigurablePlugin extends AbstractParameterizablePlugin {
 
@@ -54,7 +52,7 @@ public abstract class AbstractConfigurablePlugin extends AbstractParameterizable
 
 	@Override
 	public Collection<QName> getCustomizationElementNames() {
-		return Arrays.asList(XEW_QNAME);
+		return Collections.singletonList(XEW_QNAME);
 	}
 
 	private void initLoggerIfNecessary(Options opts) {

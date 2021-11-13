@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="wsdl-viewer.xsl"?>
-<wsdl:definitions xmlns="http://jax-ws-commons.jvnet.org/test" targetNamespace="http://jax-ws-commons.jvnet.org/test"
+<wsdl:definitions xmlns="http://jaxb-xew-plugin.github.com/jaxws-maven-plugin" targetNamespace="http://jaxb-xew-plugin.github.com/jaxws-maven-plugin"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                   name="testService">
 	<wsdl:types>
 		<xsd:schema>
-			<xsd:import namespace="http://jax-ws-commons.jvnet.org/test" schemaLocation="test.xsd"/>
+			<xsd:import namespace="http://jaxb-xew-plugin.github.com/jaxws-maven-plugin" schemaLocation="test.xsd"/>
 		</xsd:schema>
 	</wsdl:types>
 
@@ -19,7 +19,7 @@
 	</wsdl:message>
 
 	<wsdl:portType name="testPort">
-		<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+		<jaxws:bindings xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws">
 			<jaxws:enableWrapperStyle>true</jaxws:enableWrapperStyle>
 		</jaxws:bindings>
 		<wsdl:operation name="list">

@@ -1,23 +1,3 @@
-/*
- * LoggingOutputStream.java
- * 
- * Copyright (C) 2009, Dmitry Katsubo
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301  USA
- */
 package com.sun.tools.xjc.addon.xew;
 
 import java.io.OutputStream;
@@ -35,11 +15,11 @@ class LoggingOutputStream extends OutputStream {
 		TRACE, DEBUG, INFO, WARN, ERROR, FATAL
 	}
 
-	private final StringBuilder                sb = new StringBuilder();
+	private final StringBuilder				   sb = new StringBuilder();
 
-	private final Log                          logger;
+	private final Log						   logger;
 	private final LoggingOutputStream.LogLevel logLevel;
-	private final String                       messagePrefix;
+	private final String					   messagePrefix;
 
 	public LoggingOutputStream(Log logger, LoggingOutputStream.LogLevel logLevel) {
 		this(logger, logLevel, null);
@@ -91,23 +71,18 @@ class LoggingOutputStream extends OutputStream {
 		case TRACE:
 			logger.trace(message);
 			break;
-
 		case DEBUG:
 			logger.debug(message);
 			break;
-
 		case INFO:
 			logger.info(message);
 			break;
-
 		case WARN:
 			logger.warn(message);
 			break;
-
 		case ERROR:
 			logger.error(message);
 			break;
-
 		case FATAL:
 			logger.fatal(message);
 			break;

@@ -1,4 +1,4 @@
-# JAXB @XmlElementWrapper Plugin
+# Jakarta XML Binding (JAXB) `@XmlElementWrapper` Plugin
 
 [![Build Status](https://travis-ci.org/dmak/jaxb-xew-plugin.svg)](https://travis-ci.org/dmak/jaxb-xew-plugin)
 [![Coverage Status](https://coveralls.io/repos/github/dmak/jaxb-xew-plugin/badge.svg?branch=master)](https://coveralls.io/github/dmak/jaxb-xew-plugin?branch=master)
@@ -180,8 +180,8 @@ With JAXB customization it is possible to pass the same options as via XJC argum
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema
-	jaxb:version="2.0"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	jaxb:version="3.0"
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
 	xmlns:xew="http://github.com/jaxb-xew-plugin"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	jaxb:extensionBindingPrefixes="xew"
@@ -203,7 +203,7 @@ XJC arguments are overridden with JAXB global customizations, which are overridd
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <jaxb:bindings
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:xew="http://github.com/jaxb-xew-plugin"
 	jaxb:extensionBindingPrefixes="xew"
@@ -227,17 +227,16 @@ To use the plugin from Ant you will need something like the following in your bu
 <project name="SunlightDataService" default="build" basedir=".">
 	<path id="runtime.classpath">
 		<fileset dir="libs">
-			<include name="jaxb-xjc-2.2.11.jar" />
+			<include name="jaxb-xjc-3.0.1.jar" />
 			<include name="jaxb-api-2.2.11.jar" />
-			<include name="jaxb-core-2.2.11.jar" />
-			<include name="commons-logging-1.1.1.jar" />
-			<include name="commons-lang-2.2.jar" />
+			<include name="jaxb-core-3.0.1.jar" />
+			<include name="commons-logging-1.2.jar" />
 		</fileset>
 	</path>
 	<path id="xjc.classpath">
 		<fileset dir="libs">
-			<include name="jaxb2-basics-tools-0.12.0.jar" />
-			<include name="jaxb-xew-plugin-1.10.jar" />
+			<include name="jaxb2-basics-tools-3.0.0.jar" />
+			<include name="jaxb-xew-plugin-2.0.jar" />
 		</fileset>
 	</path>
 	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
@@ -258,6 +257,39 @@ To use the plugin from Ant you will need something like the following in your bu
 ### Maven
 
 #### maven-jaxb2-plugin
+
+Plugin does not support JAXB v3, see [issue #199](https://github.com/highsource/maven-jaxb2-plugin/issues/199).
+
+Versions ≥ 0.12.2 work with `jaxb-xew-plugin` ≥ v1.8 (see [issue#50](https://github.com/dmak/jaxb-xew-plugin/issues/50) for other options):
+```xml
+<plugin>
+	<groupId>org.jvnet.jaxb2.maven2</groupId>
+	<artifactId>maven-jaxb2-plugin</artifactId>
+	<version>0.12.2</version>
+	<executions>
+		<execution>
+			<phase>generate-sources</phase>
+			<goals>
+				<goal>generate</goal>
+			</goals>
+			<configuration>
+				<generateDirectory>${project.build.sourceDirectory}</generateDirectory>
+				<extension>true</extension>
+				<args>
+					<arg>-Xxew</arg>
+				</args>
+				<plugins>
+					<plugin>
+						<groupId>com.github.jaxb-xew-plugin</groupId>
+						<artifactId>jaxb-xew-plugin</artifactId>
+						<version>1.11</version>
+					</plugin>
+				</plugins>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+```
 
 Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API which _is not compatible with this plugin_. Versions [0.8.1…0.12.1] should work fine.
 ```xml
@@ -288,37 +320,7 @@ Note: `maven-jaxb2-plugin` prior to v0.8.0 was compiled against JAXB XJC API whi
 					<plugin>
 						<groupId>com.github.jaxb-xew-plugin</groupId>
 						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.10</version>
-					</plugin>
-				</plugins>
-			</configuration>
-		</execution>
-	</executions>
-</plugin>
-```
-Versions ≥ 0.12.2 work with `jaxb-xew-plugin` ≥ v1.8 (see [issue#50](https://github.com/dmak/jaxb-xew-plugin/issues/50) for other options):
-```xml
-<plugin>
-	<groupId>org.jvnet.jaxb2.maven2</groupId>
-	<artifactId>maven-jaxb2-plugin</artifactId>
-	<version>0.12.2</version>
-	<executions>
-		<execution>
-			<phase>generate-sources</phase>
-			<goals>
-				<goal>generate</goal>
-			</goals>
-			<configuration>
-				<generateDirectory>${project.build.sourceDirectory}</generateDirectory>
-				<extension>true</extension>
-				<args>
-					<arg>-Xxew</arg>
-				</args>
-				<plugins>
-					<plugin>
-						<groupId>com.github.jaxb-xew-plugin</groupId>
-						<artifactId>jaxb-xew-plugin</artifactId>
-						<version>1.10</version>
+						<version>1.11</version>
 					</plugin>
 				</plugins>
 			</configuration>
@@ -329,7 +331,9 @@ Versions ≥ 0.12.2 work with `jaxb-xew-plugin` ≥ v1.8 (see [issue#50](https:/
 
 #### jaxb2-maven-plugin
 
-`jaxb2-maven-plugin` ≥ v2.1 should work just fine, see [example](samples/jaxb2-maven-plugin/pom.xml).
+`jaxb2-maven-plugin` ≥ v3.1.0 requires `jaxb-xew-plugin` ≥ v2.0, see [example](samples/jaxb2-maven-plugin/pom.xml).
+
+`jaxb2-maven-plugin` ≥ v2.1 should work just fine with `jaxb-xew-plugin` ≤ v1.11.
 
 Note: `jaxb2-maven-plugin` ≤ v1.5 was compiled against JAXB XJC API v2.1.13 which _is not compatible with this plugin_, thus additional dependency is needed to be added to **plugin classpath**.
 ```xml
@@ -358,7 +362,7 @@ Note: `jaxb2-maven-plugin` ≤ v1.5 was compiled against JAXB XJC API v2.1.13 wh
 		<dependency>
 			<groupId>com.github.jaxb-xew-plugin</groupId>
 			<artifactId>jaxb-xew-plugin</artifactId>
-			<version>1.10</version>
+			<version>1.11</version>
 		</dependency>
 		<!--
 		 | We need to update the jaxb-xjc dependency from v2.1.13 to v2.2.11
@@ -383,15 +387,15 @@ plugins {
     id 'maven'
 }
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 8
+targetCompatibility = 8
 
 repositories {
     mavenCentral()
 }
 
 project.ext {
-    jaxbVersion = "2.2.11"
+    jaxbVersion = "3.0.1"
     generatedSourcesDir = "target/generated-sources"
 }
 
@@ -413,13 +417,12 @@ configurations {
 }
 
 dependencies {
-    compile "com.sun.xml.bind:jaxb-xjc:${jaxbVersion}"
-    compile "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
-    compile "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
-    compile "javax.xml.bind:jaxb-api:${jaxbVersion}"
+    compile "jakarta.xml.bind:jakarta.xml.bind-api:${jaxbVersion}"
+    compile "org.glassfish.jaxb:jaxb-xjc:${jaxbVersion}"
+    compile "org.glassfish.jaxb:jaxb-runtime:${jaxbVersion}"
 
-    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:1.10"
-    xjc "net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8"
+    xjc "com.github.jaxb-xew-plugin:jaxb-xew-plugin:2.0"
+    xjc "codes.rafael.jaxb2_commons:jaxb2-fluent-api:3.0.0"
 }
 
 task processXSD {
@@ -483,9 +486,9 @@ Everybody is very welcomed to send patches by email. But the best way would be:
 - Create a branch referring the ticket number (`git branch issue-22`).
 - Do the changes.
 - Verify your outgoing changeset. Make sure that:
-  - your changeset is _minimal and sufficient_ for the feature implementation
-  - your formatting rules have not caused changes in each and every line (e.g. due to end-of-line markers)
-  - all unit tests run successfully
+  - Your changeset is _minimal and sufficient_ for the feature implementation.
+  - Your formatting rules have not caused changes in each and every line (e.g. due to end-of-line markers).
+  - All unit tests run successfully.
 - Commit to your own fork, mentioning the ticket number in commit message (`Implemented nice feature (fixes #22)`). Check [here](https://github.com/blog/831-issues-2-0-the-next-generation) the commit message syntax sugar.
 - [Request for pull](http://help.github.com/send-pull-requests/).
 

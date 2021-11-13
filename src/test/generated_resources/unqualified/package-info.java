@@ -1,2 +1,2 @@
-@javax.xml.bind.annotation.XmlSchema(namespace = "testNamespace")
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "testNamespace")
 package unqualified;

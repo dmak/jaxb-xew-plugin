@@ -1,8 +1,8 @@
 <xsd:schema
 	version="1.0"
-	jaxb:version="2.1"
+	jaxb:version="3.0"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
 	xmlns="testNamespace"
 	targetNamespace="testNamespace"
 	elementFormDefault="unqualified"

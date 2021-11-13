@@ -8,12 +8,12 @@
 	<action>
 		<add>
 			<item>
-				<value>SpiderMan</value>
 				<key>Mutant</key>
+				<value>SpiderMan</value>
 			</item>
 			<item>
-				<value>Luke Skywalker</value>
 				<key>Jedi</key>
+				<value>Luke Skywalker</value>
 			</item>
 			<item xsi:nil="true" />
 		</add>

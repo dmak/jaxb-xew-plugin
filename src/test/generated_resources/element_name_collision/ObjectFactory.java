@@ -1,7 +1,7 @@
 
 package element_name_collision;
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

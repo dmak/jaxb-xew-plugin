@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://jax-ws-commons.jvnet.org/test" targetNamespace="http://jax-ws-commons.jvnet.org/test"
-            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+<xsd:schema xmlns="http://jaxb-xew-plugin.github.com/jaxws-maven-plugin" targetNamespace="http://jaxb-xew-plugin.github.com/jaxws-maven-plugin"
+            xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             elementFormDefault="qualified"
-            jaxb:version="2.1"
+            jaxb:version="3.0"
             version="1.0">
 
 	<xsd:element name="list">
@@ -15,7 +15,7 @@
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
-	
+
 	<xsd:element name="listResponse">
 		<xsd:complexType>
 			<xsd:sequence>

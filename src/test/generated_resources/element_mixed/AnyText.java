@@ -4,17 +4,17 @@ package element_mixed;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlMixed;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementRef;
+import jakarta.xml.bind.annotation.XmlElementRefs;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlMixed;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
@@ -63,9 +63,9 @@ public class AnyText {
     protected List<Serializable> fixedText = new ArrayList<Serializable>();
     @XmlElementWrapper(name = "prefixed-text", required = true)
     @XmlElementRefs({
+        @XmlElementRef(name = "prefix", namespace = "http://foo.org/", type = JAXBElement.class, required = false),
         @XmlElementRef(name = "title", namespace = "http://foo.org/", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "suffix", namespace = "http://foo.org/", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "prefix", namespace = "http://foo.org/", type = JAXBElement.class, required = false)
+        @XmlElementRef(name = "suffix", namespace = "http://foo.org/", type = JAXBElement.class, required = false)
     })
     protected List<JAXBElement<String>> prefixedText = new ArrayList<JAXBElement<String>>();
 
