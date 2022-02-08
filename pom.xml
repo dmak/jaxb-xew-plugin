@@ -52,7 +52,8 @@
 	</licenses>
 
 	<properties>
-		<jaxb.version>3.0.1</jaxb.version>
+		<jaxb-api.version>3.0.1</jaxb-api.version>
+		<jaxb-core.version>3.0.1</jaxb-core.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -189,17 +190,17 @@
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>${jaxb.version}</version>
+			<version>${jaxb-api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-xjc</artifactId>
-			<version>${jaxb.version}</version>
+			<version>${jaxb-core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
-			<version>${jaxb.version}</version>
+			<version>${jaxb-core.version}</version>
 		</dependency>
 
 		<dependency>
@@ -230,9 +231,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>${jaxb.version}</version>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>${jaxb-core.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -277,6 +278,7 @@
 						<format>xml</format>
 						<format>html</format>
 					</formats>
+					<check/>
 				</configuration>
 				<executions>
 					<execution>
