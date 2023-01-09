@@ -20,7 +20,7 @@ public class PublisherImpl implements Publisher
 
     @XmlElementWrapper(required = true)
     @XmlElement(name = "article", type = ArticleImpl.class)
-    protected List<Article> articles = new ArrayList<Article>();
+    protected List<Article> articles = new ArrayList<>();
 
     public List<Article> getArticles() {
         return articles;

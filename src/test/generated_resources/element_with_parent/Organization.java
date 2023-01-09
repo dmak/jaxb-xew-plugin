@@ -15,17 +15,17 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType name="organization"&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base="{}group"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="address" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="organization">
+ *   <complexContent>
+ *     <extension base="{}group">
+ *       <sequence>
+ *         <element name="address" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
+ *       </sequence>
+ *     </extension>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -49,7 +49,7 @@ public class Organization
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the Jakarta XML Binding object.
-     * This is why there is not a <CODE>set</CODE> method for the address property.
+     * This is why there is not a {@code set} method for the address property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
@@ -63,10 +63,12 @@ public class Organization
      * {@link String }
      * 
      * 
+     * @return
+     *     The value of the address property.
      */
     public List<String> getAddress() {
         if (address == null) {
-            address = new ArrayList<String>();
+            address = new ArrayList<>();
         }
         return this.address;
     }

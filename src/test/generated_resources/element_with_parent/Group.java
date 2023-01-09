@@ -17,28 +17,28 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType name="group"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="person" maxOccurs="unbounded"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;all&gt;
- *                   &lt;element name="first-name" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *                   &lt;element name="second-name" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *                 &lt;/all&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="group">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="person" maxOccurs="unbounded">
+ *           <complexType>
+ *             <complexContent>
+ *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 <all>
+ *                   <element name="first-name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                   <element name="second-name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                 </all>
+ *               </restriction>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -65,7 +65,7 @@ public class Group
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the Jakarta XML Binding object.
-     * This is why there is not a <CODE>set</CODE> method for the person property.
+     * This is why there is not a {@code set} method for the person property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
@@ -79,10 +79,12 @@ public class Group
      * {@link Group.Person }
      * 
      * 
+     * @return
+     *     The value of the person property.
      */
     public List<Group.Person> getPerson() {
         if (person == null) {
-            person = new ArrayList<Group.Person>();
+            person = new ArrayList<>();
         }
         return this.person;
     }
@@ -93,18 +95,18 @@ public class Group
      * 
      * <p>The following schema fragment specifies the expected content contained within this class.
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;all&gt;
-     *         &lt;element name="first-name" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-     *         &lt;element name="second-name" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-     *       &lt;/all&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       <all>
+     *         <element name="first-name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *         <element name="second-name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *       </all>
+     *     </restriction>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */

@@ -19,30 +19,30 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence minOccurs="0"&gt;
- *         &lt;element name="users"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;sequence maxOccurs="unbounded"&gt;
- *                   &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *                   &lt;element name="age" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *                 &lt;/sequence&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element ref="{http://example.com/extra}age"/&gt;
- *         &lt;element name="search-parameters" type="{http://example.com/scope}search-parameters"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType>
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence minOccurs="0">
+ *         <element name="users">
+ *           <complexType>
+ *             <complexContent>
+ *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 <sequence maxOccurs="unbounded">
+ *                   <element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                   <element name="age" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                 </sequence>
+ *               </restriction>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *         <element ref="{http://example.com/extra}age"/>
+ *         <element name="search-parameters" type="{http://example.com/scope}search-parameters"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -60,7 +60,7 @@ public class Return {
         @XmlElementRef(name = "name", namespace = "http://example.com/scope", type = JAXBElement.class),
         @XmlElementRef(name = "age", namespace = "http://example.com/scope", type = JAXBElement.class)
     })
-    protected List<JAXBElement<String>> users = new ArrayList<JAXBElement<String>>();
+    protected List<JAXBElement<String>> users = new ArrayList<>();
     @XmlElement(namespace = "http://example.com/extra")
     protected String age;
     @XmlElement(name = "search-parameters")

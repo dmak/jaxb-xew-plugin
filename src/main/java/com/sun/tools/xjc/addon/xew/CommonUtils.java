@@ -134,9 +134,9 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Check that given field property has name customization ({@code <jaxb:property name="..." />}). See also
-	 * {@code org.glassfish.jaxb.core.api.impl.NameUtil}.
+	 * Check that given field property has name customization ({@code <jaxb:property name="..." />}).
 	 * 
+	 * @see org.glassfish.jaxb.core.api.impl.NameUtil
 	 * @see com.sun.codemodel.JJavaName
 	 * @see com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty#getCustomization(XSComponent)
 	 */

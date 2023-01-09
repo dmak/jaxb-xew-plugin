@@ -18,18 +18,18 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;choice maxOccurs="unbounded"&gt;
- *         &lt;element name="organization" type="{}organization"/&gt;
- *         &lt;element name="group" type="{}group"/&gt;
- *       &lt;/choice&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType>
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <choice maxOccurs="unbounded">
+ *         <element name="organization" type="{}organization"/>
+ *         <element name="group" type="{}group"/>
+ *       </choice>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -57,7 +57,7 @@ public class Alliance
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the Jakarta XML Binding object.
-     * This is why there is not a <CODE>set</CODE> method for the organizationOrGroup property.
+     * This is why there is not a {@code set} method for the organizationOrGroup property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
@@ -72,10 +72,12 @@ public class Alliance
      * {@link Organization }
      * 
      * 
+     * @return
+     *     The value of the organizationOrGroup property.
      */
     public List<Group> getOrganizationOrGroup() {
         if (organizationOrGroup == null) {
-            organizationOrGroup = new ArrayList<Group>();
+            organizationOrGroup = new ArrayList<>();
         }
         return this.organizationOrGroup;
     }

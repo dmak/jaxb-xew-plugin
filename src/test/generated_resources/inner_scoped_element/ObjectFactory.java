@@ -37,6 +37,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Catalogue }
      * 
+     * @return
+     *     the new instance of {@link Catalogue }
      */
     public Catalogue createCatalogue() {
         return new Catalogue();
@@ -45,6 +47,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Catalogue.Stockage }
      * 
+     * @return
+     *     the new instance of {@link Catalogue.Stockage }
      */
     public Catalogue.Stockage createCatalogueStockage() {
         return new Catalogue.Stockage();
@@ -52,12 +56,12 @@ public class ObjectFactory {
 
     @XmlElementDecl(namespace = "", name = "effect", scope = Catalogue.Stockage.class)
     public JAXBElement<String> createCatalogueStockageEffect(String value) {
-        return new JAXBElement<String>(new QName("", "effect"), String.class, Catalogue.Stockage.class, value);
+        return new JAXBElement<>(new QName("", "effect"), String.class, Catalogue.Stockage.class, value);
     }
 
     @XmlElementDecl(namespace = "", name = "term", scope = Catalogue.Stockage.class)
     public JAXBElement<String> createCatalogueStockageTerm(String value) {
-        return new JAXBElement<String>(new QName("", "term"), String.class, Catalogue.Stockage.class, value);
+        return new JAXBElement<>(new QName("", "term"), String.class, Catalogue.Stockage.class, value);
     }
 
 }

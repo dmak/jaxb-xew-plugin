@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Class }
      * 
+     * @return
+     *     the new instance of {@link Class }
      */
     public Class createClass() {
         return new Class();
@@ -40,6 +42,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Method }
      * 
+     * @return
+     *     the new instance of {@link Method }
      */
     public Method createMethod() {
         return new Method();

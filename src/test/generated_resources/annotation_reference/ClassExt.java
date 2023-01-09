@@ -12,18 +12,18 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType name="class-ext"&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base="{}class-common"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="country" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="code" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="class-ext">
+ *   <complexContent>
+ *     <extension base="{}class-common">
+ *       <sequence>
+ *         <element name="country" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         <element name="code" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       </sequence>
+ *     </extension>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */

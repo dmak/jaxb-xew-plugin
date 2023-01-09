@@ -18,11 +18,11 @@ public class ArticlesCollectionsImpl implements ArticlesCollections
 {
 
     @XmlElement(required = true, type = ArticlesImpl.class)
-    protected List<Articles> articles = new Vector<Articles>();
+    protected List<Articles> articles = new Vector<>();
 
     public List<Articles> getArticles() {
         if (articles == null) {
-            articles = new Vector<Articles>();
+            articles = new Vector<>();
         }
         return this.articles;
     }

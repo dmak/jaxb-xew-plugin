@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Container }
      * 
+     * @return
+     *     the new instance of {@link Container }
      */
     public Container createContainer() {
         return new Container();
@@ -40,6 +42,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link BaseContainer }
      * 
+     * @return
+     *     the new instance of {@link BaseContainer }
      */
     public BaseContainer createBaseContainer() {
         return new BaseContainer();
@@ -48,6 +52,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Entry }
      * 
+     * @return
+     *     the new instance of {@link Entry }
      */
     public Entry createEntry() {
         return new Entry();

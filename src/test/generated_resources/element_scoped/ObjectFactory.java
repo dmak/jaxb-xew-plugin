@@ -40,6 +40,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Return }
      * 
+     * @return
+     *     the new instance of {@link Return }
      */
     public Return createReturn() {
         return new Return();
@@ -48,6 +50,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link SearchParameters }
      * 
+     * @return
+     *     the new instance of {@link SearchParameters }
      */
     public SearchParameters createSearchParameters() {
         return new SearchParameters();
@@ -63,22 +67,22 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://example.com/extra", name = "age")
     public JAXBElement<String> createAge(String value) {
-        return new JAXBElement<String>(_Age_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Age_QNAME, String.class, null, value);
     }
 
     @XmlElementDecl(namespace = "http://example.com/scope", name = "name", scope = Return.class)
     public JAXBElement<String> createReturnName(String value) {
-        return new JAXBElement<String>(new QName("http://example.com/scope", "name"), String.class, Return.class, value);
+        return new JAXBElement<>(new QName("http://example.com/scope", "name"), String.class, Return.class, value);
     }
 
     @XmlElementDecl(namespace = "http://example.com/scope", name = "age", scope = Return.class)
     public JAXBElement<String> createReturnAge(String value) {
-        return new JAXBElement<String>(new QName("http://example.com/scope", "age"), String.class, Return.class, value);
+        return new JAXBElement<>(new QName("http://example.com/scope", "age"), String.class, Return.class, value);
     }
 
     @XmlElementDecl(namespace = "http://example.com/scope", name = "id", scope = SearchParameters.class)
     public JAXBElement<List<String>> createSearchParametersId(List<String> value) {
-        return new JAXBElement<List<String>>(new QName("http://example.com/scope", "id"), ((Class) List.class), SearchParameters.class, value);
+        return new JAXBElement<>(new QName("http://example.com/scope", "id"), ((Class) List.class), SearchParameters.class, value);
     }
 
 }

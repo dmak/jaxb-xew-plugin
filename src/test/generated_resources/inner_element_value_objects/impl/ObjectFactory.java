@@ -38,6 +38,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Filesystem }
      * 
+     * @return
+     *     the new instance of {@link Filesystem }
      */
     public FilesystemImpl createFilesystem() {
         return new FilesystemImpl();
@@ -46,6 +48,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Article }
      * 
+     * @return
+     *     the new instance of {@link Article }
      */
     public ArticleImpl createArticle() {
         return new ArticleImpl();
@@ -54,6 +58,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Articles }
      * 
+     * @return
+     *     the new instance of {@link Articles }
      */
     public ArticlesImpl createArticles() {
         return new ArticlesImpl();
@@ -62,6 +68,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link ArticlesCollections }
      * 
+     * @return
+     *     the new instance of {@link ArticlesCollections }
      */
     public ArticlesCollectionsImpl createArticlesCollections() {
         return new ArticlesCollectionsImpl();
@@ -70,6 +78,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Publisher }
      * 
+     * @return
+     *     the new instance of {@link Publisher }
      */
     public PublisherImpl createPublisher() {
         return new PublisherImpl();
@@ -78,6 +88,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Volume }
      * 
+     * @return
+     *     the new instance of {@link Volume }
      */
     public VolumeImpl createVolume() {
         return new VolumeImpl();
@@ -86,6 +98,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Filesystem.FileItem }
      * 
+     * @return
+     *     the new instance of {@link Filesystem.FileItem }
      */
     public FilesystemImpl.FileItemImpl createFilesystemFileItem() {
         return new FilesystemImpl.FileItemImpl();

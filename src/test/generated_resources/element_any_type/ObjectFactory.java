@@ -37,6 +37,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Conversion }
      * 
+     * @return
+     *     the new instance of {@link Conversion }
      */
     public Conversion createConversion() {
         return new Conversion();
@@ -45,6 +47,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Entry }
      * 
+     * @return
+     *     the new instance of {@link Entry }
      */
     public Entry createEntry() {
         return new Entry();
@@ -60,7 +64,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "key", scope = Entry.class)
     public JAXBElement<Object> createEntryKey(Object value) {
-        return new JAXBElement<Object>(_EntryKey_QNAME, Object.class, Entry.class, value);
+        return new JAXBElement<>(_EntryKey_QNAME, Object.class, Entry.class, value);
     }
 
     /**
@@ -73,7 +77,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "value", scope = Entry.class)
     public JAXBElement<Object> createEntryValue(Object value) {
-        return new JAXBElement<Object>(_EntryValue_QNAME, Object.class, Entry.class, value);
+        return new JAXBElement<>(_EntryValue_QNAME, Object.class, Entry.class, value);
     }
 
 }

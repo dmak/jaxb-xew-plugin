@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Filesystem }
      * 
+     * @return
+     *     the new instance of {@link Filesystem }
      */
     public Filesystem createFilesystem() {
         return new Filesystem();
@@ -40,6 +42,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Volumes }
      * 
+     * @return
+     *     the new instance of {@link Volumes }
      */
     public Volumes createVolumes() {
         return new Volumes();
@@ -48,6 +52,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Filesystem.FileListing }
      * 
+     * @return
+     *     the new instance of {@link Filesystem.FileListing }
      */
     public Filesystem.FileListing createFilesystemFileListing() {
         return new Filesystem.FileListing();
@@ -56,6 +62,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Volumes.Volume }
      * 
+     * @return
+     *     the new instance of {@link Volumes.Volume }
      */
     public Volumes.Volume createVolumesVolume() {
         return new Volumes.Volume();
@@ -64,6 +72,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Filesystem.FileListing.FileItem }
      * 
+     * @return
+     *     the new instance of {@link Filesystem.FileListing.FileItem }
      */
     public Filesystem.FileListing.FileItem createFilesystemFileListingFileItem() {
         return new Filesystem.FileListing.FileItem();
