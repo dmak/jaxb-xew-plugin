@@ -594,12 +594,10 @@ The plugin flow consists of the following parts:
 
 There are many pitfalls in JAXB Code Model API which are forcing the developer to use dirty tricks (like accessing private fields) in order to implement the manipulation of code model. Among others:
 
-* [JAXB-784](https://github.com/javaee/jaxb-v2/issues/784) is about NPE in `JAnnotationUse#getAnnotationMembers()` method.
-* [JAXB-884](https://github.com/javaee/jaxb-v2/issues/884) is about ClassCastException in `JAnnotationArrayMember#annotations()` method.
-* [JAXB-878](https://github.com/javaee/jaxb-v2/issues/878) and [JAXB-879](https://github.com/javaee/jaxb-v2/issues/879) describe the lack of public getters for class fields.
-* [JAXB-957](https://github.com/javaee/jaxb-v2/issues/957) mentions what need to be added to make it possible for the inner class to be moved to another class or package.
-* [JAXB-883](https://github.com/javaee/jaxb-v2/issues/883) does not allow to learn if "simpleMode" setting is enabled, which in its turn controls plural form for collection property names. There are however some more difficulties to overcome.
-* [JAXB-1107](https://github.com/javaee/jaxb-v2/issues/1107) – marshalling of text nodes for mixed-mode contents
+* [issue #957](https://github.com/eclipse-ee4j/jaxb-ri/issues/957) mentions what need to be added to make it possible for the inner class to be moved to another class or package.
+* [issue #883](https://github.com/eclipse-ee4j/jaxb-ri/issues/883) does not allow to learn if "simpleMode" setting is enabled, which in its turn controls plural form for collection property names. There are however some more difficulties to overcome.
+* [issue #1677](https://github.com/eclipse-ee4j/jaxb-ri/issues/1677) add/implement JVar.annotate(JAnnotationUse annotation).
+* [issue #1679](https://github.com/eclipse-ee4j/jaxb-ri/issues/1679) add/implement JAnnotationUse.param(String name, JAnnotationValue annotationValue).
 
 ## Authors
 
@@ -612,6 +610,7 @@ Original code by [Bjarne Hansen](http://www.conspicio.dk/blog/bjarne/jaxb-xmlele
 * [Colin Fairless](https://github.com/colin-yell/)
 * [Patrick Crocker](https://github.com/patrickcrocker/)
 * [Kermit The Frog](https://github.com/kermit-the-frog/)
+* [Dominik Broj](https://github.com/thetric)
 * and others...
 
 ## License

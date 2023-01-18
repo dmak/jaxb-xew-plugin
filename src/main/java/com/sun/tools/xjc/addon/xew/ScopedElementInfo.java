@@ -1,6 +1,5 @@
 package com.sun.tools.xjc.addon.xew;
 
-import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JType;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -29,19 +28,19 @@ public final class ScopedElementInfo {
 	/**
 	 * Element name ("post-office").
 	 */
-	public final JExpression name;
+	public final String	name;
 
 	/**
 	 * Element namespace ("http://foo.bar").
 	 */
-	public final JExpression namespace;
+	public final String	namespace;
 
 	/**
 	 * Element type ({@link String}).
 	 */
-	public final JType		 type;
+	public final JType	type;
 
-	public ScopedElementInfo(JExpression name, JExpression namespace, JType type) {
+	public ScopedElementInfo(String name, String namespace, JType type) {
 		this.name = name;
 		this.namespace = namespace;
 		this.type = type;
