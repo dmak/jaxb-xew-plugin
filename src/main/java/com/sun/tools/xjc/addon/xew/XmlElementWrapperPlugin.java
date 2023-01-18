@@ -22,17 +22,17 @@
 package com.sun.tools.xjc.addon.xew;
 
 import static com.sun.tools.xjc.addon.xew.CommonUtils.addAnnotation;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.copyAnnotationMemberValue;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.copyFields;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMember;
-import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberValue;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getPrivateField;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getXsdDeclaration;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.hasPropertyNameCustomization;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isListedAsParametrisation;
-import static com.sun.tools.xjc.addon.xew.CommonUtils.removeAnnotation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.setPrivateField;
 
 import java.io.IOException;
@@ -55,7 +55,6 @@ import com.sun.codemodel.JClassContainer;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JJavaName;
@@ -317,35 +316,16 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				JAnnotationUse xmlElementOriginalAnnotation = getAnnotation(originalImplField, xmlElementModelClass);
 
 				// xmlElementOriginalAnnotation can be null:
-				JExpression wrapperXmlName = getAnnotationMemberExpression(xmlElementOriginalAnnotation, "name");
-				if (wrapperXmlName != null) {
-					xmlElementWrapperAnnotation.param("name", wrapperXmlName);
-				}
-				else if (fieldConfiguration.isApplyPluralForm()) {
-					xmlElementWrapperAnnotation.param("name", getXsdDeclaration(fieldPropertyInfo).getName());
-				}
-
-				JExpression wrapperXmlRequired = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
-				            "required");
-				if (wrapperXmlRequired != null) {
-					xmlElementWrapperAnnotation.param("required", wrapperXmlRequired);
-				}
-
-				JExpression wrapperXmlNillable = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
-				            "nillable");
-				if (wrapperXmlNillable != null) {
-					xmlElementWrapperAnnotation.param("nillable", wrapperXmlNillable);
-				}
-
-				// Namespace of the wrapper element
-				JExpression wrapperXmlNamespace = getAnnotationMemberExpression(xmlElementOriginalAnnotation,
-				            "namespace");
-				if (wrapperXmlNamespace != null) {
-					xmlElementWrapperAnnotation.param("namespace", wrapperXmlNamespace);
-				}
+				copyAnnotationMemberValue(xmlElementOriginalAnnotation, "name",
+				            fieldConfiguration.isApplyPluralForm() ? getXsdDeclaration(fieldPropertyInfo).getName()
+				                        : null,
+				            xmlElementWrapperAnnotation);
+				copyAnnotationMemberValue(xmlElementOriginalAnnotation, "required", null, xmlElementWrapperAnnotation);
+				copyAnnotationMemberValue(xmlElementOriginalAnnotation, "nillable", null, xmlElementWrapperAnnotation);
+				copyAnnotationMemberValue(xmlElementOriginalAnnotation, "namespace", null, xmlElementWrapperAnnotation);
 
 				if (xmlElementOriginalAnnotation != null) {
-					removeAnnotation(originalImplField, xmlElementOriginalAnnotation);
+					originalImplField.removeAnnotation(xmlElementOriginalAnnotation);
 				}
 
 				boolean xmlElementInfoWasTransferred = false;
@@ -362,7 +342,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 
 							if (annotationArrayMember != null) {
 								for (JAnnotationUse subAnnotation : annotationArrayMember.annotations()) {
-									if (getAnnotationMemberExpression(subAnnotation, "namespace") == null) {
+									if (getAnnotationMemberValue(subAnnotation, "namespace") == null) {
 										subAnnotation.param("namespace", candidate.getFieldTargetNamespace());
 									}
 								}
@@ -383,38 +363,15 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 					JAnnotationUse xmlElementCandidateAnnotation = getAnnotation(candidate.getField(),
 					            xmlElementModelClass);
 
-					// xmlElementOriginalAnnotation can be null:
-					JExpression xmlName = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "name");
-					if (xmlName != null) {
-						xmlElementAnnotation.param("name", xmlName);
-					}
-					else {
-						xmlElementAnnotation.param("name", candidate.getFieldName());
-					}
-
-					JExpression xmlNamespace = getAnnotationMemberExpression(xmlElementCandidateAnnotation,
-					            "namespace");
-					if (xmlNamespace != null) {
-						xmlElementAnnotation.param("namespace", xmlNamespace);
-					}
-					else if (candidate.getFieldTargetNamespace() != null) {
-						xmlElementAnnotation.param("namespace", candidate.getFieldTargetNamespace());
-					}
-
-					JExpression type = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "type");
-					if (type != null) {
-						xmlElementAnnotation.param("type", type);
-					}
-
-					JExpression required = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "defaultValue");
-					if (required != null) {
-						xmlElementAnnotation.param("defaultValue", required);
-					}
-
-					JExpression nillable = getAnnotationMemberExpression(xmlElementCandidateAnnotation, "nillable");
-					if (nillable != null) {
-						xmlElementAnnotation.param("nillable", nillable);
-					}
+					// xmlElementCandidateAnnotation can be null:
+					copyAnnotationMemberValue(xmlElementCandidateAnnotation, "name", candidate.getFieldName(),
+					            xmlElementAnnotation);
+					copyAnnotationMemberValue(xmlElementCandidateAnnotation, "namespace",
+					            candidate.getFieldTargetNamespace(), xmlElementAnnotation);
+					copyAnnotationMemberValue(xmlElementCandidateAnnotation, "type", null, xmlElementAnnotation);
+					copyAnnotationMemberValue(xmlElementCandidateAnnotation, "defaultValue", null,
+					            xmlElementAnnotation);
+					copyAnnotationMemberValue(xmlElementCandidateAnnotation, "nillable", null, xmlElementAnnotation);
 				}
 
 				JAnnotationUse adapterAnnotation = getAnnotation(candidate.getField(), xmlJavaTypeAdapterModelClass);
@@ -595,11 +552,10 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 			for (JMethod method : factoryClass.methods()) {
 				JAnnotationUse xmlElementDeclAnnotation = getAnnotation(method, xmlElementDeclModelClass);
 
-				JExpression scope = getAnnotationMemberExpression(xmlElementDeclAnnotation, "scope");
-				JExpression name = getAnnotationMemberExpression(xmlElementDeclAnnotation, "name");
+				String scope = getAnnotationMemberValue(xmlElementDeclAnnotation, "scope");
+				String name = getAnnotationMemberValue(xmlElementDeclAnnotation, "name");
 
-				if (scope != null && dotClazz.equals(generableToString(scope))
-				            && generableToString(info.name).equals(generableToString(name))) {
+				if (scope != null && dotClazz.equals(scope) && info.name.equals(name)) {
 					continue NEXT;
 				}
 			}
@@ -623,7 +579,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				}
 			}
 
-			methodName.insert(0, "create").append(NameConverter.standard.toPropertyName(generableToString(info.name)));
+			methodName.insert(0, "create").append(NameConverter.standard.toPropertyName(info.name));
 
 			JClass jaxbElementType = jaxbElementModelClass.narrow(info.type);
 
@@ -975,7 +931,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				continue;
 			}
 
-			JExpression type = getAnnotationMemberExpression(annotation, "type");
+			String type = getAnnotationMemberValue(annotation, "type");
 
 			if (type == null) {
 				// Can be the case for @XmlElement(name = "publication-reference", namespace = "http://mycompany.org/exchange")
@@ -983,7 +939,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				continue;
 			}
 
-			Candidate candidate = candidatesMap.get(generableToString(type).replace(".class", ""));
+			Candidate candidate = candidatesMap.get(type.replace(".class", ""));
 
 			if (candidate != null) {
 				logger.debug("Candidate " + candidate.getClassName()

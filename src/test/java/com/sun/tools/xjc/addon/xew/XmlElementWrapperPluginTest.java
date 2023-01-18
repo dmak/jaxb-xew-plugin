@@ -20,30 +20,12 @@
  */
 package com.sun.tools.xjc.addon.xew;
 
-import com.sun.tools.xjc.BadCommandLineException;
-import com.sun.tools.xjc.Driver;
-import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.reader.Const;
-import com.sun.tools.xjc.reader.internalizer.DOMForest;
-import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xmlunit.assertj3.XmlAssert;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import javax.xml.XMLConstants;
-import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -56,7 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -64,10 +45,32 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import javax.xml.XMLConstants;
+import javax.xml.validation.SchemaFactory;
+
+import com.sun.tools.xjc.BadCommandLineException;
+import com.sun.tools.xjc.Driver;
+import com.sun.tools.xjc.Options;
+import com.sun.tools.xjc.reader.Const;
+import com.sun.tools.xjc.reader.internalizer.DOMForest;
+import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xmlunit.assertj3.XmlAssert;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 
 /**
  * Testcases for the XEW Plugin.
@@ -84,6 +87,12 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testUsage() {
 		assertThat(new XmlElementWrapperPlugin().getUsage()).isNotNull();
+	}
+
+	@Test
+	public void testToString() {
+		assertThat(new XmlElementWrapperPlugin().toString()).isEqualTo(
+		            "XmlElementWrapperPlugin[globalConfiguration=GlobalConfiguration[collectionImplClass=java.util.ArrayList,collectionInterfaceClass=java.util.List,instantiationMode=EARLY,applyPluralForm=false,controlList=[]]]");
 	}
 
 	@Test
@@ -118,27 +127,27 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
-	@Disabled("This test works reliably on Java7 but produces different results from run to run on Java8.")
+	@Disabled("This test works reliably on Java7 but produces different results from run to run on Java8, see https://github.com/eclipse-ee4j/jaxb-ri/issues/1682")
 	public void testDifferentNamespacesForWrapperAndElement() throws Exception {
 		// Plural form in this case will have no impact as all properties are already in plural:
-		List<String> extraXewOptions = Arrays.asList("-Xxew:collection", "java.util.LinkedList", "-Xxew:instantiate",
-		            "lazy", "-Xxew:plural");
-		List<String> classesToCheck = Arrays.asList("BaseContainer", "Container", "Entry");
+		List<String> extraXewOptions = asList("-Xxew:collection", "java.util.LinkedList", "-Xxew:instantiate", "lazy",
+		            "-Xxew:plural");
+		List<String> classesToCheck = asList("BaseContainer", "Container", "Entry", "package-info");
 		runTest("different-namespaces", extraXewOptions, false, classesToCheck);
 	}
 
 	@Test
 	public void testInnerElement() throws Exception {
-		List<String> extraXewOptions = Arrays.asList("-verbose", "-Xxew:instantiate none",
+		List<String> extraXewOptions = asList("-verbose", "-Xxew:instantiate none",
 		            "-Xxew:control " + getClass().getResource("inner-element-control.txt").getFile());
-		List<String> classesToCheck = Arrays.asList("Filesystem", "Volumes");
+		List<String> classesToCheck = asList("Filesystem", "Volumes");
 		runTest("inner-element", extraXewOptions, true, classesToCheck);
 	}
 
 	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
-		List<String> classesToCheck = Arrays.asList("Article", "Articles", "ArticlesCollections", "Filesystem",
-		            "Publisher", "Volume", "impl.ArticleImpl", "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl",
+		List<String> classesToCheck = asList("Article", "Articles", "ArticlesCollections", "Filesystem", "Publisher",
+		            "Volume", "impl.ArticleImpl", "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl",
 		            "impl.FilesystemImpl", "impl.PublisherImpl", "impl.VolumeImpl", "impl.ObjectFactory",
 		            "impl.JAXBContextFactory");
 		runTest("inner-element-value-objects", singletonList("-debug"), false, classesToCheck);
@@ -149,27 +158,27 @@ public class XmlElementWrapperPluginTest {
 		// "Markup.java" cannot be verified for content because the content is changing from
 		// one compilation to other as order of @XmlElementRef/@XmlElement annotations is not pre-defined
 		// (set is used as their container).
-		List<String> extraXewOptions = Arrays.asList("-verbose", "-debug");
-		List<String> classesToCheck = Arrays.asList("ClassCommon", "ClassesEu", "ClassesUs", "ClassExt", "Markup",
-		            "Para", "SearchEu", "SearchMulti");
+		List<String> extraXewOptions = asList("-verbose", "-debug");
+		List<String> classesToCheck = asList("ClassCommon", "ClassesEu", "ClassesUs", "ClassExt", "Markup", "Para",
+		            "SearchEu", "SearchMulti");
 		runTest("annotation-reference", extraXewOptions, false, classesToCheck);
 	}
 
 	@Test
 	public void testElementAsParametrisationPublisher() throws Exception {
-		final List<String> extraXewOptions = Arrays.asList("-debug", "-Xxew:control "
+		final List<String> extraXewOptions = asList("-debug", "-Xxew:control "
 		            + getClass().getResource("element-as-parametrisation-publisher-control.txt").getFile());
-		List<String> classesToCheck = Arrays.asList("Article", "Articles", "ArticlesCollections", "Publisher");
+		List<String> classesToCheck = asList("Article", "Articles", "ArticlesCollections", "Publisher");
 		runTest("element-as-parametrisation-publisher", extraXewOptions, false, classesToCheck);
 	}
 
 	@Test
 	public void testElementAsParametrisationFamily() throws Exception {
-		List<String> extraXewOptions = Arrays.asList("-debug",
+		List<String> extraXewOptions = asList("-debug",
 		            "-Xxew:control "
 		                        + getClass().getResource("element-as-parametrisation-family-control.txt").getFile(),
 		            "-Xxew:summary " + GENERATED_SOURCES_PREFIX + "summary.txt");
-		List<String> classesToCheck = Arrays.asList("Family", "FamilyMember");
+		List<String> classesToCheck = asList("Family", "FamilyMember");
 		runTest("element-as-parametrisation-family", extraXewOptions, false, classesToCheck);
 
 		assertThat(Paths.get(GENERATED_SOURCES_PREFIX, "summary.txt")).content()
@@ -180,13 +189,13 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementWithParent() throws Exception {
 		List<String> extraXewOptions = singletonList("-debug");
-		List<String> classesToCheck = Arrays.asList("Alliance", "Group", "Organization");
+		List<String> classesToCheck = asList("Alliance", "Group", "Organization");
 		runTest("element-with-parent", extraXewOptions, false, classesToCheck);
 	}
 
 	@Test
 	public void testElementAny() throws Exception {
-		List<String> extraXewOptions = Arrays.asList("-quiet", "-Xxew:plural");
+		List<String> extraXewOptions = asList("-quiet", "-Xxew:plural");
 		List<String> classesToCheck = singletonList("Message");
 		runTest("element-any", extraXewOptions, false, classesToCheck);
 	}
@@ -194,7 +203,7 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementAnyType() throws Exception {
 		List<String> extraXewOptions = singletonList("-Xxew:plural");
-		List<String> classesToCheck = Arrays.asList("Conversion", "Entry");
+		List<String> classesToCheck = asList("Conversion", "Entry");
 		runTest("element-any-type", extraXewOptions, false, classesToCheck);
 	}
 
@@ -202,7 +211,7 @@ public class XmlElementWrapperPluginTest {
 	public void testElementMixed() throws Exception {
 		// Most classes cannot be tested for content
 		List<String> extraXewOptions = singletonList("-debug");
-		List<String> classesToCheck = Arrays.asList("B", "Br", "I", "AnyText", "package-info");
+		List<String> classesToCheck = asList("B", "Br", "I", "AnyText", "package-info");
 		runTest("element-mixed", extraXewOptions, false, classesToCheck);
 	}
 
@@ -216,8 +225,8 @@ public class XmlElementWrapperPluginTest {
 	@Test
 	public void testElementNameCollision() throws Exception {
 		// Most classes cannot be tested for content
-		List<String> extraXewOptions = Arrays.asList("-debug", "-Xxew:instantiate", "lazy");
-		List<String> classesToCheck = Arrays.asList("Root", "package-info");
+		List<String> extraXewOptions = asList("-debug", "-Xxew:instantiate", "lazy");
+		List<String> classesToCheck = asList("Root", "package-info");
 		runTest("element-name-collision", extraXewOptions, false, classesToCheck);
 	}
 
@@ -225,41 +234,41 @@ public class XmlElementWrapperPluginTest {
 	public void testElementScoped() throws Exception {
 		// Most classes cannot be tested for content
 		List<String> extraXewOptions = singletonList("-debug");
-		List<String> classesToCheck = Arrays.asList("Return", "SearchParameters", "package-info");
+		List<String> classesToCheck = asList("Return", "SearchParameters", "package-info");
 		runTest("element-scoped", extraXewOptions, false, classesToCheck);
 	}
 
 	@Test
 	public void testElementWithAdapter() throws Exception {
 		// Plural form in this case will have no impact as there is property customization:
-		List<String> extraXewOptions = Arrays.asList("-Xxew:plural", "-Xxew:collectionInterface java.util.Collection");
-		List<String> classesToCheck = Arrays.asList("Calendar", "Adapter1");
+		List<String> extraXewOptions = asList("-Xxew:plural", "-Xxew:collectionInterface java.util.Collection");
+		List<String> classesToCheck = asList("Calendar", "Adapter1");
 		runTest("element-with-adapter", extraXewOptions, false, classesToCheck);
 	}
 
 	@Test
 	public void testElementWithCustomization() throws Exception {
 		// This run is additionally configured from XSD (<xew:xew ... >):
-		List<String> extraXewOptions = Arrays.asList("-debug", "-Xxew:plural");
-		List<String> classesToCheck = Arrays.asList("PostOffice", "Args");
+		List<String> extraXewOptions = asList("-debug", "-Xxew:plural");
+		List<String> classesToCheck = asList("PostOffice", "Args");
 		runTest("element-with-customization", extraXewOptions, false, classesToCheck);
 	}
 
 	@Test
 	public void testElementReservedWord() throws Exception {
-		List<String> classesToCheck = Arrays.asList("Class", "Method");
+		List<String> classesToCheck = asList("Class", "Method");
 		runTest("element-reserved-word", emptyList(), false, classesToCheck);
 	}
 
 	@Test
 	public void testSubstitutionGroups() throws Exception {
-		List<String> classesToCheck = Arrays.asList("Address", "ContactInfo", "Customer", "PhoneNumber");
+		List<String> classesToCheck = asList("Address", "ContactInfo", "Customer", "PhoneNumber");
 		runTest("substitution-groups", emptyList(), false, classesToCheck);
 	}
 
 	@Test
 	public void testUnqualifiedSchema() throws Exception {
-		List<String> classesToCheck = Arrays.asList("RootElement", "package-info");
+		List<String> classesToCheck = asList("RootElement", "package-info");
 		runTest("unqualified", emptyList(), false, classesToCheck);
 	}
 
@@ -293,13 +302,13 @@ public class XmlElementWrapperPluginTest {
 		            new LoggingOutputStream(logger, LoggingOutputStream.LogLevel.INFO, "[XJC] "));
 
 		List<String> opts = new ArrayList<>(extraXewOptions);
-		opts.addAll(Arrays.asList("-no-header", "-extension", "-Xxew", "-d", baseDir.toString(), xsdUrl.getFile()));
+		opts.addAll(asList("-no-header", "-extension", "-Xxew", "-d", baseDir.toString(), xsdUrl.getFile()));
 
 		String episodeFile = baseDir.resolve("episode.xml").toString();
 
 		// Episode plugin should be triggered after Xew, see https://github.com/dmak/jaxb-xew-plugin/issues/6
 		if (generateEpisode) {
-			opts.addAll(Arrays.asList("-episode", episodeFile));
+			opts.addAll(asList("-episode", episodeFile));
 		}
 
 		assertThat(Driver.run(opts.toArray(new String[0]), loggingPrintStream, loggingPrintStream))
@@ -320,13 +329,14 @@ public class XmlElementWrapperPluginTest {
 
 		Path targetDir = baseDir.resolve(packageName);
 
-		Collection<String> generatedJavaSources = new HashSet<>();
+		Collection<String> generatedJavaSources;
 
 		// *.properties files are ignored:
 		try (Stream<Path> stream = Files.walk(targetDir)) {
-			stream.filter(file -> Files.isRegularFile(file) && file.getFileName().toString().endsWith(".java"))
+			generatedJavaSources = stream
+			            .filter(file -> Files.isRegularFile(file) && file.getFileName().toString().endsWith(".java"))
 			            .map(f -> f.toString().substring(targetDir.toString().length() + 1).replace('\\', '/'))
-			            .forEach(generatedJavaSources::add);
+			            .collect(Collectors.toSet());
 		}
 
 		// This class is added and checked by default:

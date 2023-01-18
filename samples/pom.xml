@@ -9,7 +9,7 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<jaxb-xew-plugin.version>2.0-SNAPSHOT</jaxb-xew-plugin.version>
+		<jaxb-xew-plugin.version>2.1</jaxb-xew-plugin.version>
 		<jakarta-api.version>3.0.1</jakarta-api.version>
 		<jaxb2-basics.version>3.0.0</jaxb2-basics.version>
 		<jaxb2-maven-plugin.version>3.1.0</jaxb2-maven-plugin.version>

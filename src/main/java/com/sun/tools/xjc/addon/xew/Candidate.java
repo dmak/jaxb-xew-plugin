@@ -1,8 +1,7 @@
 package com.sun.tools.xjc.addon.xew;
 
-import static com.sun.tools.xjc.addon.xew.CommonUtils.generableToString;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotation;
-import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberExpression;
+import static com.sun.tools.xjc.addon.xew.CommonUtils.getAnnotationMemberValue;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.getXsdDeclaration;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
 import static com.sun.tools.xjc.addon.xew.XmlElementWrapperPlugin.FACTORY_CLASS_NAME;
@@ -16,7 +15,6 @@ import java.util.Map;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.tools.xjc.model.CClassInfo;
@@ -81,10 +79,10 @@ public final class Candidate {
 			// see com.sun.tools.xjc.generator.bean.PackageOutlineImpl#calcDefaultValues()
 			for (JDefinedClass objectFactoryClass : objectFactoryClasses.values()) {
 				JAnnotationUse schemaAnnotation = getAnnotation(objectFactoryClass.getPackage(), xmlSchemaModelClass);
-				JExpression elementFormDefault = getAnnotationMemberExpression(schemaAnnotation, "elementFormDefault");
+				String elementFormDefault = getAnnotationMemberValue(schemaAnnotation, "elementFormDefault");
 
-				if (elementFormDefault != null && generableToString(elementFormDefault).endsWith(".QUALIFIED")) {
-					return generableToString(getAnnotationMemberExpression(schemaAnnotation, "namespace"));
+				if (elementFormDefault != null && elementFormDefault.endsWith(".QUALIFIED")) {
+					return getAnnotationMemberValue(schemaAnnotation, "namespace");
 				}
 			}
 		}
@@ -98,15 +96,15 @@ public final class Candidate {
 		// Only value Object Factory methods are inspected:
 		for (JMethod method : objectFactoryClasses.values().iterator().next().methods()) {
 			JAnnotationUse xmlElementDeclAnnotation = getAnnotation(method, xmlElementDeclModelClass);
-			JExpression scope = getAnnotationMemberExpression(xmlElementDeclAnnotation, "scope");
+			String scope = getAnnotationMemberValue(xmlElementDeclAnnotation, "scope");
 
-			if (scope == null || !dotClazz.equals(generableToString(scope))) {
+			if (scope == null || !dotClazz.equals(scope)) {
 				continue;
 			}
 
 			scopedElementInfos.put(method.name(),
-			            new ScopedElementInfo(getAnnotationMemberExpression(xmlElementDeclAnnotation, "name"),
-			                        getAnnotationMemberExpression(xmlElementDeclAnnotation, "namespace"),
+			            new ScopedElementInfo(getAnnotationMemberValue(xmlElementDeclAnnotation, "name"),
+			                        getAnnotationMemberValue(xmlElementDeclAnnotation, "namespace"),
 			                        method.params().get(0).type()));
 		}
 	}

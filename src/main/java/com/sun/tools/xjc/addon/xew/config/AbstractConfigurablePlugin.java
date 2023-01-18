@@ -13,6 +13,8 @@ import com.sun.tools.xjc.model.CCustomizations;
 import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.outline.Outline;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.logging.LogFactory;
 import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
 import org.w3c.dom.NamedNodeMap;
@@ -276,4 +278,13 @@ public abstract class AbstractConfigurablePlugin extends AbstractParameterizable
 	 * Actual work is done in this method.
 	 */
 	protected abstract void runInternal(Outline outline) throws ClassNotFoundException, IOException;
+
+	@Override
+	public String toString() {
+		ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+
+		sb.append("globalConfiguration", globalConfiguration);
+
+		return sb.toString();
+	}
 }

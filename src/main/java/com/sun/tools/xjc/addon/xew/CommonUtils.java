@@ -4,6 +4,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +13,6 @@ import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JGenerable;
 import com.sun.codemodel.JType;
@@ -76,10 +75,9 @@ public final class CommonUtils {
 			return null;
 		}
 
-		// FIXME: Workaround for https://java.net/jira/browse/JAXB-1040:
-		Map<String, JAnnotationValue> memberValues = getPrivateField(annotation, "memberValues");
+		Map<String, JAnnotationValue> memberValues = annotation.getAnnotationMembers();
 
-		if (memberValues == null) {
+		if (memberValues.isEmpty()) {
 			return null;
 		}
 
@@ -87,27 +85,44 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Returns the value of annotation element as {@link JExpression}. For example, for annotation
-	 * <code>@XmlElementRef(name = "last-name", namespace = "http://mycompany.org/exchange", type = JAXBElement.class)</code>
-	 * for member <code>name</code> the value <code>last-name</code> will be returned.
+	 * Copies the annotation member with a given name from source annotations to target annotations. If given member
+	 * does not exist, then default value is used.
 	 */
-	public static JExpression getAnnotationMemberExpression(JAnnotationUse annotation, String annotationMember) {
+	public static void copyAnnotationMemberValue(JAnnotationUse sourceAnnotation, String annotationMember,
+	            String defaultAnotationValue, JAnnotationUse targetAnnotation) {
+		JAnnotationValue annotationValue = getAnnotationMember(sourceAnnotation, annotationMember);
+
+		if (annotationValue == null) {
+			if (defaultAnotationValue != null) {
+				targetAnnotation.param(annotationMember, defaultAnotationValue);
+			}
+			return;
+		}
+
+		Map<String, JAnnotationValue> memberValues = getPrivateField(targetAnnotation, "memberValues");
+
+		if (memberValues == null) {
+			memberValues = new LinkedHashMap<>();
+			setPrivateField(targetAnnotation, "memberValues", memberValues);
+		}
+
+		memberValues.put(annotationMember, annotationValue);
+	}
+
+	/**
+	 * Returns the value of annotation element as string. For example, for annotation
+	 * <code>@XmlElementRef(name = "last-name", namespace = "http://mycompany.org/exchange", type = JAXBElement.class)</code>
+	 * for member <code>name</code> the value <code>"last-name"</code> will be returned, for member <code>type</code>
+	 * the value <code>"jakarta.xml.bind.JAXBElement.class"</code> will be returned.
+	 */
+	public static String getAnnotationMemberValue(JAnnotationUse annotation, String annotationMember) {
 		JAnnotationValue annotationValue = getAnnotationMember(annotation, annotationMember);
 
 		if (annotationValue == null) {
 			return null;
 		}
 
-		// FIXME: Pending for https://java.net/jira/browse/JAXB-878
-		try {
-			// In most cases the value is some expression...
-			return getPrivateField(annotationValue, "value");
-		}
-		catch (IllegalArgumentException e) {
-			// ... and in some cases (like enum) do the conversion from JGenerable to JExpression
-			// (a bit unoptimal, since this expression is going to be converted back to string)
-			return JExpr.lit(generableToString(annotationValue));
-		}
+		return generableToString(annotationValue);
 	}
 
 	/**
@@ -119,17 +134,9 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Remove the given {@code annotation} from the list of annotations for the given {@code field}.
-	 */
-	public static void removeAnnotation(JVar field, JAnnotationUse annotation) {
-		List<JAnnotationUse> annotations = getPrivateField(field, "annotations");
-		annotations.remove(annotation);
-	}
-
-	/**
-	 * Check that given field property has name customization ({@code <jaxb:property name="..." />}).
+	 * Check that given field property has name customization ({@code <jaxb:property name="..." />}). See also
+	 * {@code org.glassfish.jaxb.core.api.impl.NameUtil}.
 	 * 
-	 * @see <code>com.sun.xml.bind.api.impl.NameUtil</code>
 	 * @see com.sun.codemodel.JJavaName
 	 * @see com.sun.tools.xjc.reader.xmlschema.bindinfo.BIProperty#getCustomization(XSComponent)
 	 */
