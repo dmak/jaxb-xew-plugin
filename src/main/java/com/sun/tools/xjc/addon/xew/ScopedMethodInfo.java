@@ -23,7 +23,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * }
  * </pre>
  */
-public final class ScopedElementInfo {
+public final class ScopedMethodInfo {
 
 	/**
 	 * Element name ("post-office").
@@ -40,7 +40,7 @@ public final class ScopedElementInfo {
 	 */
 	public final JType	type;
 
-	public ScopedElementInfo(String name, String namespace, JType type) {
+	public ScopedMethodInfo(String name, String namespace, JType type) {
 		this.name = name;
 		this.namespace = namespace;
 		this.type = type;

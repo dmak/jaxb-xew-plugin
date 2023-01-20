@@ -463,7 +463,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 				// Adapt factory class:
 				for (JDefinedClass objectFactoryClass : candidate.getObjectFactoryClasses()) {
 					modificationCount += createScopedFactoryMethods(codeModel, objectFactoryClass,
-					            candidate.getScopedElementInfos().values(), targetClass, xmlElementDeclModelClass,
+					            candidate.getScopedFactoryMethods().values(), targetClass, xmlElementDeclModelClass,
 					            jaxbElementModelClass, qNameModelClass);
 				}
 
@@ -492,7 +492,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	 * {@code TypeClass (is a collection type) -> ContainerClass (marked for removal) -> ElementClass}<br>
 	 * we need to get<br>
 	 * {@code TypeClass -> ElementClass}.<br>
-	 * Also this move should be reflected on factory method names.
+	 * Also this move should be reflected on factory method names (and scope methods of other candidates as well).
 	 */
 	private boolean moveInnerClassToParent(Outline outline, Candidate candidate) {
 		// Skip basic parametrisations like "List<String>":
@@ -509,18 +509,18 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 
 		JDefinedClass fieldParametrisationClass = candidate.getFieldParametrisationClass();
 
-		String oldFactoryMethodName = fieldParametrisationClass.outer().name() + fieldParametrisationClass.name();
+		String oldMethodName = fieldParametrisationClass.outer().name() + fieldParametrisationClass.name();
 
 		moveClassLevelUp(outline, fieldParametrisationImpl);
 
-		renameFactoryMethod(fieldParametrisationImpl._package()._getClass(FACTORY_CLASS_NAME), oldFactoryMethodName,
+		renameFactoryMethod(fieldParametrisationImpl._package()._getClass(FACTORY_CLASS_NAME), oldMethodName,
 		            fieldParametrisationClass.name());
 
 		if (candidate.isValueObjectDisabled()) {
 			moveClassLevelUp(outline, fieldParametrisationClass);
 
-			renameFactoryMethod(fieldParametrisationClass._package()._getClass(FACTORY_CLASS_NAME),
-			            oldFactoryMethodName, fieldParametrisationClass.name());
+			renameFactoryMethod(fieldParametrisationClass._package()._getClass(FACTORY_CLASS_NAME), oldMethodName,
+			            fieldParametrisationClass.name());
 		}
 
 		return true;
@@ -539,11 +539,11 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	 * @see com.sun.tools.xjc.generator.bean.ObjectFactoryGenerator
 	 */
 	private int createScopedFactoryMethods(JCodeModel codeModel, JDefinedClass factoryClass,
-	            Collection<ScopedElementInfo> scopedElementInfos, JDefinedClass targetClass,
+	            Collection<ScopedMethodInfo> scopedFactoryMethodInfos, JDefinedClass targetClass,
 	            JClass xmlElementDeclModelClass, JClass jaxbElementModelClass, JClass qNameModelClass) {
 		int createdMethods = 0;
 
-		NEXT: for (ScopedElementInfo info : scopedElementInfos) {
+		NEXT: for (ScopedMethodInfo info : scopedFactoryMethodInfos) {
 			String dotClazz = targetClass.fullName() + ".class";
 
 			// First check that such factory method has not yet been created. It can be the case if target class
@@ -758,15 +758,17 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	/**
 	 * Rename methods in factory class: {@code createABC() -> createAC()}.
 	 */
-	private void renameFactoryMethod(JDefinedClass factoryClass, String oldMethodName, String newMethodName) {
+	private void renameFactoryMethod(JDefinedClass factoryClass, String oldMethodNameSuffix, String newMethodNameSuffix) {
 		for (JMethod method : factoryClass.methods()) {
 			String methodName = method.name();
 
-			if (!methodName.contains(oldMethodName)) {
+			if (!methodName.contains(oldMethodNameSuffix)) {
 				continue;
 			}
 
-			method.name(methodName.replace(oldMethodName, newMethodName));
+			method.name(methodName.replace(oldMethodNameSuffix, newMethodNameSuffix));
+
+			// Method renaming for scoped methods is automatically applied.
 
 			writeSummary("\tRenamed " + methodName + " -> " + method.name() + " in " + factoryClass.fullName());
 		}
@@ -791,7 +793,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 			if ((method.type() instanceof JDefinedClass
 			            && ((JDefinedClass) method.type()).isAssignableFrom(candidate.getClazz()))
 			            || isListedAsParametrisation(candidate.getClazz(), method.type())
-			            || candidate.getScopedElementInfos().containsKey(method.name())) {
+			            || candidate.getScopedFactoryMethods().containsKey(method)) {
 				writeSummary("\tRemoving factory method [" + method.type().fullName() + "#" + method.name()
 				            + "()] from " + factoryClass.fullName());
 				iter.remove();

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" attributeFormDefault="unqualified"
+	version="1.0"
+	jaxb:version="3.0"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="inner_scoped_element" />
+			</jaxb:schemaBindings>
+		</xsd:appinfo>
+	</xsd:annotation>
+
+	<xsd:element name="catalogue">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="stockage_collection">
+					<xsd:complexType>
+						<xsd:sequence minOccurs="0">
+							<xsd:element name="stockage" minOccurs="0" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:all>
+										<xsd:element name="collection" minOccurs="0">
+											<xsd:complexType>
+												<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+													<xsd:element name="effect" type="xsd:string" minOccurs="0" />
+													<xsd:element name="term" type="xsd:string" minOccurs="0" />
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:all>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

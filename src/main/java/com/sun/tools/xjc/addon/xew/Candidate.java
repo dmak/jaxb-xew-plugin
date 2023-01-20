@@ -7,7 +7,6 @@ import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
 import static com.sun.tools.xjc.addon.xew.XmlElementWrapperPlugin.FACTORY_CLASS_NAME;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -43,7 +42,8 @@ public final class Candidate {
 
 	private final boolean						 valueObjectDisabled;
 
-	private final Map<String, ScopedElementInfo> scopedElementInfos	  = new HashMap<>();
+	// Order matters as it affects the order of generated methods in Object Factory:
+	private final Map<JMethod, ScopedMethodInfo> scopedFactoryMethods = new LinkedHashMap<>();
 
 	/**
 	 * By default the candidate is marked for removal unless something prevents it from being removed.
@@ -65,7 +65,7 @@ public final class Candidate {
 		this.fieldParametrisationImpl = fieldParametrisationImpl;
 		this.valueObjectDisabled = addObjectFactoryForClass(candidateClass);
 		this.fieldTargetNamespace = getTargetNamespace(candidateClassInfo, xmlSchemaModelClass);
-		collectScopedElementInfos(xmlElementDeclModelClass);
+		collectScopedFactoryMethods(xmlElementDeclModelClass);
 	}
 
 	private String getTargetNamespace(CClassInfo candidateClassInfo, JClass xmlSchemaModelClass) {
@@ -90,7 +90,7 @@ public final class Candidate {
 		return null;
 	}
 
-	private void collectScopedElementInfos(JClass xmlElementDeclModelClass) {
+	private void collectScopedFactoryMethods(JClass xmlElementDeclModelClass) {
 		String dotClazz = candidateClass.fullName() + ".class";
 
 		// Only value Object Factory methods are inspected:
@@ -102,8 +102,8 @@ public final class Candidate {
 				continue;
 			}
 
-			scopedElementInfos.put(method.name(),
-			            new ScopedElementInfo(getAnnotationMemberValue(xmlElementDeclAnnotation, "name"),
+			scopedFactoryMethods.put(method,
+			            new ScopedMethodInfo(getAnnotationMemberValue(xmlElementDeclAnnotation, "name"),
 			                        getAnnotationMemberValue(xmlElementDeclAnnotation, "namespace"),
 			                        method.params().get(0).type()));
 		}
@@ -176,12 +176,12 @@ public final class Candidate {
 	}
 
 	/**
-	 * Return information about scoped elements, that have this candidate as a scope.
+	 * Return information about scoped methods that have this candidate as a scope.
 	 * 
 	 * @return object factory method name -to- element info map
 	 */
-	public Map<String, ScopedElementInfo> getScopedElementInfos() {
-		return scopedElementInfos;
+	public Map<JMethod, ScopedMethodInfo> getScopedFactoryMethods() {
+		return scopedFactoryMethods;
 	}
 
 	/**

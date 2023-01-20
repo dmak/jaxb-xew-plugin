@@ -139,6 +139,13 @@ public class XmlElementWrapperPluginTest {
 	}
 
 	@Test
+	public void testInnerScopedElement() throws Exception {
+		List<String> extraXewOptions = asList("-verbose", "-Xxew:instantiate early");
+		List<String> classesToCheck = asList("Catalogue");
+		runTest("inner-scoped-element", extraXewOptions, false, classesToCheck);
+	}
+
+	@Test
 	public void testInnerElementWithValueObjects() throws Exception {
 		List<String> classesToCheck = asList("Article", "Articles", "ArticlesCollections", "Filesystem", "Publisher",
 		            "Volume", "impl.ArticleImpl", "impl.ArticlesImpl", "impl.ArticlesCollectionsImpl",
