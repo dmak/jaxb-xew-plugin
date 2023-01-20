@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema
 	jaxb:version="3.0"
-    xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 >
@@ -29,7 +29,6 @@
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-
 
 	<xsd:complexType name="publisher">
 		<xsd:sequence>

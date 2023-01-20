@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="inner-scoped-element.xsd">
+	<stockage_collection>
+		<stockage>
+			<collection>
+				<term>solar panels</term>
+				<effect>system performance</effect>
+				<effect>energy efficiency</effect>
+				<term>microinverter</term>
+			</collection>
+		</stockage>
+		<stockage>
+			<collection>
+				<effect>shaded panel</effect>
+				<effect>maintenance costs</effect>
+			</collection>
+		</stockage>
+	</stockage_collection>
+</catalogue>
