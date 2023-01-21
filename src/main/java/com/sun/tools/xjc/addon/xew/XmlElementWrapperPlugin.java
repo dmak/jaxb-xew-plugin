@@ -34,6 +34,7 @@ import static com.sun.tools.xjc.addon.xew.CommonUtils.hasPropertyNameCustomizati
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isHiddenClass;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.isListedAsParametrisation;
 import static com.sun.tools.xjc.addon.xew.CommonUtils.setPrivateField;
+import static java.util.Collections.singletonList;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -153,7 +154,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 		// Write information on candidate classes to summary file.
 		writeSummary("Candidates:");
 
-		for (Candidate candidate : findCandidateClasses(outline, xmlElementDeclModelClass)) {
+		for (Candidate candidate : findCandidateClasses(outline, xmlElementsModelClass, xmlElementDeclModelClass)) {
 			if (globalConfiguration.isClassIncluded(candidate.getClassName())) {
 				if (globalConfiguration.isClassUnmarkedForRemoval(candidate.getClassName())) {
 					candidate.unmarkForRemoval();
@@ -496,34 +497,37 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	 */
 	private boolean moveInnerClassToParent(Outline outline, Candidate candidate) {
 		// Skip basic parametrisations like "List<String>":
-		if (candidate.getFieldParametrisationClass() == null) {
+		if (candidate.getParametrisationInfos().isEmpty()) {
 			return false;
 		}
 
-		JDefinedClass fieldParametrisationImpl = candidate.getFieldParametrisationImpl();
+		boolean wasAnyClassMoved = false;
 
-		if (candidate.getClazz() != fieldParametrisationImpl.parentContainer()) {
-			// Field parametrisation class is not inner class of the candidate:
-			return false;
+		for (ParametrisationInfo parametrisationInfo : candidate.getParametrisationInfos()) {
+			if (candidate.getClazz() != parametrisationInfo.parametrisationImpl.parentContainer()) {
+				// Field parametrisation class is not inner class of the candidate, hence skipped:
+				continue;
+			}
+
+			wasAnyClassMoved = true;
+
+			String oldMethodName = parametrisationInfo.parametrisationClass.outer().name()
+			            + parametrisationInfo.parametrisationClass.name();
+
+			moveClassLevelUp(outline, parametrisationInfo.parametrisationImpl);
+
+			renameFactoryMethod(parametrisationInfo.parametrisationImpl._package()._getClass(FACTORY_CLASS_NAME),
+			            oldMethodName, parametrisationInfo.parametrisationClass.name());
+
+			if (candidate.isValueObjectDisabled()) {
+				moveClassLevelUp(outline, parametrisationInfo.parametrisationClass);
+
+				renameFactoryMethod(parametrisationInfo.parametrisationClass._package()._getClass(FACTORY_CLASS_NAME),
+				            oldMethodName, parametrisationInfo.parametrisationClass.name());
+			}
 		}
 
-		JDefinedClass fieldParametrisationClass = candidate.getFieldParametrisationClass();
-
-		String oldMethodName = fieldParametrisationClass.outer().name() + fieldParametrisationClass.name();
-
-		moveClassLevelUp(outline, fieldParametrisationImpl);
-
-		renameFactoryMethod(fieldParametrisationImpl._package()._getClass(FACTORY_CLASS_NAME), oldMethodName,
-		            fieldParametrisationClass.name());
-
-		if (candidate.isValueObjectDisabled()) {
-			moveClassLevelUp(outline, fieldParametrisationClass);
-
-			renameFactoryMethod(fieldParametrisationClass._package()._getClass(FACTORY_CLASS_NAME), oldMethodName,
-			            fieldParametrisationClass.name());
-		}
-
-		return true;
+		return wasAnyClassMoved;
 	}
 
 	/**
@@ -609,14 +613,18 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	/**
 	 * Locate the candidates classes for substitution/removal.
 	 * 
-	 * @return a map className -> Candidate
+	 * @return list of potential candidates
 	 */
-	private Collection<Candidate> findCandidateClasses(Outline outline, JClass xmlElementDeclModelClass) {
+	private Collection<Candidate> findCandidateClasses(Outline outline, JClass xmlElementsModelClass,
+	            JClass xmlElementDeclModelClass) {
+		Map<String, JDefinedClass> classes = new HashMap<>();
 		Map<String, ClassOutline> interfaceImplementations = new HashMap<>();
 
 		// Visit all classes to create a map "interfaceName -> ClassOutline".
 		// This map is later used to resolve implementations from interfaces.
 		for (ClassOutline classOutline : outline.getClasses()) {
+			classes.put(classOutline.implClass.fullName() + ".class", classOutline.implClass);
+
 			for (Iterator<JClass> iter = classOutline.implClass._implements(); iter.hasNext();) {
 				JClass interfaceClass = iter.next();
 
@@ -676,30 +684,55 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 			// FIXME: All known collections have exactly one parametrisation type.
 			assert fieldParametrisations.size() == 1;
 
-			JDefinedClass fieldParametrisationClass = null;
-			JDefinedClass fieldParametrisationImpl = null;
+			List<ParametrisationInfo> parametrisationInfos = new ArrayList<>();
 
-			// Parametrisations like "List<String>" or "List<Serialazable>" are not considered.
-			// They are substituted as is and do not require moving of classes.
 			if (fieldParametrisations.get(0) instanceof JDefinedClass) {
-				fieldParametrisationClass = (JDefinedClass) fieldParametrisations.get(0);
+				parametrisationInfos = singletonList(
+				            new ParametrisationInfo((JDefinedClass) fieldParametrisations.get(0)));
+			}
+			else {
+				parametrisationInfos = new ArrayList<>();
 
+				// Parametrisations like "List<String>" or "List<Serialazable>" require types in @XmlElements to be considered.
+				JAnnotationUse annotation = getAnnotation(field, xmlElementsModelClass);
+
+				if (annotation != null) {
+					JAnnotationArrayMember annotationArrayMember = (JAnnotationArrayMember) getAnnotationMember(
+					            annotation, "value");
+
+					if (annotationArrayMember != null) {
+						for (JAnnotationUse subAnnotation : annotationArrayMember.annotations()) {
+							String typeClassName = getAnnotationMemberValue(subAnnotation, "type");
+							if (typeClassName != null) {
+								JDefinedClass typeClass = classes.get(typeClassName);
+
+								if (typeClass != null) {
+									parametrisationInfos.add(new ParametrisationInfo(typeClass));
+								}
+							}
+						}
+					}
+				}
+			}
+
+			for (ParametrisationInfo parametrisationInfo : parametrisationInfos) {
 				ClassOutline fieldParametrisationClassOutline = interfaceImplementations
-				            .get(fieldParametrisationClass.fullName());
+				            .get(parametrisationInfo.parametrisationClass.fullName());
 
 				if (fieldParametrisationClassOutline != null) {
-					assert fieldParametrisationClassOutline.ref == fieldParametrisationClass;
+					assert fieldParametrisationClassOutline.ref == parametrisationInfo.parametrisationClass;
 
-					fieldParametrisationImpl = fieldParametrisationClassOutline.implClass;
+					parametrisationInfo.parametrisationImpl = fieldParametrisationClassOutline.implClass;
 				}
 				else {
-					fieldParametrisationImpl = fieldParametrisationClass;
+					// Set to the same class for simplicity:
+					parametrisationInfo.parametrisationImpl = parametrisationInfo.parametrisationClass;
 				}
 			}
 
 			// We have a candidate class:
-			Candidate candidate = new Candidate(candidateClass, classOutline.target, field, fieldParametrisationClass,
-			            fieldParametrisationImpl, xmlElementDeclModelClass, xmlSchemaModelClass);
+			Candidate candidate = new Candidate(candidateClass, classOutline.target, field, parametrisationInfos,
+			            xmlElementDeclModelClass, xmlSchemaModelClass);
 			candidates.add(candidate);
 
 			logger.debug("Found " + candidate);
@@ -758,7 +791,8 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 	/**
 	 * Rename methods in factory class: {@code createABC() -> createAC()}.
 	 */
-	private void renameFactoryMethod(JDefinedClass factoryClass, String oldMethodNameSuffix, String newMethodNameSuffix) {
+	private void renameFactoryMethod(JDefinedClass factoryClass, String oldMethodNameSuffix,
+	            String newMethodNameSuffix) {
 		for (JMethod method : factoryClass.methods()) {
 			String methodName = method.name();
 
@@ -834,6 +868,7 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 		// Modify the container so it now refers the class. Container can be a class or package.
 		JDefinedClass parent = (JDefinedClass) clazz.parentContainer();
 		JClassContainer grandParent = parent.parentContainer();
+		// Allows to track class name collisions:
 		Map<String, JDefinedClass> classes;
 
 		// FIXME: Pending https://java.net/jira/browse/JAXB-957

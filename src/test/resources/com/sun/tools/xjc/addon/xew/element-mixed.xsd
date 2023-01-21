@@ -25,11 +25,9 @@
 			<xsd:element name="b" type="foo:b" />
 		</xsd:sequence>
 	</xsd:complexType>
-
-	<!--
-		Example of element with no fields.
-	-->
-	<xsd:complexType name="br" />
+	<xsd:complexType name="br">
+		<xsd:attribute name="mode" type="xsd:string" />
+	</xsd:complexType>
 
 	<xsd:simpleType name="text">
 		<xsd:restriction base="xsd:string" />
@@ -40,13 +38,18 @@
 	</xsd:simpleType>
 
 	<!--
-		Example of "List<Object>" field + @XmlElements annotation.
+		Example of "List<Object>" field + @XmlElements annotation + inner element.
 	-->
 	<xsd:complexType name="formatted-text">
 		<xsd:choice maxOccurs="unbounded">
 			<xsd:element name="i" type="foo:i" />
 			<xsd:element name="b" type="foo:b" />
-			<xsd:element name="br" type="foo:br" />
+			<!--
+				Example of element with no fields. Note that when moved one level up, it will collide with another element.
+			-->
+			<xsd:element name="br">
+				<xsd:complexType />
+			</xsd:element>
 		</xsd:choice>
 	</xsd:complexType>
 

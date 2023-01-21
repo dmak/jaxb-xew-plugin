@@ -212,7 +212,7 @@ public class XmlElementWrapperPluginTest {
 	public void testElementMixed() throws Exception {
 		// Most classes cannot be tested for content
 		List<String> extraXewOptions = singletonList("-debug");
-		List<String> classesToCheck = asList("B", "Br", "I", "AnyText", "package-info");
+		List<String> classesToCheck = asList("B", "Br", "FormattedTextBr", "I", "AnyText", "package-info");
 		runTest("element-mixed", extraXewOptions, false, classesToCheck);
 	}
 
