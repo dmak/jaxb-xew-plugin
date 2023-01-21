@@ -25,44 +25,41 @@ import com.sun.xml.xsom.XSDeclaration;
  * of objects.
  */
 public final class Candidate {
-	private final JDefinedClass					 candidateClass;
+	private final JDefinedClass					  candidateClass;
 
-	private final JFieldVar						 field;
+	private final JFieldVar						  field;
 
-	private final CPropertyInfo					 fieldPropertyInfo;
+	private final CPropertyInfo					  fieldPropertyInfo;
 
-	private final String						 fieldTargetNamespace;
+	private final String						  fieldTargetNamespace;
 
-	private final JDefinedClass					 fieldParametrisationClass;
-
-	private final JDefinedClass					 fieldParametrisationImpl;
+	private final Collection<ParametrisationInfo> parametrisationInfos;
 
 	// Order matters (value Object Factory is first):
-	private final Map<String, JDefinedClass>	 objectFactoryClasses = new LinkedHashMap<>();
+	private final Map<String, JDefinedClass>	  objectFactoryClasses = new LinkedHashMap<>();
 
-	private final boolean						 valueObjectDisabled;
+	private final boolean						  valueObjectDisabled;
 
 	// Order matters as it affects the order of generated methods in Object Factory:
-	private final Map<JMethod, ScopedMethodInfo> scopedFactoryMethods = new LinkedHashMap<>();
+	private final Map<JMethod, ScopedMethodInfo>  scopedFactoryMethods = new LinkedHashMap<>();
 
 	/**
 	 * By default the candidate is marked for removal unless something prevents it from being removed.
 	 */
-	private boolean								 markedForRemoval	  = true;
+	private boolean								  markedForRemoval	   = true;
 
 	/**
 	 * Number of times this candidate has been substituted in the model.
 	 */
-	private int									 substitutionsCount;
+	private int									  substitutionsCount;
 
 	Candidate(JDefinedClass candidateClass, CClassInfo candidateClassInfo, JFieldVar field,
-	            JDefinedClass fieldParametrizationClass, JDefinedClass fieldParametrisationImpl,
-	            JClass xmlElementDeclModelClass, JClass xmlSchemaModelClass) {
+	            Collection<ParametrisationInfo> parametrisationInfos, JClass xmlElementDeclModelClass,
+	            JClass xmlSchemaModelClass) {
 		this.candidateClass = candidateClass;
 		this.field = field;
 		this.fieldPropertyInfo = candidateClassInfo.getProperty(field.name());
-		this.fieldParametrisationClass = fieldParametrizationClass;
-		this.fieldParametrisationImpl = fieldParametrisationImpl;
+		this.parametrisationInfos = parametrisationInfos;
 		this.valueObjectDisabled = addObjectFactoryForClass(candidateClass);
 		this.fieldTargetNamespace = getTargetNamespace(candidateClassInfo, xmlSchemaModelClass);
 		collectScopedFactoryMethods(xmlElementDeclModelClass);
@@ -138,7 +135,7 @@ public final class Candidate {
 	}
 
 	/**
-	 * The class of the only field in container class (collection interface or concrete implementation).
+	 * The class of the only field in container class (collection interface or particular implementation).
 	 */
 	public JClass getFieldClass() {
 		return (JClass) field.type();
@@ -159,20 +156,11 @@ public final class Candidate {
 	}
 
 	/**
-	 * The only parametrisation class of the field (collection type). In case of basic parametrisation like
-	 * {@code List<String>} this property is {@code null}.
+	 * The list of parametrisation classes of the field (collection types). In case of basic parametrisation like
+	 * {@code List<String>} this collection is empty.
 	 */
-	public JDefinedClass getFieldParametrisationClass() {
-		return fieldParametrisationClass;
-	}
-
-	/**
-	 * If {@link #getFieldParametrisationClass()} is an interface, then this holds the same value. Otherwise it holds
-	 * the implementation (value object) of {@link #getFieldParametrisationClass()}. In case of basic parametrisation
-	 * like {@code List<String>} this property is {@code null}.
-	 */
-	public JDefinedClass getFieldParametrisationImpl() {
-		return fieldParametrisationImpl;
+	public Collection<ParametrisationInfo> getParametrisationInfos() {
+		return parametrisationInfos;
 	}
 
 	/**

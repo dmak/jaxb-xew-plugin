@@ -71,6 +71,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link FormattedTextBr }
+     * 
+     */
+    public FormattedTextBr createFormattedTextBr() {
+        return new FormattedTextBr();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link B }{@code >}
      * 
      * @param value

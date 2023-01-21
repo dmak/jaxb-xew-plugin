@@ -51,7 +51,7 @@ public class AnyText {
     @XmlElements({
         @XmlElement(name = "i", type = I.class, namespace = "http://foo.org/"),
         @XmlElement(name = "b", type = B.class, namespace = "http://foo.org/"),
-        @XmlElement(name = "br", type = Br.class, namespace = "http://foo.org/")
+        @XmlElement(name = "br", type = FormattedTextBr.class, namespace = "http://foo.org/")
     })
     protected List<Object> formattedText = new ArrayList<Object>();
     @XmlElementWrapper(name = "fixed-text", required = true)

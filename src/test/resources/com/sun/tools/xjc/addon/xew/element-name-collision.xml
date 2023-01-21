@@ -8,11 +8,11 @@
 	<action>
 		<add>
 			<item>
-				<key>Mutant</key>
-				<value>SpiderMan</value>
+				<key>rebellion</key>
+				<value>Han Solo</value>
 			</item>
 			<item>
-				<key>Jedi</key>
+				<key>jedi</key>
 				<value>Luke Skywalker</value>
 			</item>
 			<item xsi:nil="true" />
