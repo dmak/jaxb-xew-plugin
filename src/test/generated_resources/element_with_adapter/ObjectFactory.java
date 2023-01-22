@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Calendar }
      * 
+     * @return
+     *     the new instance of {@link Calendar }
      */
     public Calendar createCalendar() {
         return new Calendar();

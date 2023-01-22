@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link RootElement }
      * 
+     * @return
+     *     the new instance of {@link RootElement }
      */
     public RootElement createRootElement() {
         return new RootElement();

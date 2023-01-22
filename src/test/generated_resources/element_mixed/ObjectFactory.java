@@ -41,6 +41,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link AnyText }
      * 
+     * @return
+     *     the new instance of {@link AnyText }
      */
     public AnyText createAnyText() {
         return new AnyText();
@@ -49,6 +51,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link B }
      * 
+     * @return
+     *     the new instance of {@link B }
      */
     public B createB() {
         return new B();
@@ -57,6 +61,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link I }
      * 
+     * @return
+     *     the new instance of {@link I }
      */
     public I createI() {
         return new I();
@@ -65,6 +71,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Br }
      * 
+     * @return
+     *     the new instance of {@link Br }
      */
     public Br createBr() {
         return new Br();
@@ -73,6 +81,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link FormattedTextBr }
      * 
+     * @return
+     *     the new instance of {@link FormattedTextBr }
      */
     public FormattedTextBr createFormattedTextBr() {
         return new FormattedTextBr();
@@ -88,7 +98,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://foo.org/", name = "b", scope = I.class)
     public JAXBElement<B> createIB(B value) {
-        return new JAXBElement<B>(_IB_QNAME, B.class, I.class, value);
+        return new JAXBElement<>(_IB_QNAME, B.class, I.class, value);
     }
 
     /**
@@ -101,27 +111,27 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://foo.org/", name = "i", scope = B.class)
     public JAXBElement<I> createBI(I value) {
-        return new JAXBElement<I>(_BI_QNAME, I.class, B.class, value);
+        return new JAXBElement<>(_BI_QNAME, I.class, B.class, value);
     }
 
     @XmlElementDecl(namespace = "http://foo.org/", name = "title", scope = AnyText.class)
     public JAXBElement<String> createAnyTextTitle(String value) {
-        return new JAXBElement<String>(new QName("http://foo.org/", "title"), String.class, AnyText.class, value);
+        return new JAXBElement<>(new QName("http://foo.org/", "title"), String.class, AnyText.class, value);
     }
 
     @XmlElementDecl(namespace = "http://foo.org/", name = "year", scope = AnyText.class)
     public JAXBElement<Integer> createAnyTextYear(Integer value) {
-        return new JAXBElement<Integer>(new QName("http://foo.org/", "year"), Integer.class, AnyText.class, value);
+        return new JAXBElement<>(new QName("http://foo.org/", "year"), Integer.class, AnyText.class, value);
     }
 
     @XmlElementDecl(namespace = "http://foo.org/", name = "prefix", scope = AnyText.class)
     public JAXBElement<String> createAnyTextPrefix(String value) {
-        return new JAXBElement<String>(new QName("http://foo.org/", "prefix"), String.class, AnyText.class, value);
+        return new JAXBElement<>(new QName("http://foo.org/", "prefix"), String.class, AnyText.class, value);
     }
 
     @XmlElementDecl(namespace = "http://foo.org/", name = "suffix", scope = AnyText.class)
     public JAXBElement<String> createAnyTextSuffix(String value) {
-        return new JAXBElement<String>(new QName("http://foo.org/", "suffix"), String.class, AnyText.class, value);
+        return new JAXBElement<>(new QName("http://foo.org/", "suffix"), String.class, AnyText.class, value);
     }
 
 }

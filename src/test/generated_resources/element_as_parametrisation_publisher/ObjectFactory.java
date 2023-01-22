@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Article }
      * 
+     * @return
+     *     the new instance of {@link Article }
      */
     public Article createArticle() {
         return new Article();
@@ -40,6 +42,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Articles }
      * 
+     * @return
+     *     the new instance of {@link Articles }
      */
     public Articles createArticles() {
         return new Articles();
@@ -48,6 +52,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link ArticlesCollections }
      * 
+     * @return
+     *     the new instance of {@link ArticlesCollections }
      */
     public ArticlesCollections createArticlesCollections() {
         return new ArticlesCollections();
@@ -56,6 +62,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Publisher }
      * 
+     * @return
+     *     the new instance of {@link Publisher }
      */
     public Publisher createPublisher() {
         return new Publisher();

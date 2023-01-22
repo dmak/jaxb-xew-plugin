@@ -17,19 +17,19 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType name="class"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="extends" type="{}types"/&gt;
- *         &lt;element name="implements" type="{}types"/&gt;
- *         &lt;element name="methods" type="{}methods"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="class">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="extends" type="{}types"/>
+ *         <element name="implements" type="{}types"/>
+ *         <element name="methods" type="{}methods"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -46,16 +46,16 @@ public class Class {
         @XmlElement(name = "type", type = String.class),
         @XmlElement(name = "primitive", type = Byte.class)
     })
-    protected List<Serializable> _extends = new ArrayList<Serializable>();
+    protected List<Serializable> _extends = new ArrayList<>();
     @XmlElementWrapper(name = "implements", required = true)
     @XmlElements({
         @XmlElement(name = "type", type = String.class),
         @XmlElement(name = "primitive", type = Byte.class)
     })
-    protected List<Serializable> _implements = new ArrayList<Serializable>();
+    protected List<Serializable> _implements = new ArrayList<>();
     @XmlElementWrapper(required = true)
     @XmlElement(name = "method")
-    protected List<Method> methods = new ArrayList<Method>();
+    protected List<Method> methods = new ArrayList<>();
 
     public List<Serializable> getExtends() {
         return _extends;

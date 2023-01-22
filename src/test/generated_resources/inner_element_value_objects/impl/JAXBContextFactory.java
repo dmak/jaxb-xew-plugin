@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -63,14 +63,14 @@ public class JAXBContextFactory {
     /**
      * The JAXB API will invoke this method via reflection
      */
-    public static JAXBContext createContext( Class[] classes, Map properties ) throws JAXBException {
-        Class[] r = new Class[classes.length];
+    public static JAXBContext createContext( Class<?>[] classes, Map<String, ?> properties ) throws JAXBException {
+        Class<?>[] r = new Class<?>[classes.length];
         boolean modified = false;
 
         // find any reference to our 'public' ObjectFactory and
         // replace that to our 'private' ObjectFactory.
         for( int i=0; i<r.length; i++ ) {
-            Class c = classes[i];
+            Class<?> c = classes[i];
             String name = c.getName();
             if(name.endsWith(DOT_OBJECT_FACTORY)
             && !name.endsWith(IMPL_DOT_OBJECT_FACTORY)) {
@@ -117,9 +117,9 @@ public class JAXBContextFactory {
      * The JAXB API will invoke this method via reflection
      */
     public static JAXBContext createContext( String contextPath,
-                                             ClassLoader classLoader, Map properties ) throws JAXBException {
+                                             ClassLoader classLoader, Map<String, ?> properties ) throws JAXBException {
 
-        List<Class> classes = new ArrayList<Class>();
+        List<Class<?>> classes = new ArrayList<>();
         StringTokenizer tokens = new StringTokenizer(contextPath,":");
 
         // each package should be pointing to a JAXB RI generated
@@ -136,16 +136,17 @@ public class JAXBContextFactory {
         }
 
         // delegate to the JAXB provider in the system
-        return JAXBContext.newInstance(classes.toArray(new Class[classes.size()]),properties);
+        return JAXBContext.newInstance(classes.toArray(new Class<?>[0]),properties);
     }
     
-    private static ClassLoader getClassClassLoader(final Class c) {
+    private static ClassLoader getClassClassLoader(final Class<?> c) {
         if (System.getSecurityManager() == null) {
             return c.getClassLoader();
         } else {
-            return (ClassLoader) java.security.AccessController.doPrivileged(
-                    new java.security.PrivilegedAction() {
-                        public java.lang.Object run() {
+            return java.security.AccessController.doPrivileged(
+                    new java.security.PrivilegedAction<>() {
+                        @Override
+                        public ClassLoader run() {
                             return c.getClassLoader();
                         }
                     });

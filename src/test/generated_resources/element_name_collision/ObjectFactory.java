@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Root }
      * 
+     * @return
+     *     the new instance of {@link Root }
      */
     public Root createRoot() {
         return new Root();
@@ -40,6 +42,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Root.Action }
      * 
+     * @return
+     *     the new instance of {@link Root.Action }
      */
     public Root.Action createRootAction() {
         return new Root.Action();
@@ -48,6 +52,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Root.Action.AddItem }
      * 
+     * @return
+     *     the new instance of {@link Root.Action.AddItem }
      */
     public Root.Action.AddItem createRootActionAddItem() {
         return new Root.Action.AddItem();
@@ -56,6 +62,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Root.Action.Item }
      * 
+     * @return
+     *     the new instance of {@link Root.Action.Item }
      */
     public Root.Action.Item createRootActionItem() {
         return new Root.Action.Item();

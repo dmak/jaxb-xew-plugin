@@ -16,18 +16,18 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="accept" type="{}List"/&gt;
- *         &lt;element name="return" type="{}Map"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType>
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="accept" type="{}List"/>
+ *         <element name="return" type="{}Map"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -41,10 +41,10 @@ public class Conversion {
 
     @XmlElementWrapper(name = "accept", required = true)
     @XmlElement(name = "elements", nillable = true)
-    protected List<Object> accepts = new ArrayList<Object>();
+    protected List<Object> accepts = new ArrayList<>();
     @XmlElementWrapper(name = "return", required = true)
     @XmlElement(name = "entry", nillable = true)
-    protected List<Entry> returns = new ArrayList<Entry>();
+    protected List<Entry> returns = new ArrayList<>();
 
     public List<Object> getAccepts() {
         return accepts;

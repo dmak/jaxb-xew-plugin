@@ -16,70 +16,70 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="action"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice&gt;
- *                   &lt;element name="update"&gt;
- *                     &lt;complexType&gt;
- *                       &lt;complexContent&gt;
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                           &lt;sequence&gt;
- *                             &lt;element name="item" maxOccurs="unbounded" minOccurs="0"&gt;
- *                               &lt;complexType&gt;
- *                                 &lt;complexContent&gt;
- *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                                     &lt;all&gt;
- *                                       &lt;element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *                                       &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *                                     &lt;/all&gt;
- *                                   &lt;/restriction&gt;
- *                                 &lt;/complexContent&gt;
- *                               &lt;/complexType&gt;
- *                             &lt;/element&gt;
- *                           &lt;/sequence&gt;
- *                         &lt;/restriction&gt;
- *                       &lt;/complexContent&gt;
- *                     &lt;/complexType&gt;
- *                   &lt;/element&gt;
- *                   &lt;element name="add"&gt;
- *                     &lt;complexType&gt;
- *                       &lt;complexContent&gt;
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                           &lt;sequence&gt;
- *                             &lt;element name="item" maxOccurs="unbounded" minOccurs="0"&gt;
- *                               &lt;complexType&gt;
- *                                 &lt;complexContent&gt;
- *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                                     &lt;all&gt;
- *                                       &lt;element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *                                       &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *                                     &lt;/all&gt;
- *                                   &lt;/restriction&gt;
- *                                 &lt;/complexContent&gt;
- *                               &lt;/complexType&gt;
- *                             &lt;/element&gt;
- *                           &lt;/sequence&gt;
- *                         &lt;/restriction&gt;
- *                       &lt;/complexContent&gt;
- *                     &lt;/complexType&gt;
- *                   &lt;/element&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType>
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="action">
+ *           <complexType>
+ *             <complexContent>
+ *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 <choice>
+ *                   <element name="update">
+ *                     <complexType>
+ *                       <complexContent>
+ *                         <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           <sequence>
+ *                             <element name="item" maxOccurs="unbounded" minOccurs="0">
+ *                               <complexType>
+ *                                 <complexContent>
+ *                                   <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                     <all>
+ *                                       <element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                                       <element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                                     </all>
+ *                                   </restriction>
+ *                                 </complexContent>
+ *                               </complexType>
+ *                             </element>
+ *                           </sequence>
+ *                         </restriction>
+ *                       </complexContent>
+ *                     </complexType>
+ *                   </element>
+ *                   <element name="add">
+ *                     <complexType>
+ *                       <complexContent>
+ *                         <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           <sequence>
+ *                             <element name="item" maxOccurs="unbounded" minOccurs="0">
+ *                               <complexType>
+ *                                 <complexContent>
+ *                                   <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                     <all>
+ *                                       <element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                                       <element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *                                     </all>
+ *                                   </restriction>
+ *                                 </complexContent>
+ *                               </complexType>
+ *                             </element>
+ *                           </sequence>
+ *                         </restriction>
+ *                       </complexContent>
+ *                     </complexType>
+ *                   </element>
+ *                 </choice>
+ *               </restriction>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -123,60 +123,60 @@ public class Root {
      * 
      * <p>The following schema fragment specifies the expected content contained within this class.
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="update"&gt;
-     *           &lt;complexType&gt;
-     *             &lt;complexContent&gt;
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *                 &lt;sequence&gt;
-     *                   &lt;element name="item" maxOccurs="unbounded" minOccurs="0"&gt;
-     *                     &lt;complexType&gt;
-     *                       &lt;complexContent&gt;
-     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *                           &lt;all&gt;
-     *                             &lt;element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-     *                             &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-     *                           &lt;/all&gt;
-     *                         &lt;/restriction&gt;
-     *                       &lt;/complexContent&gt;
-     *                     &lt;/complexType&gt;
-     *                   &lt;/element&gt;
-     *                 &lt;/sequence&gt;
-     *               &lt;/restriction&gt;
-     *             &lt;/complexContent&gt;
-     *           &lt;/complexType&gt;
-     *         &lt;/element&gt;
-     *         &lt;element name="add"&gt;
-     *           &lt;complexType&gt;
-     *             &lt;complexContent&gt;
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *                 &lt;sequence&gt;
-     *                   &lt;element name="item" maxOccurs="unbounded" minOccurs="0"&gt;
-     *                     &lt;complexType&gt;
-     *                       &lt;complexContent&gt;
-     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *                           &lt;all&gt;
-     *                             &lt;element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-     *                             &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-     *                           &lt;/all&gt;
-     *                         &lt;/restriction&gt;
-     *                       &lt;/complexContent&gt;
-     *                     &lt;/complexType&gt;
-     *                   &lt;/element&gt;
-     *                 &lt;/sequence&gt;
-     *               &lt;/restriction&gt;
-     *             &lt;/complexContent&gt;
-     *           &lt;/complexType&gt;
-     *         &lt;/element&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       <choice>
+     *         <element name="update">
+     *           <complexType>
+     *             <complexContent>
+     *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 <sequence>
+     *                   <element name="item" maxOccurs="unbounded" minOccurs="0">
+     *                     <complexType>
+     *                       <complexContent>
+     *                         <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                           <all>
+     *                             <element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *                             <element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *                           </all>
+     *                         </restriction>
+     *                       </complexContent>
+     *                     </complexType>
+     *                   </element>
+     *                 </sequence>
+     *               </restriction>
+     *             </complexContent>
+     *           </complexType>
+     *         </element>
+     *         <element name="add">
+     *           <complexType>
+     *             <complexContent>
+     *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 <sequence>
+     *                   <element name="item" maxOccurs="unbounded" minOccurs="0">
+     *                     <complexType>
+     *                       <complexContent>
+     *                         <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                           <all>
+     *                             <element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *                             <element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     *                           </all>
+     *                         </restriction>
+     *                       </complexContent>
+     *                     </complexType>
+     *                   </element>
+     *                 </sequence>
+     *               </restriction>
+     *             </complexContent>
+     *           </complexType>
+     *         </element>
+     *       </choice>
+     *     </restriction>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */
@@ -196,7 +196,7 @@ public class Root {
 
         public List<Root.Action.Item> getUpdate() {
             if (update == null) {
-                update = new ArrayList<Root.Action.Item>();
+                update = new ArrayList<>();
             }
             return update;
         }
@@ -207,7 +207,7 @@ public class Root {
 
         public List<Root.Action.AddItem> getAdd() {
             if (add == null) {
-                add = new ArrayList<Root.Action.AddItem>();
+                add = new ArrayList<>();
             }
             return add;
         }
@@ -222,18 +222,18 @@ public class Root {
          * 
          * <p>The following schema fragment specifies the expected content contained within this class.
          * 
-         * <pre>
-         * &lt;complexType&gt;
-         *   &lt;complexContent&gt;
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-         *       &lt;all&gt;
-         *         &lt;element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-         *         &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-         *       &lt;/all&gt;
-         *     &lt;/restriction&gt;
-         *   &lt;/complexContent&gt;
-         * &lt;/complexType&gt;
-         * </pre>
+         * <pre>{@code
+         * <complexType>
+         *   <complexContent>
+         *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       <all>
+         *         <element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/>
+         *         <element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+         *       </all>
+         *     </restriction>
+         *   </complexContent>
+         * </complexType>
+         * }</pre>
          * 
          * 
          */
@@ -304,18 +304,18 @@ public class Root {
          * 
          * <p>The following schema fragment specifies the expected content contained within this class.
          * 
-         * <pre>
-         * &lt;complexType&gt;
-         *   &lt;complexContent&gt;
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-         *       &lt;all&gt;
-         *         &lt;element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-         *         &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
-         *       &lt;/all&gt;
-         *     &lt;/restriction&gt;
-         *   &lt;/complexContent&gt;
-         * &lt;/complexType&gt;
-         * </pre>
+         * <pre>{@code
+         * <complexType>
+         *   <complexContent>
+         *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       <all>
+         *         <element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/>
+         *         <element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+         *       </all>
+         *     </restriction>
+         *   </complexContent>
+         * </complexType>
+         * }</pre>
          * 
          * 
          */

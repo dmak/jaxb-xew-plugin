@@ -14,17 +14,17 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType name="articles-collections"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="articles" type="{}articles" maxOccurs="unbounded"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="articles-collections">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="articles" type="{}articles" maxOccurs="unbounded"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -35,7 +35,7 @@ import jakarta.xml.bind.annotation.XmlType;
 public class ArticlesCollections {
 
     @XmlElement(required = true)
-    protected List<Articles> articles = new Vector<Articles>();
+    protected List<Articles> articles = new Vector<>();
 
     /**
      * Gets the value of the articles property.
@@ -44,7 +44,7 @@ public class ArticlesCollections {
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the Jakarta XML Binding object.
-     * This is why there is not a <CODE>set</CODE> method for the articles property.
+     * This is why there is not a {@code set} method for the articles property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
@@ -58,10 +58,12 @@ public class ArticlesCollections {
      * {@link Articles }
      * 
      * 
+     * @return
+     *     The value of the articles property.
      */
     public List<Articles> getArticles() {
         if (articles == null) {
-            articles = new Vector<Articles>();
+            articles = new Vector<>();
         }
         return this.articles;
     }

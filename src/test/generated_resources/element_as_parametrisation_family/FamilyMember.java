@@ -14,28 +14,28 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType name="family-member"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="id" maxOccurs="unbounded"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;sequence&gt;
- *                   &lt;element name="number" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
- *                   &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
- *                 &lt;/sequence&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="family-member">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="id" maxOccurs="unbounded">
+ *           <complexType>
+ *             <complexContent>
+ *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 <sequence>
+ *                   <element name="number" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                   <element name="type" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                 </sequence>
+ *               </restriction>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -55,7 +55,7 @@ public class FamilyMember {
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the Jakarta XML Binding object.
-     * This is why there is not a <CODE>set</CODE> method for the id property.
+     * This is why there is not a {@code set} method for the id property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
@@ -69,10 +69,12 @@ public class FamilyMember {
      * {@link FamilyMember.Id }
      * 
      * 
+     * @return
+     *     The value of the id property.
      */
     public List<FamilyMember.Id> getId() {
         if (id == null) {
-            id = new ArrayList<FamilyMember.Id>();
+            id = new ArrayList<>();
         }
         return this.id;
     }
@@ -83,18 +85,18 @@ public class FamilyMember {
      * 
      * <p>The following schema fragment specifies the expected content contained within this class.
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;sequence&gt;
-     *         &lt;element name="number" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
-     *         &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
-     *       &lt;/sequence&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       <sequence>
+     *         <element name="number" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *         <element name="type" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *       </sequence>
+     *     </restriction>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */

@@ -22,7 +22,7 @@ public class ArticlesImpl implements Articles
 
     public List<Article> getArticle() {
         if (article == null) {
-            article = new ArrayList<Article>();
+            article = new ArrayList<>();
         }
         return this.article;
     }

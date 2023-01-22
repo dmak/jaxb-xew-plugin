@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Message }
      * 
+     * @return
+     *     the new instance of {@link Message }
      */
     public Message createMessage() {
         return new Message();

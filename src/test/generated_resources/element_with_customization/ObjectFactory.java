@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link PostOffice }
      * 
+     * @return
+     *     the new instance of {@link PostOffice }
      */
     public PostOffice createPostOffice() {
         return new PostOffice();
@@ -40,6 +42,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Args }
      * 
+     * @return
+     *     the new instance of {@link Args }
      */
     public Args createArgs() {
         return new Args();

@@ -24,13 +24,13 @@ public class FilesystemImpl implements Filesystem
 
     @XmlElementWrapper(name = "file-listing", required = true)
     @XmlElement(name = "file-item", type = FilesystemImpl.FileItemImpl.class)
-    protected List<Filesystem.FileItem> fileListing = new ArrayList<Filesystem.FileItem>();
+    protected List<Filesystem.FileItem> fileListing = new ArrayList<>();
     @XmlElementWrapper(name = "directory-listing", required = true)
     @XmlElement(name = "directory-item", defaultValue = "SPAM")
-    protected List<String> directoryListing = new ArrayList<String>();
+    protected List<String> directoryListing = new ArrayList<>();
     @XmlElementWrapper(required = true)
     @XmlElement(name = "volume", type = VolumeImpl.class)
-    protected List<Volume> volumes = new ArrayList<Volume>();
+    protected List<Volume> volumes = new ArrayList<>();
 
     public List<Filesystem.FileItem> getFileListing() {
         return fileListing;

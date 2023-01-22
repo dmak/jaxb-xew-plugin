@@ -47,11 +47,11 @@
 	</licenses>
 
 	<properties>
-		<jaxb-api.version>3.0.1</jaxb-api.version>
-		<jaxb-core.version>3.0.1</jaxb-core.version>
+		<jaxb-api.version>4.0.0</jaxb-api.version>
+		<jaxb-core.version>4.0.1</jaxb-core.version>
 
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

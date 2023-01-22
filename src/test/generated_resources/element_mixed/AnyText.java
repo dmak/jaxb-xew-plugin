@@ -22,19 +22,19 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="formatted-text" type="{http://foo.org/}formatted-text"/&gt;
- *         &lt;element name="fixed-text" type="{http://foo.org/}fixed-text"/&gt;
- *         &lt;element name="prefixed-text" type="{http://foo.org/}prefixed-text"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType>
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="formatted-text" type="{http://foo.org/}formatted-text"/>
+ *         <element name="fixed-text" type="{http://foo.org/}fixed-text"/>
+ *         <element name="prefixed-text" type="{http://foo.org/}prefixed-text"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -53,21 +53,21 @@ public class AnyText {
         @XmlElement(name = "b", type = B.class, namespace = "http://foo.org/"),
         @XmlElement(name = "br", type = FormattedTextBr.class, namespace = "http://foo.org/")
     })
-    protected List<Object> formattedText = new ArrayList<Object>();
+    protected List<Object> formattedText = new ArrayList<>();
     @XmlElementWrapper(name = "fixed-text", required = true)
     @XmlMixed
     @XmlElementRefs({
         @XmlElementRef(name = "title", namespace = "http://foo.org/", type = JAXBElement.class, required = false),
         @XmlElementRef(name = "year", namespace = "http://foo.org/", type = JAXBElement.class, required = false)
     })
-    protected List<Serializable> fixedText = new ArrayList<Serializable>();
+    protected List<Serializable> fixedText = new ArrayList<>();
     @XmlElementWrapper(name = "prefixed-text", required = true)
     @XmlElementRefs({
         @XmlElementRef(name = "prefix", namespace = "http://foo.org/", type = JAXBElement.class, required = false),
         @XmlElementRef(name = "title", namespace = "http://foo.org/", type = JAXBElement.class, required = false),
         @XmlElementRef(name = "suffix", namespace = "http://foo.org/", type = JAXBElement.class, required = false)
     })
-    protected List<JAXBElement<String>> prefixedText = new ArrayList<JAXBElement<String>>();
+    protected List<JAXBElement<String>> prefixedText = new ArrayList<>();
 
     public List<Object> getFormattedText() {
         return formattedText;

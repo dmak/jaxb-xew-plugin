@@ -18,20 +18,20 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element ref="{}type-of-message"/&gt;
- *         &lt;element ref="{}args"/&gt;
- *         &lt;element ref="{}class"/&gt;
- *         &lt;element ref="{}misc" minOccurs="0"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType>
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element ref="{}type-of-message"/>
+ *         <element ref="{}args"/>
+ *         <element ref="{}class"/>
+ *         <element ref="{}misc" minOccurs="0"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -49,13 +49,13 @@ public class PostOffice {
     protected Args args;
     @XmlElementWrapper(name = "class", required = true)
     @XmlElement(name = "name")
-    protected Collection<String> classes = new Vector<String>();
+    protected Collection<String> classes = new Vector<>();
     @XmlElementWrapper(name = "misc")
     @XmlAnyElement(lax = true)
-    protected Collection<Object> misc = new LinkedList<Object>();
+    protected Collection<Object> misc = new LinkedList<>();
     @XmlElementWrapper(name = "type-of-message", required = true)
     @XmlElement(name = "type")
-    protected Collection<String> typeOfMessages = new LinkedList<String>();
+    protected Collection<String> typeOfMessages = new LinkedList<>();
 
     /**
      * Gets the value of the args property.

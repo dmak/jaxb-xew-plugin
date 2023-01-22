@@ -32,6 +32,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link FamilyMember }
      * 
+     * @return
+     *     the new instance of {@link FamilyMember }
      */
     public FamilyMember createFamilyMember() {
         return new FamilyMember();
@@ -40,6 +42,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Family }
      * 
+     * @return
+     *     the new instance of {@link Family }
      */
     public Family createFamily() {
         return new Family();
@@ -48,6 +52,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link FamilyMember.Id }
      * 
+     * @return
+     *     the new instance of {@link FamilyMember.Id }
      */
     public FamilyMember.Id createFamilyMemberId() {
         return new FamilyMember.Id();

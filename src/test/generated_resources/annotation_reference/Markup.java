@@ -16,19 +16,19 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType name="markup"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *         &lt;element ref="{}br"/&gt;
- *         &lt;element ref="{}page"/&gt;
- *         &lt;element ref="{}para"/&gt;
- *       &lt;/choice&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="markup">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <choice maxOccurs="unbounded" minOccurs="0">
+ *         <element ref="{}br"/>
+ *         <element ref="{}page"/>
+ *         <element ref="{}para"/>
+ *       </choice>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -52,7 +52,7 @@ public class Markup {
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the Jakarta XML Binding object.
-     * This is why there is not a <CODE>set</CODE> method for the brOrPageOrPara property.
+     * This is why there is not a {@code set} method for the brOrPageOrPara property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
@@ -68,10 +68,12 @@ public class Markup {
      * {@link JAXBElement }{@code <}{@link Object }{@code >}
      * 
      * 
+     * @return
+     *     The value of the brOrPageOrPara property.
      */
     public List<Object> getBrOrPageOrPara() {
         if (brOrPageOrPara == null) {
-            brOrPageOrPara = new ArrayList<Object>();
+            brOrPageOrPara = new ArrayList<>();
         }
         return this.brOrPageOrPara;
     }

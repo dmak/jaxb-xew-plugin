@@ -12,18 +12,18 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
- * <pre>
- * &lt;complexType name="phoneNumberType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base="{}contactInfoType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="area-number" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="phone-number" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="phoneNumberType">
+ *   <complexContent>
+ *     <extension base="{}contactInfoType">
+ *       <sequence>
+ *         <element name="area-number" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         <element name="phone-number" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       </sequence>
+ *     </extension>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */

@@ -37,6 +37,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Para }
      * 
+     * @return
+     *     the new instance of {@link Para }
      */
     public Para createPara() {
         return new Para();
@@ -45,6 +47,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link Markup }
      * 
+     * @return
+     *     the new instance of {@link Markup }
      */
     public Markup createMarkup() {
         return new Markup();
@@ -53,6 +57,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link SearchEu }
      * 
+     * @return
+     *     the new instance of {@link SearchEu }
      */
     public SearchEu createSearchEu() {
         return new SearchEu();
@@ -61,6 +67,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link SearchMulti }
      * 
+     * @return
+     *     the new instance of {@link SearchMulti }
      */
     public SearchMulti createSearchMulti() {
         return new SearchMulti();
@@ -69,6 +77,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link ClassCommon }
      * 
+     * @return
+     *     the new instance of {@link ClassCommon }
      */
     public ClassCommon createClassCommon() {
         return new ClassCommon();
@@ -77,6 +87,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link ClassExt }
      * 
+     * @return
+     *     the new instance of {@link ClassExt }
      */
     public ClassExt createClassExt() {
         return new ClassExt();
@@ -85,6 +97,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link ClassesEu }
      * 
+     * @return
+     *     the new instance of {@link ClassesEu }
      */
     public ClassesEu createClassesEu() {
         return new ClassesEu();
@@ -93,6 +107,8 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link ClassesUs }
      * 
+     * @return
+     *     the new instance of {@link ClassesUs }
      */
     public ClassesUs createClassesUs() {
         return new ClassesUs();
@@ -108,7 +124,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "br")
     public JAXBElement<Object> createBr(Object value) {
-        return new JAXBElement<Object>(_Br_QNAME, Object.class, null, value);
+        return new JAXBElement<>(_Br_QNAME, Object.class, null, value);
     }
 
     /**
@@ -121,7 +137,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "page")
     public JAXBElement<Object> createPage(Object value) {
-        return new JAXBElement<Object>(_Page_QNAME, Object.class, null, value);
+        return new JAXBElement<>(_Page_QNAME, Object.class, null, value);
     }
 
 }
