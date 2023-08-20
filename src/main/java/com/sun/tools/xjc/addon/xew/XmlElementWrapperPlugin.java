@@ -904,12 +904,18 @@ public class XmlElementWrapperPlugin extends AbstractConfigurablePlugin {
 			}
 		}
 
-		if (classes.containsKey(clazz.name())) {
-			writeSummary("\tRenaming class " + clazz.fullName() + " to class " + parent.name() + clazz.name());
-			setPrivateField(clazz, "name", parent.name() + clazz.name());
+		// Rename the class in case there is class name collision.
+		// FIXME: Should that be doublechecked after renaming?
+		if (classes.containsKey(clazz.name()) || classes.containsKey(clazz.name().toUpperCase())) {
+			String newName = parent.name() + clazz.name();
+			writeSummary("\tRenaming class " + clazz.fullName() + " to class " + newName);
+			setPrivateField(clazz, "name", newName);
 		}
 
-		classes.put(clazz.name(), clazz);
+		// Special treatment for the case when "classes" map holds class names in upper case
+		// (true for case-sensitive filesystems, see usages of JCodeModel.isCaseSensitiveFileSystem):
+		boolean allClassNamesInUpperCase = classes.keySet().stream().allMatch(key -> key.equals(key.toUpperCase()));
+		classes.put(allClassNamesInUpperCase ? clazz.name().toUpperCase() : clazz.name(), clazz);
 
 		// Finally modify the class so that it refers back the container:
 		setPrivateField(clazz, "outer", grandParent);

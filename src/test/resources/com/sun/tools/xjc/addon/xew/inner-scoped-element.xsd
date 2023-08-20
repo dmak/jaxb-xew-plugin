@@ -16,7 +16,8 @@
 	<xsd:element name="catalogue">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="stockage_collection">
+                <!-- Also tests the scenario when element/class names collide within parent class. -->
+				<xsd:element name="stockage">
 					<xsd:complexType>
 						<xsd:sequence minOccurs="0">
 							<xsd:element name="stockage" minOccurs="0" maxOccurs="unbounded">

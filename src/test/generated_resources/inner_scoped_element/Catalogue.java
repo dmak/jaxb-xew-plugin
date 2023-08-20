@@ -24,7 +24,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="stockage_collection"&gt;
+ *         &lt;element name="stockage"&gt;
  *           &lt;complexType&gt;
  *             &lt;complexContent&gt;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
@@ -66,21 +66,21 @@ import jakarta.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "stockageCollection"
+    "stockage"
 })
 @XmlRootElement(name = "catalogue")
 public class Catalogue {
 
-    @XmlElementWrapper(name = "stockage_collection", required = true)
+    @XmlElementWrapper(required = true)
     @XmlElement(name = "stockage")
-    protected List<Catalogue.Stockage> stockageCollection = new ArrayList<Catalogue.Stockage>();
+    protected List<Catalogue.StockageStockage> stockage = new ArrayList<Catalogue.StockageStockage>();
 
-    public List<Catalogue.Stockage> getStockageCollection() {
-        return stockageCollection;
+    public List<Catalogue.StockageStockage> getStockage() {
+        return stockage;
     }
 
-    public void setStockageCollection(List<Catalogue.Stockage> stockageCollection) {
-        this.stockageCollection = stockageCollection;
+    public void setStockage(List<Catalogue.StockageStockage> stockage) {
+        this.stockage = stockage;
     }
 
 
@@ -118,7 +118,7 @@ public class Catalogue {
     @XmlType(name = "", propOrder = {
 
     })
-    public static class Stockage {
+    public static class StockageStockage {
 
         @XmlElementWrapper
         @XmlElementRefs({

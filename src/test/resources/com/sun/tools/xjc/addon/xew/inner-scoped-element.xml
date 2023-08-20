@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="inner-scoped-element.xsd">
-	<stockage_collection>
+	<stockage>
 		<stockage>
 			<collection>
 				<term>solar panels</term>
@@ -15,5 +15,5 @@
 				<effect>maintenance costs</effect>
 			</collection>
 		</stockage>
-	</stockage_collection>
+	</stockage>
 </catalogue>

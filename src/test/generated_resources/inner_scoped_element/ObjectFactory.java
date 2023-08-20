@@ -24,8 +24,8 @@ import jakarta.xml.bind.annotation.XmlRegistry;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _CatalogueStockageCollectionStockageCollectionEffect_QNAME = new QName("", "effect");
-    private final static QName _CatalogueStockageCollectionStockageCollectionTerm_QNAME = new QName("", "term");
+    private final static QName _CatalogueStockageStockageCollectionEffect_QNAME = new QName("", "effect");
+    private final static QName _CatalogueStockageStockageCollectionTerm_QNAME = new QName("", "term");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: inner_scoped_element
@@ -43,21 +43,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Catalogue.Stockage }
+     * Create an instance of {@link Catalogue.StockageStockage }
      * 
      */
-    public Catalogue.Stockage createCatalogueStockage() {
-        return new Catalogue.Stockage();
+    public Catalogue.StockageStockage createCatalogueStockageStockage() {
+        return new Catalogue.StockageStockage();
     }
 
-    @XmlElementDecl(namespace = "", name = "effect", scope = Catalogue.Stockage.class)
-    public JAXBElement<String> createCatalogueStockageEffect(String value) {
-        return new JAXBElement<String>(new QName("", "effect"), String.class, Catalogue.Stockage.class, value);
+    @XmlElementDecl(namespace = "", name = "effect", scope = Catalogue.StockageStockage.class)
+    public JAXBElement<String> createCatalogueStockageStockageEffect(String value) {
+        return new JAXBElement<String>(new QName("", "effect"), String.class, Catalogue.StockageStockage.class, value);
     }
 
-    @XmlElementDecl(namespace = "", name = "term", scope = Catalogue.Stockage.class)
-    public JAXBElement<String> createCatalogueStockageTerm(String value) {
-        return new JAXBElement<String>(new QName("", "term"), String.class, Catalogue.Stockage.class, value);
+    @XmlElementDecl(namespace = "", name = "term", scope = Catalogue.StockageStockage.class)
+    public JAXBElement<String> createCatalogueStockageStockageTerm(String value) {
+        return new JAXBElement<String>(new QName("", "term"), String.class, Catalogue.StockageStockage.class, value);
     }
 
 }
